@@ -1,0 +1,1 @@
+Note: The CTO progress tracker currently shows a blocker due to CI kickoff not yet triggered by QA. Action required: QA CI Kickoff (kickoff request) and kickoff progress; update CTO_progress with results and remediation plan.
