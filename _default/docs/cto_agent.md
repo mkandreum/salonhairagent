@@ -1,0 +1,14 @@
+CTO Agent Scaffold Overview
+- Purpose: A lightweight, testable CTO agent scaffold to keep momentum while we design deeper integrations (LangGraph/OpenAI).
+- Public contract: runAgent(config) returns:
+  - { config, plan, createdAt }
+- Plan structure:
+  - An array of steps with fields like { step: number, name: string, detail?: string }
+- How to run:
+  - Import and call runAgent({ objective: 'Your objective' }) to obtain a structured plan.
+  - Or execute the file directly to print a JSON payload for quick inspection.
+- Current status:
+  - Scaffold added at _default/src/index.js
+  - Tests added at _default/tests/ct_agent.test.js validating contract shape
+- Next work:
+  - Wire deeper automation logic later (LangGraph/OpenAI), add more tests for edge cases, integrate CI checks.
