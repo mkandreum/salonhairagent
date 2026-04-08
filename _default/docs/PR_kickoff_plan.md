@@ -17,3 +17,6 @@ Plan
 
 Owner
 - CTO / QA / DevOps
+- Status: Pending kickoff trigger by QA; awaiting CI results.
+- Next steps:
+- After kickoff completes, publish a summary of results and plan next steps.
