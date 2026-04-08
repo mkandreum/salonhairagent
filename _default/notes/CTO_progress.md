@@ -13,7 +13,8 @@ CTO Scaffold Progress
 - If CI failures occur, triage and implement fixes, then re-run.
 - Unblockers needed: QA to initiate CI kickoff; Boss Review slot confirmation.
 -
-- Blockers: QA kickoff not started. Assignment: QA to trigger CI kickoff for CTO scaffold via _default/tickets/qa_ci_cto_scaffold_kickoff.md with comment requesting: "Trigger CI kickoff for CTO scaffold (PR-based or direct push), attach logs and blockers if any." 
+- Blockers: QA kickoff not started. Assignment: QA to trigger CI kickoff for CTO scaffold via _default/tickets/qa_ci_cto_scaffold_kickoff.md with a comment requesting: "Please trigger CI kickoff for CTO scaffold (PR-based or direct push), attach logs and blockers if any." 
+- Status: Waiting on QA action. 
 - Status: Added a new blocker ticket to surface and track blockers.
 - Unblockers / Risks:
 - Need QA to initiate CI and provide logs. If access or credentials are needed for CI integration, request them via a blocking ticket.
