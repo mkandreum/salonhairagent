@@ -14,6 +14,8 @@ CTO Scaffold Progress
 - unblockers needed: QA to initiate CI; Boss Review slot confirmation
 -
 - Unblockers / Risks:
+- New unblock ticket created: _default/tickets/qa_ci_cto_scaffold_unblock.md to coordinate CI kickoff with QA/DevOps.
+- We are awaiting QA to trigger the CI run or provide trigger instructions.
 - Need QA to initiate CI and provide logs. If access or credentials are needed for CI integration, request them via a blocking ticket.
 - If Boss Review scheduling requires availability, propose a few time slots.
 -
