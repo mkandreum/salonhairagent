@@ -1,0 +1,30 @@
+{
+  "name": "process-automation-ai-agents",
+  "version": "1.0.0",
+  "description": "AI agent system for process automation",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "build": "echo \"No build step required\""
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "automation",
+    "langgraph"
+  ],
+  "author": "Process Automation Company",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/langgraph": "^0.0.18",
+    "@langchain/openai": "^0.0.13",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "nodemon": "^3.0.1"
+  }
+}
