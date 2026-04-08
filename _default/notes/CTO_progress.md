@@ -7,7 +7,14 @@ CTO Scaffold Progress
 - Schedule Boss Review and align on roadmap.
 - If CI failures occur, triage and implement fixes, then re-run.
 - unblockers needed: QA to initiate CI; Boss Review slot confirmation
+- Next steps:
+- Kick off CI run for CTO scaffold; collect results.
+- Schedule Boss Review and align on roadmap.
+- If CI failures occur, triage and implement fixes, then re-run.
+- Unblockers needed: QA to initiate CI kickoff; Boss Review slot confirmation.
 -
+- Blockers: QA kickoff not started. Assignment: QA to trigger CI kickoff for CTO scaffold via _default/tickets/qa_ci_cto_scaffold_kickoff.md with comment requesting: "Trigger CI kickoff for CTO scaffold (PR-based or direct push), attach logs and blockers if any." 
+- Status: Added a new blocker ticket to surface and track blockers.
 - Unblockers / Risks:
 - Need QA to initiate CI and provide logs. If access or credentials are needed for CI integration, request them via a blocking ticket.
 - If Boss Review scheduling requires availability, propose a few time slots.
