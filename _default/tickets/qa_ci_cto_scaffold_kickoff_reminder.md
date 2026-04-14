@@ -9,3 +9,8 @@ Action requested:
 
 Owner: QA / DevOps
 Priority: High
+
+- Note: If kickoff does not start within 24 hours, escalate to Boss Review and surface blockers in the unblock ticket.
+
+- Status: Assignment created for QA/DevOps to trigger kickoff; awaiting kickoff; 48h deadline.
+- Next steps: If kickoff not observed, escalate to Boss Review and surface blockers.

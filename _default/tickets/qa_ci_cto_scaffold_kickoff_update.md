@@ -4,6 +4,8 @@ Description:
 - This ticket tracks the status and blockers for kicking off CI against the CTO scaffold.
 
 Status: Pending
+ETA: 48 hours from assignment
+- Last Update: kickoff not started yet; ETA unchanged.
 Owner: QA / DevOps
 Next Actions:
 - Trigger CI kickoff (PR-based or direct push) and attach logs.

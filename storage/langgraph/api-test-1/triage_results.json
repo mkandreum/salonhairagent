@@ -1,0 +1,9 @@
+[
+  {
+    "ticket_id": "API-TEST-1",
+    "category": "bug",
+    "priority": "high",
+    "route": "tier1",
+    "subject": "URGENT: Password reset not working"
+  }
+]

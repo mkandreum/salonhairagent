@@ -1,20 +1,11 @@
-FROM node:20-slim
-
+FROM python:3.11-slim
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm ci --only=production
+COPY automation /app/automation
+COPY samples /app/samples
 
-# Copy source code
-COPY . .
+RUN python3 -m pip install --no-cache-dir --upgrade pip
+RUN python3 -m pip install --no-cache-dir -r /app/automation/requirements.txt
 
-# Create non-root user
-RUN useradd -m appuser
-USER appuser
-
-# Expose port
-EXPOSE 3000
-
-# Start application
-CMD ["npm", "start"]
+# Default command: run the API
+CMD ["python3", "/app/automation/api.py"]

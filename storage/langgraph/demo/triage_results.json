@@ -1,0 +1,30 @@
+[
+  {
+    "ticket_id": "DEMO1",
+    "category": "auth",
+    "priority": "high",
+    "route": "tier1",
+    "subject": "URGENT: Can't access my account"
+  },
+  {
+    "ticket_id": "DEMO2",
+    "category": "bug",
+    "priority": "medium",
+    "route": "tier2",
+    "subject": "Bug report: App freezes"
+  },
+  {
+    "ticket_id": "DEMO3",
+    "category": "feature",
+    "priority": "low",
+    "route": "tier2",
+    "subject": "Feature suggestion"
+  },
+  {
+    "ticket_id": "DEMO4",
+    "category": "general",
+    "priority": "normal",
+    "route": "tier2",
+    "subject": "Billing question"
+  }
+]
