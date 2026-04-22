@@ -9,6 +9,20 @@ import os
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def index():
+    """Root endpoint — returns API overview."""
+    return jsonify({
+        "service": "Salon Hair Agent — Ticket Triage API",
+        "version": "1.0.0",
+        "endpoints": {
+            "health": "GET /health",
+            "triage": "POST /triage",
+            "demo": "GET /demo",
+            "stats": "GET /stats"
+        }
+    })
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint."""
