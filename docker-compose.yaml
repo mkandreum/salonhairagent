@@ -14,7 +14,7 @@ services:
     networks:
       - salon-network
     healthcheck:
-      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:3000/health')\" || exit 1"]
+      test: ["CMD-SHELL", "python3 -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:3000/health\")'"]
       interval: 30s
       timeout: 10s
       retries: 5
