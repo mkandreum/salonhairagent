@@ -86,8 +86,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
               </div>
             </div>
           </div>
-        </div>  </div>
-
+        </div>
         <div>
           <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 text-sm uppercase tracking-wider">Distribución de Servicios</h3>
           <div className="h-64">
