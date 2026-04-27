@@ -37,3 +37,42 @@ export async function fetchTriage() {
   return res.json();
 }
 
+export async function fetchNotifications() {
+  const res = await fetch(`${API_BASE}/notifications`);
+  return res.json();
+}
+
+export async function markNotificationRead(id: number) {
+  const res = await fetch(`${API_BASE}/notifications/${id}/read`, { method: 'POST' });
+  return res.json();
+}
+
+export async function deleteNotification(id: number) {
+  const res = await fetch(`${API_BASE}/notifications/${id}`, { method: 'DELETE' });
+  return res.json();
+}
+
+export async function fetchAnalytics() {
+  const res = await fetch(`${API_BASE}/analytics`);
+  return res.json();
+}
+
+export async function createAppointment(data: any) {
+  const res = await fetch(`${API_BASE}/appointments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function createClient(data: any) {
+  const res = await fetch(`${API_BASE}/clients`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+

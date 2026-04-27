@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus } from 'lucide-react'
-import { fetchAppointments } from '@/lib/api'
+import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus, X } from 'lucide-react'
+import { fetchAppointments, createAppointment, fetchClients, fetchStylists } from '@/lib/api'
 
 interface Appointment {
   id: number
@@ -20,16 +20,51 @@ interface AppointmentCalendarProps {
 export default function AppointmentCalendar({ fullView = false }: AppointmentCalendarProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [clients, setClients] = useState<any[]>([])
+  const [stylists, setStylists] = useState<any[]>([])
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    client_id: '',
+    stylist_id: '',
+    service: '',
+    time: ''
+  })
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const [apps, cls, sts] = await Promise.all([
+        fetchAppointments(),
+        fetchClients(),
+        fetchStylists()
+      ])
+      setAppointments(apps)
+      setClients(cls)
+      setStylists(sts)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    fetchAppointments().then(data => {
-      setAppointments(data)
-      setLoading(false)
-    }).catch(err => {
-      console.error("Failed to fetch appointments", err)
-      setLoading(false)
-    })
+    loadData()
   }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await createAppointment(formData)
+      setIsModalOpen(false)
+      loadData() // Refresh
+      setFormData({ client_id: '', stylist_id: '', service: '', time: '' })
+    } catch (err) {
+      alert('Error al crear la cita')
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -40,10 +75,10 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
     }
   }
 
-  if (loading) return <div className="glass-card p-8 animate-pulse h-[400px]" />
+  if (loading && appointments.length === 0) return <div className="glass-card p-8 animate-pulse h-[400px]" />
 
   return (
-    <div className="glass-card p-8">
+    <div className="glass-card p-8 relative">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
@@ -54,11 +89,84 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Lunes, 27 de Abril</p>
           </div>
         </div>
-        <button className="btn-premium py-2 px-4 text-sm">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn-premium py-2 px-4 text-sm"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Nueva Cita
         </button>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Nueva Cita</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Cliente</label>
+                <select 
+                  required
+                  value={formData.client_id}
+                  onChange={e => setFormData({...formData, client_id: e.target.value})}
+                  className="input-premium py-2"
+                >
+                  <option value="">Seleccionar cliente</option>
+                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Estilista</label>
+                <select 
+                  required
+                  value={formData.stylist_id}
+                  onChange={e => setFormData({...formData, stylist_id: e.target.value})}
+                  className="input-premium py-2"
+                >
+                  <option value="">Seleccionar estilista</option>
+                  {stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Servicio</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="Ej: Corte"
+                    value={formData.service}
+                    onChange={e => setFormData({...formData, service: e.target.value})}
+                    className="input-premium py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Hora</label>
+                  <input 
+                    type="time" 
+                    required
+                    value={formData.time}
+                    onChange={e => setFormData({...formData, time: e.target.value})}
+                    className="input-premium py-2"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="btn-premium w-full mt-6 py-3">
+                Crear Cita
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
 
       <div className="overflow-x-auto">
         <table className="w-full">

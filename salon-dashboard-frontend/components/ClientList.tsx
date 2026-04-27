@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Phone, Mail, Calendar, MoreVertical, Plus, Search } from 'lucide-react'
-import { fetchClients } from '@/lib/api'
+import { User, Phone, Mail, Calendar, MoreVertical, Plus, Search, X } from 'lucide-react'
+import { fetchClients, createClient } from '@/lib/api'
 
 interface Client {
   id: number
@@ -22,22 +22,49 @@ export default function ClientList({ fullView = false }: ClientListProps) {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  })
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const data = await fetchClients()
+      setClients(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    fetchClients().then(data => {
-      setClients(data)
-      setLoading(false)
-    }).catch(err => {
-      console.error("Failed to fetch clients", err)
-      setLoading(false)
-    })
+    loadData()
   }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await createClient(formData)
+      setIsModalOpen(false)
+      loadData()
+      setFormData({ name: '', email: '', phone: '' })
+    } catch (err) {
+      alert('Error al añadir el cliente')
+    }
+  }
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.phone.includes(searchQuery)
+    (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (client.phone && client.phone.includes(searchQuery))
   )
+
 
   if (loading) return <div className="glass-card p-8 animate-pulse h-[400px]" />
 
@@ -64,12 +91,70 @@ export default function ClientList({ fullView = false }: ClientListProps) {
               className="input-premium py-2 pl-9 pr-4 text-sm w-48"
             />
           </div>
-          <button className="btn-premium py-2 px-4 text-sm">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn-premium py-2 px-4 text-sm"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Añadir
           </button>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Añadir Cliente</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Nombre</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Nombre del cliente"
+                  value={formData.name}
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email</label>
+                <input 
+                  type="email" 
+                  required
+                  placeholder="email@ejemplo.com"
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Teléfono</label>
+                <input 
+                  type="text" 
+                  placeholder="+34 600 000 000"
+                  value={formData.phone}
+                  onChange={e => setFormData({...formData, phone: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+
+              <button type="submit" className="btn-premium w-full mt-6 py-3">
+                Guardar Cliente
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
 
       <div className="overflow-x-auto">
         <table className="w-full">

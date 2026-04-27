@@ -1,30 +1,25 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts'
-
-const revenueData = [
-  { month: 'Ene', revenue: 4200, appointments: 120 },
-  { month: 'Feb', revenue: 5200, appointments: 145 },
-  { month: 'Mar', revenue: 6100, appointments: 168 },
-  { month: 'Abr', revenue: 5800, appointments: 152 },
-  { month: 'May', revenue: 7200, appointments: 195 },
-  { month: 'Jun', revenue: 6800, appointments: 182 },
-]
-
-const serviceData = [
-  { name: 'Corte', value: 45, color: '#6366f1' },
-  { name: 'Color', value: 25, color: '#ec4899' },
-  { name: 'Peinado', value: 15, color: '#10b981' },
-  { name: 'Tratamiento', value: 10, color: '#f59e0b' },
-  { name: 'Otros', value: 5, color: '#8b5cf6' },
-]
+import { fetchAnalytics } from '@/lib/api'
 
 interface AnalyticsDashboardProps {
   fullView?: boolean
 }
 
 export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashboardProps) {
+  const [data, setData] = useState<{revenueData: any[], serviceData: any[]} | null>(null)
+
+  useEffect(() => {
+    fetchAnalytics().then(setData)
+  }, [])
+
+  if (!data) return <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+
+  const { revenueData, serviceData } = data
+
   return (
     <div className="glass-card p-8">
       <div className="flex items-center justify-between mb-8">

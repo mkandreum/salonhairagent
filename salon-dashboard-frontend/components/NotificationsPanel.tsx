@@ -1,7 +1,7 @@
 'use client'
 
-import { Bell, CheckCircle, AlertCircle, Info, X, Trash2, CheckCheck } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { fetchNotifications, markNotificationRead, deleteNotification as apiDeleteNotification } from '@/lib/api'
 
 interface Notification {
   id: number
@@ -12,17 +12,15 @@ interface Notification {
   read: boolean
 }
 
-const initialNotifications: Notification[] = [
-  { id: 1, type: 'success', title: 'Cita Confirmada', message: 'Sarah Johnson confirmó su cita de las 2:00 PM', time: 'hace 10 min', read: false },
-  { id: 2, type: 'warning', title: 'Alerta: No se presentó', message: 'Michael Brown no asistió a su cita de las 11:00 AM', time: 'hace 1 hora', read: false },
-  { id: 3, type: 'info', title: 'Nuevo Cliente Registrado', message: 'Lisa Anderson se registró vía WhatsApp', time: 'hace 2 horas', read: true },
-  { id: 4, type: 'success', title: 'Pago Recibido', message: 'Pago de $85 recibido de Robert Taylor', time: 'hace 3 horas', read: true },
-  { id: 5, type: 'warning', title: 'Inventario Bajo', message: 'Stock de tinte capilar bajo', time: 'hace 5 horas', read: true },
-]
-
 export default function NotificationsPanel() {
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchNotifications().then(setNotifications)
+    }
+  }, [isOpen])
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -33,19 +31,25 @@ export default function NotificationsPanel() {
     }
   }
 
-  const markAsRead = (id: number) => {
+  const markAsRead = async (id: number) => {
+    await markNotificationRead(id)
     setNotifications(notifications.map(notification =>
       notification.id === id ? { ...notification, read: true } : notification
     ))
   }
 
-  const deleteNotification = (id: number) => {
+  const deleteNotification = async (id: number) => {
+    await apiDeleteNotification(id)
     setNotifications(notifications.filter(notification => notification.id !== id))
   }
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    for (const n of notifications) {
+      if (!n.read) await markNotificationRead(n.id)
+    }
     setNotifications(notifications.map(notification => ({ ...notification, read: true })))
   }
+
 
   const unreadCount = notifications.filter(n => !n.read).length
 

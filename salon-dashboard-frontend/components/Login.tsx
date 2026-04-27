@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { Scissors, Mail, Lock, ArrowRight, Github, Chrome, Users } from 'lucide-react'
 
 interface LoginProps {
-  onLogin: () => void
+  onLogin: (user: any) => void
 }
+
 
 export default function Login({ onLogin }: LoginProps) {
   const [isLogin, setIsLogin] = useState(true)
@@ -44,8 +45,9 @@ export default function Login({ onLogin }: LoginProps) {
         return
       }
 
-      onLogin()
+      onLogin(data.user)
     } catch (err: any) {
+
       setError(err.message)
       setLoading(false)
     }

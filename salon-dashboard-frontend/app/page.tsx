@@ -13,12 +13,22 @@ import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('dashboard')
 
-  if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />
+  const handleLogin = (userData: any) => {
+    setUser(userData)
   }
+
+  const handleLogout = () => {
+    setUser(null)
+  }
+
+  if (!user) {
+    return <Login onLogin={handleLogin} />
+  }
+
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -53,9 +63,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
       <div className="flex-1 ml-72 flex flex-col min-h-screen">
-        <Header />
+        <Header user={user} onLogout={handleLogout} />
+
         <main className="p-8 flex-1">
           <div className="max-w-[1600px] mx-auto">
             <div className="mb-8">

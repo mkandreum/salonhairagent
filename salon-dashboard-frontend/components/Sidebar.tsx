@@ -17,7 +17,9 @@ import {
 interface SidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
+  onLogout: () => void
 }
+
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
@@ -31,8 +33,9 @@ const menuItems = [
 ]
 
 
-export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarProps) {
   return (
+
     <aside className="fixed left-0 top-0 h-screen w-72 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800 z-50 transition-all duration-300">
       <div className="p-8">
         <div className="flex items-center space-x-4 group cursor-pointer">
@@ -74,7 +77,10 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             <div className="bg-indigo-600 h-full w-3/4 rounded-full" />
           </div>
         </div>
-        <button className="nav-item w-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 dark:hover:text-red-400">
+        <button 
+          onClick={onLogout}
+          className="nav-item w-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 dark:hover:text-red-400"
+        >
           <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
             <LogOut className="w-5 h-5" />
           </div>

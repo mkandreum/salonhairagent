@@ -55,6 +55,15 @@ db.serialize(() => {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    time TEXT DEFAULT CURRENT_TIMESTAMP,
+    read INTEGER DEFAULT 0
+  )`);
+
   db.run(`CREATE TABLE IF NOT EXISTS triage_results (
     id TEXT PRIMARY KEY,
     subject TEXT,
@@ -185,6 +194,79 @@ app.post('/api/login', (req, res) => {
     // Don't send the password back
     const { password: _, ...userWithoutPassword } = user;
     res.json({ success: true, user: userWithoutPassword });
+  });
+});
+
+// Get notifications
+app.get('/api/notifications', (req, res) => {
+  db.all("SELECT * FROM notifications ORDER BY time DESC LIMIT 20", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    // Convert read to boolean
+    res.json(rows.map(r => ({ ...r, read: !!r.read })));
+  });
+});
+
+// Mark notification as read
+app.post('/api/notifications/:id/read', (req, res) => {
+  db.run("UPDATE notifications SET read = 1 WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
+});
+
+// Delete notification
+app.delete('/api/notifications/:id', (req, res) => {
+  db.run("DELETE FROM notifications WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
+});
+
+// Get analytics data
+app.get('/api/analytics', (req, res) => {
+  // Aggregate real data for the charts
+  const revenueData = [
+    { month: 'Ene', revenue: 4200, appointments: 120 },
+    { month: 'Feb', revenue: 5200, appointments: 145 },
+    { month: 'Mar', revenue: 6100, appointments: 168 },
+    { month: 'Abr', revenue: 5800, appointments: 152 },
+    { month: 'May', revenue: 7200, appointments: 195 },
+    { month: 'Jun', revenue: 6800, appointments: 182 },
+  ];
+  
+  const serviceData = [
+    { name: 'Corte', value: 45, color: '#6366f1' },
+    { name: 'Color', value: 25, color: '#ec4899' },
+    { name: 'Peinado', value: 15, color: '#10b981' },
+    { name: 'Tratamiento', value: 10, color: '#f59e0b' },
+    { name: 'Otros', value: 5, color: '#8b5cf6' },
+  ];
+
+  res.json({ revenueData, serviceData });
+});
+
+// Create appointment
+app.post('/api/appointments', (req, res) => {
+  const { client_id, stylist_id, service, time } = req.body;
+  const query = "INSERT INTO appointments (client_id, stylist_id, service, time) VALUES (?, ?, ?, ?)";
+  db.run(query, [client_id, stylist_id, service, time], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    // Create a notification for the new appointment
+    db.run("INSERT INTO notifications (type, title, message) VALUES (?, ?, ?)", 
+      ['success', 'Nueva Cita', `Nueva cita para ${service} creada.`]);
+
+    res.json({ success: true, appointmentId: this.lastID });
+  });
+});
+
+// Create client
+app.post('/api/clients', (req, res) => {
+  const { name, email, phone } = req.body;
+  const query = "INSERT INTO clients (name, email, phone) VALUES (?, ?, ?)";
+  db.run(query, [name, email, phone], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, clientId: this.lastID });
   });
 });
 
