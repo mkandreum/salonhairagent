@@ -342,6 +342,7 @@ app.post('/api/login', (req, res) => {
       const { password: _, ...userWithoutPassword } = user;
       res.json({ success: true, user: userWithoutPassword, token });
     } catch (e) {
+      console.error('Login error:', e);
       res.status(500).json({ error: 'Error al procesar las credenciales' });
     }
   });
@@ -637,7 +638,7 @@ app.put('/api/stylists/:id', authenticateToken, (req, res) => {
   });
 });
 
-// Global error handler - must be after all routes
+// Global error handler - must be registered after all routes
 app.use((err, req, res, next) => {
   console.error('ERROR:', err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
