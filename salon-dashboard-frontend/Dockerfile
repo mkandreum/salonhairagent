@@ -18,6 +18,11 @@ COPY . .
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Allow the API URL to be injected at build time so that
+# next.config.js rewrites are compiled with the correct backend URL.
+ARG NEXT_PUBLIC_API_URL=http://localhost:3000
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Build the application
 RUN npm run build
 

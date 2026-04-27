@@ -331,15 +331,19 @@ app.post('/api/login', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
     
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: 'Credenciales inválidas' });
+    try {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) return res.status(401).json({ error: 'Credenciales inválidas' });
 
-    // Generate token
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '8h' });
+      // Generate token
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '8h' });
 
-    // Don't send the password back
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ success: true, user: userWithoutPassword, token });
+      // Don't send the password back
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ success: true, user: userWithoutPassword, token });
+    } catch (e) {
+      res.status(500).json({ error: 'Error al procesar las credenciales' });
+    }
   });
 });
 
@@ -633,13 +637,13 @@ app.put('/api/stylists/:id', authenticateToken, (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Salon Backend running at http://localhost:${port}`);
-});
-
-// Global error handler - must be LAST
+// Global error handler - must be after all routes
 app.use((err, req, res, next) => {
   console.error('ERROR:', err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+app.listen(port, () => {
+  console.log(`Salon Backend running at http://localhost:${port}`);
 });
 

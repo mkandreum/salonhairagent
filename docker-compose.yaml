@@ -30,6 +30,8 @@ services:
     build:
       context: ./salon-dashboard-frontend
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:3000
     restart: always
     expose:
       - "3000"
