@@ -7,5 +7,7 @@ COPY samples /app/samples
 RUN python3 -m pip install --no-cache-dir --upgrade pip
 RUN python3 -m pip install --no-cache-dir -r /app/automation/requirements.txt
 
+EXPOSE 3000
+
 # Default command: run the API
 CMD ["python3", "/app/automation/api.py"]

@@ -3,18 +3,28 @@ version: '3.8'
 services:
   backend:
     build: .
+    restart: always
     volumes:
       - ./samples:/app/samples
       - ./storage:/app/storage
     expose:
-      - "5000"
+      - "3000"
     environment:
-      - PORT=5000
+      - PORT=3000
+    networks:
+      - salon-network
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:3000/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
   frontend:
-    build: 
+    build:
       context: ./salon-dashboard-frontend
       dockerfile: Dockerfile
+    restart: always
     expose:
       - "3000"
     environment:
@@ -22,4 +32,13 @@ services:
       - PORT=3000
       - HOSTNAME=0.0.0.0
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    networks:
+      - salon-network
+    labels:
+      - "coolify.managed=true"
+
+networks:
+  salon-network:
+    driver: bridge
