@@ -47,6 +47,14 @@ db.serialize(() => {
     FOREIGN KEY(stylist_id) REFERENCES stylists(id)
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   db.run(`CREATE TABLE IF NOT EXISTS triage_results (
     id TEXT PRIMARY KEY,
     subject TEXT,
@@ -144,6 +152,41 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
+
+// Authentication Endpoints
+
+// Register a new user
+app.post('/api/register', (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  const query = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+  db.run(query, [name, email, password], function(err) {
+    if (err) {
+      if (err.message.includes('UNIQUE constraint failed')) {
+        return res.status(400).json({ error: 'El email ya está registrado' });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ success: true, userId: this.lastID });
+  });
+});
+
+// Login
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  const query = "SELECT * FROM users WHERE email = ? AND password = ?";
+  db.get(query, [email, password], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+    
+    // Don't send the password back
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({ success: true, user: userWithoutPassword });
+  });
+});
 
 // Get triage results
 app.get('/api/triage', (req, res) => {

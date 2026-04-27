@@ -13,16 +13,44 @@ export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // Simulate auth
-    setTimeout(() => {
-      setLoading(false)
+    setError('')
+    
+    const endpoint = isLogin ? '/api/login' : '/api/register'
+    const body = isLogin ? { email, password } : { name, email, password }
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      
+      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Algo salió mal')
+      }
+
+      // If it was registration, automatically log in or switch to login
+      if (!isLogin) {
+        setIsLogin(true)
+        setLoading(false)
+        alert('Cuenta creada con éxito. Ahora puedes iniciar sesión.')
+        return
+      }
+
       onLogin()
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message)
+      setLoading(false)
+    }
   }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
@@ -44,7 +72,14 @@ export default function Login({ onLogin }: LoginProps) {
           </p>
         </div>
 
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-in shake duration-500">
+            <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
+
           {!isLogin && (
             <div className="animate-in fade-in slide-in-from-top-4 duration-300">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Nombre Completo</label>
