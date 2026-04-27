@@ -37,15 +37,15 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
-      fetchSettings().then(data => {
-        if (Object.keys(data).length > 0) {
+      fetchSettings().then((data: any) => {
+        if (data && Object.keys(data).length > 0) {
           setSettings(prev => ({ ...prev, ...data }))
         }
       })
     }
   }, [user])
 
-  const toggleSetting = (key: keyof typeof settings) => {
+  const toggleSetting = (key: 'darkMode' | 'notifications' | 'emailReports') => {
     const newVal = !settings[key]
     const newSettings = { ...settings, [key]: newVal }
     setSettings(newSettings)
