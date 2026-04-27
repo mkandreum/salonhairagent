@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Scissors, Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react'
+import { Scissors, Mail, Lock, ArrowRight, Github, Chrome, Users } from 'lucide-react'
 
 interface LoginProps {
   onLogin: () => void
