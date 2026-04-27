@@ -7,19 +7,21 @@ import { fetchAnalytics } from '@/lib/api'
 
 interface AnalyticsDashboardProps {
   fullView?: boolean
+  onViewAll?: () => void
 }
 
-export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashboardProps) {
-  const [data, setData] = useState<{revenueData: any[], serviceData: any[]} | null>(null)
+export default function AnalyticsDashboard({ fullView = false, onViewAll }: AnalyticsDashboardProps) {
+  const [data, setData] = useState<{revenueData: any[], serviceData: any[], totalRevenue: number, totalAppointments: number} | null>(null)
+  const [timeRange, setTimeRange] = useState('Últimos 30 días')
 
   useEffect(() => {
     fetchAnalytics().then(setData)
-  }, [])
+  }, [timeRange])
 
   if (!data) return <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
 
-  const { revenueData, serviceData } = data
-
+  const { revenueData, serviceData, totalRevenue, totalAppointments } = data as any
+  
   return (
     <div className="glass-card p-8">
       <div className="flex items-center justify-between mb-8">
@@ -32,7 +34,11 @@ export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashbo
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Rendimiento mensual</p>
           </div>
         </div>
-        <select className="input-premium py-2 px-4 text-xs font-bold w-40">
+        <select 
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value)}
+          className="input-premium py-2 px-4 text-xs font-bold w-40"
+        >
           <option>Últimos 7 días</option>
           <option>Últimos 30 días</option>
           <option>Últimos 3 meses</option>
@@ -65,7 +71,7 @@ export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashbo
           <div className="flex items-center justify-between mt-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
             <div>
               <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Total Ingresos</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white">$35,300</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white">${(totalRevenue || 0).toLocaleString()}</p>
               <div className="flex items-center text-emerald-500 text-xs font-bold mt-1">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 <span>+12.5% vs mes anterior</span>
@@ -73,14 +79,14 @@ export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashbo
             </div>
             <div className="text-right">
               <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Citas Totales</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white">962</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white">{(totalAppointments || 0).toLocaleString()}</p>
               <div className="flex items-center text-emerald-500 text-xs font-bold mt-1 justify-end">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 <span>+8.2% vs mes anterior</span>
               </div>
             </div>
           </div>
-        </div>
+        </div>  </div>
 
         <div>
           <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 text-sm uppercase tracking-wider">Distribución de Servicios</h3>
@@ -126,7 +132,10 @@ export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashbo
 
       {!fullView && (
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors">
+          <button 
+            onClick={onViewAll || (() => alert('Generando informe detallado...'))}
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
+          >
             Ver informes detallados →
           </button>
         </div>

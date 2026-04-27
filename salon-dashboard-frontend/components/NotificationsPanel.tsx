@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Bell, CheckCircle, AlertCircle, Info, X, Trash2, CheckCheck } from 'lucide-react'
 import { fetchNotifications, markNotificationRead, deleteNotification as apiDeleteNotification } from '@/lib/api'
 
 interface Notification {

@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus, X } from 'lucide-react'
-import { fetchAppointments, createAppointment, fetchClients, fetchStylists } from '@/lib/api'
+import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus, X, Trash2, Check, AlertCircle } from 'lucide-react'
+import { fetchAppointments, createAppointment, fetchClients, fetchStylists, deleteAppointment as apiDeleteAppointment, updateAppointmentStatus } from '@/lib/api'
+
 
 interface Appointment {
   id: number
@@ -15,9 +16,11 @@ interface Appointment {
 
 interface AppointmentCalendarProps {
   fullView?: boolean
+  onViewAll?: () => void
+  searchQuery?: string
 }
 
-export default function AppointmentCalendar({ fullView = false }: AppointmentCalendarProps) {
+export default function AppointmentCalendar({ fullView = false, onViewAll, searchQuery = '' }: AppointmentCalendarProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -66,6 +69,32 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
     }
   }
 
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+      try {
+        await apiDeleteAppointment(id)
+        loadData()
+      } catch (err) {
+        alert('Error al eliminar la cita')
+      }
+    }
+  }
+
+  const handleStatusChange = async (id: number, currentStatus: string) => {
+    const nextStatus: Record<string, string> = {
+      'pending': 'confirmed',
+      'confirmed': 'cancelled',
+      'cancelled': 'pending'
+    }
+    const status = nextStatus[currentStatus] || 'pending'
+    try {
+      await updateAppointmentStatus(id, status)
+      loadData()
+    } catch (err) {
+      alert('Error al actualizar el estado')
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
@@ -74,6 +103,12 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
       default: return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
     }
   }
+
+  const filteredAppointments = appointments.filter(a => 
+    a.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    a.service.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    a.stylist.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   if (loading && appointments.length === 0) return <div className="glass-card p-8 animate-pulse h-[400px]" />
 
@@ -181,7 +216,7 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-            {appointments.map((appointment) => (
+            {filteredAppointments.map((appointment) => (
               <tr key={appointment.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                 <td className="py-4 px-2">
                   <div className="flex items-center space-x-2">
@@ -205,24 +240,34 @@ export default function AppointmentCalendar({ fullView = false }: AppointmentCal
                   </div>
                 </td>
                 <td className="py-4 px-2">
-                  <span className={`px-3 py-1 rounded-lg text-xs font-bold ${getStatusColor(appointment.status)}`}>
+                  <button 
+                    onClick={() => handleStatusChange(appointment.id, appointment.status)}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105 active:scale-95 ${getStatusColor(appointment.status)}`}
+                  >
                     {appointment.status.toUpperCase()}
-                  </span>
-                </td>
-                <td className="py-4 px-2 text-right">
-                  <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-all shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-600 opacity-0 group-hover:opacity-100">
-                    <MoreVertical className="w-5 h-5 text-slate-400" />
                   </button>
                 </td>
+                <td className="py-4 px-2 text-right">
+                  <button 
+                    onClick={() => handleDelete(appointment.id)}
+                    className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all shadow-sm border border-transparent hover:border-rose-100 dark:hover:border-rose-900/20 opacity-0 group-hover:opacity-100 text-rose-500"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {!fullView && (
+      {!fullView && onViewAll && (
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors">
+          <button 
+            onClick={onViewAll}
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
+          >
             Ver todas las citas →
           </button>
         </div>

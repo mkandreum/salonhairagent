@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Scissors, Clock, CheckCircle, XCircle, MoreVertical, Star, Plus, MessageSquare, Calendar } from 'lucide-react'
-import { fetchStylists } from '@/lib/api'
+import { Scissors, Clock, CheckCircle, XCircle, MoreVertical, Star, Plus, MessageSquare, Calendar, X, Trash2 } from 'lucide-react'
+import { fetchStylists, createStylist, deleteStylist as apiDeleteStylist } from '@/lib/api'
 
 interface Stylist {
   id: number
@@ -16,13 +16,24 @@ interface Stylist {
 
 interface StylistScheduleProps {
   fullView?: boolean
+  onViewAll?: () => void
+  searchQuery?: string
 }
 
-export default function StylistSchedule({ fullView = false }: StylistScheduleProps) {
+export default function StylistSchedule({ fullView = false, onViewAll, searchQuery = '' }: StylistScheduleProps) {
   const [stylists, setStylists] = useState<Stylist[]>([])
   const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    specialization: '',
+    rating: 5.0,
+    availability: 'available',
+    next_available: 'Ahora'
+  })
 
-  useEffect(() => {
+  const loadData = () => {
+    setLoading(true)
     fetchStylists().then(data => {
       setStylists(data)
       setLoading(false)
@@ -30,7 +41,39 @@ export default function StylistSchedule({ fullView = false }: StylistSchedulePro
       console.error("Failed to fetch stylists", err)
       setLoading(false)
     })
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await createStylist(formData)
+      setIsModalOpen(false)
+      loadData()
+      setFormData({ name: '', specialization: '', rating: 5.0, availability: 'available', next_available: 'Ahora' })
+    } catch (err) {
+      alert('Error al añadir estilista')
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este estilista?')) {
+      try {
+        await apiDeleteStylist(id)
+        loadData()
+      } catch (err) {
+        alert('Error al eliminar estilista')
+      }
+    }
+  }
+
+  const filteredStylists = stylists.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
@@ -64,14 +107,60 @@ export default function StylistSchedule({ fullView = false }: StylistSchedulePro
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Disponibilidad en tiempo real</p>
           </div>
         </div>
-        <button className="btn-premium py-2 px-4 text-sm">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn-premium py-2 px-4 text-sm"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Añadir Estilista
         </button>
       </div>
 
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Añadir Estilista</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Nombre</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Nombre completo"
+                  value={formData.name}
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Especialidad</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Ej: Coloración, Corte"
+                  value={formData.specialization}
+                  onChange={e => setFormData({...formData, specialization: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+
+              <button type="submit" className="btn-premium w-full mt-6 py-3">
+                Guardar Estilista
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {stylists.map((stylist) => (
+        {filteredStylists.map((stylist) => (
           <div key={stylist.id} className="p-6 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500/50 transition-all group">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
@@ -96,9 +185,22 @@ export default function StylistSchedule({ fullView = false }: StylistSchedulePro
                   </div>
                 </div>
               </div>
-              <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-all">
-                <MoreVertical className="w-5 h-5 text-slate-400" />
-              </button>
+              <div className="flex flex-col space-y-1">
+                <button 
+                  onClick={() => handleDelete(stylist.id)}
+                  className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all text-rose-500 opacity-0 group-hover:opacity-100"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <div className="relative group/menu">
+                  <button 
+                    onClick={() => alert('Opciones de Estilista: \n- Editar Perfil\n- Ver Estadísticas\n- Desactivar Temporalmente')}
+                    className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-all"
+                  >
+                    <MoreVertical className="w-4 h-4 text-slate-400" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4">
@@ -113,11 +215,17 @@ export default function StylistSchedule({ fullView = false }: StylistSchedulePro
             </div>
 
             <div className="mt-6 flex space-x-3">
-              <button className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2">
+              <button 
+                onClick={() => alert(`Agendando cita con ${stylist.name}...`)}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2"
+              >
                 <Calendar className="w-4 h-4" />
                 <span>Agendar</span>
               </button>
-              <button className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2">
+              <button 
+                onClick={() => alert(`Abriendo chat con ${stylist.name}...`)}
+                className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2"
+              >
                 <MessageSquare className="w-4 h-4" />
                 <span>Mensaje</span>
               </button>
@@ -126,9 +234,12 @@ export default function StylistSchedule({ fullView = false }: StylistSchedulePro
         ))}
       </div>
 
-      {!fullView && (
+      {!fullView && onViewAll && (
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors">
+          <button 
+            onClick={onViewAll}
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
+          >
             Ver todo el equipo →
           </button>
         </div>

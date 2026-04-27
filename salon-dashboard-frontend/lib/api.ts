@@ -75,4 +75,47 @@ export async function createClient(data: any) {
   return res.json();
 }
 
+export async function deleteAppointment(id: number) {
+  const res = await fetch(`${API_BASE}/appointments/${id}`, { method: 'DELETE' });
+  return res.json();
+}
+
+export async function updateAppointmentStatus(id: number, status: string) {
+  const res = await fetch(`${API_BASE}/appointments/${id}/status`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  return res.json();
+}
+
+export async function updateClient(id: number, data: any) {
+  const res = await fetch(`${API_BASE}/clients/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function createStylist(data: any) {
+  const res = await fetch(`${API_BASE}/stylists`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function deleteStylist(id: number) {
+  const res = await fetch(`${API_BASE}/stylists/${id}`, { method: 'DELETE' });
+  return res.json();
+}
+
+export async function deleteClient(id: number) {
+  const res = await fetch(`${API_BASE}/clients/${id}`, { method: 'DELETE' });
+  return res.json();
+}
+
+
 

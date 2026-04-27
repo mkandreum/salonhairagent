@@ -118,7 +118,13 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="flex items-center justify-between mb-2 px-1">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Contraseña</label>
               {isLogin && (
-                <button type="button" className="text-xs font-bold text-indigo-500 hover:text-indigo-600">¿Olvidaste tu contraseña?</button>
+                <button 
+                  type="button" 
+                  onClick={() => alert('Por favor, contacta con el administrador del sistema para restablecer tu contraseña.')}
+                  className="text-xs font-bold text-indigo-500 hover:text-indigo-600"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
               )}
             </div>
             <div className="relative group">

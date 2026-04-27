@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Phone, Mail, Calendar, MoreVertical, Plus, Search, X } from 'lucide-react'
-import { fetchClients, createClient } from '@/lib/api'
+import { User, Phone, Mail, Calendar, MoreVertical, Plus, Search, X, Trash2, Edit2 } from 'lucide-react'
+import { fetchClients, createClient, deleteClient as apiDeleteClient, updateClient } from '@/lib/api'
+
 
 interface Client {
   id: number
@@ -16,13 +17,16 @@ interface Client {
 
 interface ClientListProps {
   fullView?: boolean
+  onViewAll?: () => void
+  searchQuery?: string
 }
 
-export default function ClientList({ fullView = false }: ClientListProps) {
+export default function ClientList({ fullView = false, onViewAll, searchQuery = '' }: ClientListProps) {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [localSearchQuery, setLocalSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -50,19 +54,47 @@ export default function ClientList({ fullView = false }: ClientListProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await createClient(formData)
+      if (editingClient) {
+        await updateClient(editingClient.id, formData)
+      } else {
+        await createClient(formData)
+      }
       setIsModalOpen(false)
+      setEditingClient(null)
       loadData()
       setFormData({ name: '', email: '', phone: '' })
     } catch (err) {
-      alert('Error al añadir el cliente')
+      alert(editingClient ? 'Error al actualizar el cliente' : 'Error al añadir el cliente')
     }
   }
 
+  const handleEdit = (client: Client) => {
+    setEditingClient(client)
+    setFormData({
+      name: client.name,
+      email: client.email,
+      phone: client.phone
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+      try {
+        await apiDeleteClient(id)
+        loadData()
+      } catch (err) {
+        alert('Error al eliminar el cliente')
+      }
+    }
+  }
+
+  const effectiveSearchQuery = searchQuery || localSearchQuery
+
   const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (client.phone && client.phone.includes(searchQuery))
+    client.name.toLowerCase().includes(effectiveSearchQuery.toLowerCase()) ||
+    (client.email && client.email.toLowerCase().includes(effectiveSearchQuery.toLowerCase())) ||
+    (client.phone && client.phone.includes(effectiveSearchQuery))
   )
 
 
@@ -86,8 +118,8 @@ export default function ClientList({ fullView = false }: ClientListProps) {
             <input
               type="text"
               placeholder="Buscar..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
               className="input-premium py-2 pl-9 pr-4 text-sm w-48"
             />
           </div>
@@ -105,8 +137,8 @@ export default function ClientList({ fullView = false }: ClientListProps) {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Añadir Cliente</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingClient ? 'Editar Cliente' : 'Añadir Cliente'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingClient(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
@@ -209,19 +241,34 @@ export default function ClientList({ fullView = false }: ClientListProps) {
                   <span className="font-bold text-slate-800 dark:text-white">${client.totalSpent}</span>
                 </td>
                 <td className="py-4 px-2 text-right">
-                  <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-all shadow-sm opacity-0 group-hover:opacity-100">
-                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                  </button>
+                  <div className="flex items-center justify-end space-x-1">
+                    <button 
+                      onClick={() => handleEdit(client)}
+                      className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-lg transition-all shadow-sm opacity-0 group-hover:opacity-100 text-indigo-500"
+                    >
+                      <Edit2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(client.id)}
+                      className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all shadow-sm opacity-0 group-hover:opacity-100 text-rose-500"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {!fullView && (
+      {!fullView && onViewAll && (
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors">
+          <button 
+            onClick={onViewAll}
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
+          >
             Ver todos los clientes →
           </button>
         </div>

@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 const dataDir = path.join(process.cwd(), 'data');
 if (!fs.existsSync(dataDir)) {
@@ -46,6 +47,15 @@ db.serialize(() => {
     FOREIGN KEY(stylist_id) REFERENCES stylists(id)
   )`);
 
+  // Users Table
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Seed Data
   db.get("SELECT COUNT(*) as count FROM clients", (err, row) => {
     if (row.count === 0) {
@@ -65,6 +75,14 @@ db.serialize(() => {
     if (row.count === 0) {
       db.run("INSERT INTO appointments (client_id, stylist_id, service, time, status) VALUES (1, 1, 'Corte y Estilo', '09:00 AM', 'confirmed')");
       db.run("INSERT INTO appointments (client_id, stylist_id, service, time, status) VALUES (2, 2, 'Arreglo de Barba', '10:30 AM', 'confirmed')");
+    }
+  });
+
+  // Seed Users
+  db.get("SELECT COUNT(*) as count FROM users", async (err, row) => {
+    if (row.count === 0) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      db.run("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", ['Admin', 'admin@salonpro.com', hashedPassword]);
     }
   });
 });
