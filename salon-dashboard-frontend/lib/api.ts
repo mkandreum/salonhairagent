@@ -2,10 +2,16 @@ const API_BASE = (typeof window !== 'undefined' && (window as any).ENV_API_URL)
   || process.env.NEXT_PUBLIC_API_URL 
   || '/api';
 
-function getAuthHeader() {
+function getAuthHeader(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   const token = localStorage.getItem('salon_pro_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+  if (!token) return {};
+  return { 'Authorization': `Bearer ${token}` };
+}
+
+export async function fetchStats() {
+  const res = await fetch(`${API_BASE}/stats`, { headers: getAuthHeader() });
+  return res.json();
 }
 
 export async function fetchStats() {
