@@ -201,12 +201,12 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-            {filteredClients.map((client) => (
+            {filteredClients.map((client: any) => (
               <tr key={client.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                 <td className="py-4 px-2">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
-                      {client.name.split(' ').map(n => n[0]).join('')}
+                      {client.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
                     <div>
                       <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{client.name}</p>

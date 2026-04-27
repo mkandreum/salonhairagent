@@ -265,7 +265,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-            {filteredAppointments.map((appointment) => (
+            {filteredAppointments.map((appointment: any) => (
               <tr key={appointment.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                 <td className="py-4 px-2">
                   <div className="flex flex-col">
@@ -282,7 +282,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                 <td className="py-4 px-2">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400">
-                      {appointment.client?.split(' ').map(n => n[0]).join('') || '??'}
+                      {appointment.client?.split(' ').map((n: string) => n[0]).join('') || '??'}
                     </div>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{appointment.client}</span>
                   </div>

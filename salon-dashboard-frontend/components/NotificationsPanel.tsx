@@ -34,25 +34,25 @@ export default function NotificationsPanel() {
 
   const markAsRead = async (id: number) => {
     await markNotificationRead(id)
-    setNotifications(notifications.map(notification =>
+    setNotifications(notifications.map((notification: any) =>
       notification.id === id ? { ...notification, read: true } : notification
     ))
   }
 
   const deleteNotification = async (id: number) => {
     await apiDeleteNotification(id)
-    setNotifications(notifications.filter(notification => notification.id !== id))
+    setNotifications(notifications.filter((notification: any) => notification.id !== id))
   }
 
   const markAllAsRead = async () => {
     for (const n of notifications) {
       if (!n.read) await markNotificationRead(n.id)
     }
-    setNotifications(notifications.map(notification => ({ ...notification, read: true })))
+    setNotifications(notifications.map((notification: any) => ({ ...notification, read: true })))
   }
 
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter((n: any) => !n.read).length
 
   return (
     <div className="fixed bottom-8 right-8 z-[100]">
@@ -106,7 +106,7 @@ export default function NotificationsPanel() {
                 <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">No tienes notificaciones</p>
               </div>
             ) : (
-              notifications.map((notification) => (
+              notifications.map((notification: any) => (
                 <div
                   key={notification.id}
                   className={`p-5 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all relative group ${!notification.read ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : ''}`}

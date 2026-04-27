@@ -179,7 +179,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredStylists.map((stylist) => (
+        {filteredStylists.map((stylist: any) => (
           <div key={stylist.id} className="p-6 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500/50 transition-all group">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
@@ -197,7 +197,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   <h3 className="font-bold text-slate-800 dark:text-white leading-tight">{stylist.name}</h3>
                   <p className="text-xs font-bold text-indigo-500 uppercase tracking-wider mt-1">{stylist.specialization}</p>
                   <div className="flex items-center space-x-1 mt-2">
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(5)].map((_, i: number) => (
                       <Star key={i} className={`w-3 h-3 ${i < Math.floor(stylist.rating) ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
                     ))}
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-1">{stylist.rating}</span>
