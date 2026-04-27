@@ -3,7 +3,7 @@
 Simple API endpoint for the Customer Support Ticket Triage MVP.
 """
 from flask import Flask, request, jsonify
-from ticket_triage_mvp import Ticket, triage_tickets, push_to_langgraph
+from ticket_triage_mvp import Ticket, triage_tickets
 import json
 import os
 
@@ -18,8 +18,7 @@ def index():
         "endpoints": {
             "health": "GET /health",
             "triage": "POST /triage",
-            "demo": "GET /demo",
-            "stats": "GET /stats"
+            "demo": "GET /demo"
         }
     })
 
@@ -28,59 +27,34 @@ def health():
     """Health check endpoint."""
     return jsonify({
         "status": "healthy", 
-        "service": "ticket-triage-mvp",
-        "version": "1.0.0"
+        "service": "ticket-triage-mvp"
     })
 
 @app.route('/triage', methods=['POST'])
 def triage():
-    """
-    Triage a single ticket or batch of tickets.
-    
-    Request body should be JSON with either:
-    - Single ticket: {"id": "T1", "subject": "...", "body": "..."}
-    - Batch: [{"id": "T1", ...}, {"id": "T2", ...}]
-    
-    Optional query parameters:
-    - project_id: Project ID for LangGraph storage (default: "default")
-    - langgraph_enabled: Set to "0" to disable LangGraph persistence (default: "1")
-    """
     try:
         data = request.get_json()
         if not data:
             return jsonify({"error": "No JSON data provided"}), 400
         
-        # Handle single ticket or batch
         if isinstance(data, dict):
             tickets = [Ticket(**data)]
         elif isinstance(data, list):
             tickets = [Ticket(**ticket) for ticket in data]
         else:
-            return jsonify({"error": "Invalid data format. Expected object or array"}), 400
+            return jsonify({"error": "Invalid data format"}), 400
         
-        # Process tickets
         results = triage_tickets(tickets)
         
-        # Persist to LangGraph if enabled
-        langgraph_path = None
-        langgraph_enabled = request.args.get('langgraph_enabled', '1') == '1'
-        if langgraph_enabled:
-            project_id = request.args.get('project_id', 'default')
-            langgraph_path = push_to_langgraph(results, project_id)
-        
-        response = {
+        return jsonify({
             "success": True,
             "count": len(results),
             "results": results
-        }
-        
-        if langgraph_path:
-            response["langgraph_path"] = langgraph_path
-        
-        return jsonify(response)
+        })
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/demo', methods=['GET'])
 def demo():
