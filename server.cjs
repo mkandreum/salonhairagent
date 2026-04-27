@@ -8,10 +8,11 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const JWT_SECRET = process.env.JWT_SECRET;
+let JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  console.error('ERROR: JWT_SECRET no está definido. Use: export JWT_SECRET=$(openssl rand -hex 32)');
-  process.exit(1);
+  const crypto = require('crypto');
+  JWT_SECRET = crypto.randomBytes(32).toString('hex');
+  console.warn('ADVERTENCIA: JWT_SECRET no está definido. Usando uno generado automáticamente. Esto no es seguro para producción.');
 }
 
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
