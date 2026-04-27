@@ -22,8 +22,11 @@ export async function fetchAppointments() {
     time: a.time,
     date: a.date,
     client: a.client_name,
+    client_id: a.client_id,
     service: a.service,
     stylist: a.stylist_name,
+    stylist_id: a.stylist_id,
+    price: a.price,
     status: a.status
   }));
 }
@@ -104,6 +107,15 @@ export async function updateAppointmentStatus(id: number, status: string) {
   return res.json();
 }
 
+export async function updateAppointment(id: number, data: any) {
+  const res = await fetch(`${API_BASE}/appointments/${id}`, {
+    method: 'PUT',
+    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
 export async function updateClient(id: number, data: any) {
   const res = await fetch(`${API_BASE}/clients/${id}`, {
     method: 'PUT',
@@ -116,6 +128,15 @@ export async function updateClient(id: number, data: any) {
 export async function createStylist(data: any) {
   const res = await fetch(`${API_BASE}/stylists`, {
     method: 'POST',
+    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function updateStylist(id: number, data: any) {
+  const res = await fetch(`${API_BASE}/stylists/${id}`, {
+    method: 'PUT',
     headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
@@ -142,6 +163,20 @@ export async function deleteTriage(id: string) {
   const res = await fetch(`${API_BASE}/triage/${id}`, { 
     method: 'DELETE',
     headers: getAuthHeader()
+  });
+  return res.json();
+}
+
+export async function fetchSettings() {
+  const res = await fetch(`${API_BASE}/settings`, { headers: getAuthHeader() });
+  return res.json();
+}
+
+export async function saveSettings(settings: any) {
+  const res = await fetch(`${API_BASE}/settings`, {
+    method: 'POST',
+    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings)
   });
   return res.json();
 }

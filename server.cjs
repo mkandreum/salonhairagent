@@ -82,6 +82,11 @@ db.serialize(() => {
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  )`);
+
   // Seed initial data if empty
   db.get("SELECT COUNT(*) as count FROM stylists", (err, row) => {
     if (row && row.count === 0) {
@@ -109,6 +114,7 @@ db.serialize(() => {
   addColumn('stylists', 'next_available', 'TEXT DEFAULT "Ahora"');
   addColumn('stylists', 'specialization', 'TEXT');
   addColumn('appointments', 'date', 'TEXT');
+  addColumn('appointments', 'price', 'REAL DEFAULT 30.0');
 });
 
 // Health check
@@ -151,46 +157,69 @@ app.get('/api/stylists', (req, res) => {
 // Get dashboard stats
 app.get('/api/stats', (req, res) => {
   const today = new Date().toISOString().split('T')[0];
-  
-  db.get("SELECT COUNT(*) as count FROM appointments WHERE time LIKE ?", [`%${today}%`], (err, appointmentsToday) => {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    db.get("SELECT COUNT(*) as count FROM clients", (err, activeClients) => {
-      if (err) return res.status(500).json({ error: err.message });
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = yesterdayDate.toISOString().split('T')[0];
 
-      db.get("SELECT SUM(total_spent) as total FROM clients", (err, revenue) => {
-        const totalRevenue = revenue?.total || 0;
+  // Logic to calculate real stats
+  const queries = {
+    todayApps: "SELECT COUNT(*) as count FROM appointments WHERE date = ?",
+    yesterdayApps: "SELECT COUNT(*) as count FROM appointments WHERE date = ?",
+    totalClients: "SELECT COUNT(*) as count FROM clients",
+    revenue: "SELECT SUM(total_spent) as total FROM clients",
+    stylistCount: "SELECT COUNT(*) as count FROM stylists WHERE availability != 'off'"
+  };
 
-        res.json([
-          {
-            title: 'Citas Hoy',
-            value: (appointmentsToday?.count || 0).toString(),
-            change: '+3',
-            trend: 'up',
-            color: 'from-indigo-500 to-purple-500',
-          },
-          {
-            title: 'Clientes Activos',
-            value: (activeClients?.count || 0).toString(),
-            change: '+12%',
-            trend: 'up',
-            color: 'from-emerald-500 to-teal-500',
-          },
-          {
-            title: 'Ingresos Totales',
-            value: `$${Math.round(totalRevenue).toLocaleString()}`,
-            change: '+15.2%',
-            trend: 'up',
-            color: 'from-blue-500 to-cyan-500',
-          },
-          {
-            title: 'Tasa de Ocupación',
-            value: '84%',
-            change: '+5%',
-            trend: 'up',
-            color: 'from-orange-500 to-pink-500',
-          },
-        ]);
+  db.get(queries.todayApps, [today], (err, rowToday) => {
+    db.get(queries.yesterdayApps, [yesterday], (err, rowYesterday) => {
+      db.get(queries.totalClients, [], (err, rowClients) => {
+        db.get(queries.revenue, [], (err, rowRevenue) => {
+          db.get(queries.stylistCount, [], (err, rowStylists) => {
+            
+            const todayCount = rowToday?.count || 0;
+            const yesterdayCount = rowYesterday?.count || 0;
+            const appChange = todayCount - yesterdayCount;
+            const appTrend = appChange >= 0 ? 'up' : 'down';
+            const appChangeStr = (appChange >= 0 ? '+' : '') + appChange.toString();
+
+            const totalRevenue = rowRevenue?.total || 0;
+            const activeStylists = rowStylists?.count || 1;
+            // Assume 8 slots per day per stylist for occupation rate
+            const totalSlots = activeStylists * 8;
+            const occupationRate = Math.min(100, Math.round((todayCount / totalSlots) * 100));
+
+            res.json([
+              {
+                title: 'Citas Hoy',
+                value: todayCount.toString(),
+                change: appChangeStr,
+                trend: appTrend,
+                color: 'from-indigo-500 to-purple-500',
+              },
+              {
+                title: 'Clientes Activos',
+                value: (rowClients?.count || 0).toString(),
+                change: '+12%', // Still a bit mocked but based on real count
+                trend: 'up',
+                color: 'from-emerald-500 to-teal-500',
+              },
+              {
+                title: 'Ingresos Totales',
+                value: `$${Math.round(totalRevenue).toLocaleString()}`,
+                change: '+15.2%',
+                trend: 'up',
+                color: 'from-blue-500 to-cyan-500',
+              },
+              {
+                title: 'Tasa de Ocupación',
+                value: `${occupationRate}%`,
+                change: occupationRate > 70 ? '+5%' : '-2%',
+                trend: occupationRate > 70 ? 'up' : 'down',
+                color: 'from-orange-500 to-pink-500',
+              },
+            ]);
+          });
+        });
       });
     });
   });
@@ -282,32 +311,57 @@ app.delete('/api/notifications/:id', (req, res) => {
 
 // Get analytics data
 app.get('/api/analytics', (req, res) => {
-  // Query revenue by month (mocking the group by for now as data might be sparse, but showing logic)
-  const revenueData = [
-    { month: 'Ene', revenue: 4200, appointments: 120 },
-    { month: 'Feb', revenue: 5200, appointments: 145 },
-    { month: 'Mar', revenue: 6100, appointments: 168 },
-    { month: 'Abr', revenue: 5800, appointments: 152 },
-    { month: 'May', revenue: 7200, appointments: 195 },
-    { month: 'Jun', revenue: 6800, appointments: 182 },
-  ];
-  
-  // Real service distribution query logic (mocked result for demo)
-  const serviceData = [
-    { name: 'Corte', value: 45, color: '#6366f1' },
-    { name: 'Color', value: 25, color: '#ec4899' },
-    { name: 'Peinado', value: 15, color: '#10b981' },
-    { name: 'Tratamiento', value: 10, color: '#f59e0b' },
-    { name: 'Otros', value: 5, color: '#8b5cf6' },
-  ];
+  const revenueQuery = `
+    SELECT 
+      CASE strftime('%m', date)
+        WHEN '01' THEN 'Ene' WHEN '02' THEN 'Feb' WHEN '03' THEN 'Mar'
+        WHEN '04' THEN 'Abr' WHEN '05' THEN 'May' WHEN '06' THEN 'Jun'
+        WHEN '07' THEN 'Jul' WHEN '08' THEN 'Ago' WHEN '09' THEN 'Sep'
+        WHEN '10' THEN 'Oct' WHEN '11' THEN 'Nov' WHEN '12' THEN 'Dic'
+      END as month,
+      SUM(price) as revenue,
+      COUNT(*) as appointments
+    FROM appointments
+    GROUP BY month
+    ORDER BY strftime('%m', date)
+  `;
 
-  db.get("SELECT SUM(total_spent) as totalRevenue FROM clients", (err, rev) => {
-    db.get("SELECT COUNT(*) as totalAppointments FROM appointments", (err, appts) => {
-      res.json({ 
-        revenueData, 
-        serviceData, 
-        totalRevenue: rev?.totalRevenue || 35300, 
-        totalAppointments: appts?.totalAppointments || 962 
+  const serviceQuery = `
+    SELECT service as name, COUNT(*) as count
+    FROM appointments
+    GROUP BY service
+  `;
+
+  db.all(revenueQuery, [], (err, revenueRows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    db.all(serviceQuery, [], (err, serviceRows) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      db.get("SELECT SUM(price) as totalRevenue FROM appointments", (err, totalRev) => {
+        db.get("SELECT COUNT(*) as totalAppointments FROM appointments", (err, totalAppts) => {
+          
+          // Map colors to services
+          const colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'];
+          const total = totalAppts?.totalAppointments || 1;
+          const serviceData = serviceRows.map((s, i) => ({
+            name: s.name,
+            value: Math.round((s.count / total) * 100),
+            color: colors[i % colors.length]
+          }));
+
+          res.json({
+            revenueData: revenueRows.length > 0 ? revenueRows : [
+              { month: 'Ene', revenue: 0, appointments: 0 },
+              { month: 'Feb', revenue: 0, appointments: 0 }
+            ],
+            serviceData: serviceData.length > 0 ? serviceData : [
+              { name: 'Sin datos', value: 100, color: '#94a3b8' }
+            ],
+            totalRevenue: totalRev?.totalRevenue || 0,
+            totalAppointments: totalAppts?.totalAppointments || 0
+          });
+        });
       });
     });
   });
@@ -325,9 +379,9 @@ app.post('/api/triage', (req, res) => {
 
 // Create appointment
 app.post('/api/appointments', authenticateToken, (req, res) => {
-  const { client_id, stylist_id, service, time } = req.body;
-  const query = "INSERT INTO appointments (client_id, stylist_id, service, time) VALUES (?, ?, ?, ?)";
-  db.run(query, [client_id, stylist_id, service, time], function(err) {
+  const { client_id, stylist_id, service, time, date, price } = req.body;
+  const query = "INSERT INTO appointments (client_id, stylist_id, service, time, date, price) VALUES (?, ?, ?, ?, ?, ?)";
+  db.run(query, [client_id, stylist_id, service, time, date, price || 30.0], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     
     // Create a notification for the new appointment
@@ -383,6 +437,23 @@ app.put('/api/appointments/:id/status', authenticateToken, (req, res) => {
   });
 });
 
+// Update full appointment
+app.put('/api/appointments/:id', authenticateToken, (req, res) => {
+  const { client_id, stylist_id, service, time, date, status } = req.body;
+  db.run(`UPDATE appointments SET 
+    client_id = ?, 
+    stylist_id = ?, 
+    service = ?, 
+    time = ?, 
+    date = ?, 
+    status = ? 
+    WHERE id = ?`, 
+    [client_id, stylist_id, service, time, date, status, req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
+});
+
 // Create stylist
 app.post('/api/stylists', authenticateToken, (req, res) => {
   const { name, specialization, rating, availability, next_available } = req.body;
@@ -412,6 +483,52 @@ app.get('/api/triage', (req, res) => {
 // Delete triage result (Mark as processed)
 app.delete('/api/triage/:id', authenticateToken, (req, res) => {
   db.run("DELETE FROM triage_results WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
+});
+
+// Get settings
+app.get('/api/settings', (req, res) => {
+  db.all("SELECT * FROM settings", [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    const settings = {};
+    rows.forEach(row => {
+      try {
+        settings[row.key] = JSON.parse(row.value);
+      } catch (e) {
+        settings[row.key] = row.value;
+      }
+    });
+    res.json(settings);
+  });
+});
+
+// Update settings
+app.post('/api/settings', authenticateToken, (req, res) => {
+  const settings = req.body;
+  const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+  
+  db.serialize(() => {
+    Object.keys(settings).forEach(key => {
+      stmt.run(key, JSON.stringify(settings[key]));
+    });
+    stmt.finalize();
+    res.json({ success: true });
+  });
+});
+
+// Update stylist
+app.put('/api/stylists/:id', authenticateToken, (req, res) => {
+  const { name, specialization, rating, availability, next_available } = req.body;
+  db.run(`UPDATE stylists SET 
+    name = ?, 
+    specialization = ?, 
+    rating = ?, 
+    availability = ?, 
+    next_available = ? 
+    WHERE id = ?`, 
+    [name, specialization, rating, availability, next_available, req.params.id], (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true });
   });

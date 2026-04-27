@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Scissors, Clock, CheckCircle, XCircle, MoreVertical, Star, Plus, MessageSquare, Calendar, X, Trash2 } from 'lucide-react'
-import { fetchStylists, createStylist, deleteStylist as apiDeleteStylist } from '@/lib/api'
+import { Scissors, Clock, CheckCircle, XCircle, MoreVertical, Star, Plus, MessageSquare, Calendar, X, Trash2, Edit2 } from 'lucide-react'
+import { fetchStylists, createStylist, updateStylist, deleteStylist as apiDeleteStylist } from '@/lib/api'
 
 interface Stylist {
   id: number
@@ -25,6 +25,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
   const [stylists, setStylists] = useState<Stylist[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingStylist, setEditingStylist] = useState<Stylist | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     specialization: '',
@@ -51,13 +52,30 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await createStylist(formData)
+      if (editingStylist) {
+        await updateStylist(editingStylist.id, formData)
+      } else {
+        await createStylist(formData)
+      }
       setIsModalOpen(false)
+      setEditingStylist(null)
       loadData()
       setFormData({ name: '', specialization: '', rating: 5.0, availability: 'available', next_available: 'Ahora' })
     } catch (err) {
-      alert('Error al añadir estilista')
+      alert(editingStylist ? 'Error al actualizar estilista' : 'Error al añadir estilista')
     }
+  }
+
+  const handleEdit = (stylist: Stylist) => {
+    setEditingStylist(stylist)
+    setFormData({
+      name: stylist.name,
+      specialization: stylist.specialization,
+      rating: stylist.rating,
+      availability: stylist.availability,
+      next_available: stylist.nextAvailable
+    })
+    setIsModalOpen(true)
   }
 
   const handleDelete = async (id: number) => {
@@ -121,8 +139,8 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Añadir Estilista</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingStylist ? 'Editar Estilista' : 'Añadir Estilista'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingStylist(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
@@ -152,8 +170,8 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                 />
               </div>
 
-              <button type="submit" className="btn-premium w-full mt-6 py-3">
-                Guardar Estilista
+               <button type="submit" className="btn-premium w-full mt-6 py-3">
+                {editingStylist ? 'Actualizar Estilista' : 'Guardar Estilista'}
               </button>
             </form>
           </div>
@@ -186,21 +204,19 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col space-y-1">
+                 <div className="flex flex-col space-y-1">
+                <button 
+                  onClick={() => handleEdit(stylist)}
+                  className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-lg transition-all text-indigo-500 opacity-0 group-hover:opacity-100"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
                 <button 
                   onClick={() => handleDelete(stylist.id)}
                   className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all text-rose-500 opacity-0 group-hover:opacity-100"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
-                <div className="relative group/menu">
-                  <button 
-                    onClick={() => alert('Opciones de Estilista: \n- Editar Perfil\n- Ver Estadísticas\n- Desactivar Temporalmente')}
-                    className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-all"
-                  >
-                    <MoreVertical className="w-4 h-4 text-slate-400" />
-                  </button>
-                </div>
               </div>
             </div>
 

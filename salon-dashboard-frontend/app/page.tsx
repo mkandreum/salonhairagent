@@ -11,6 +11,8 @@ import AnalyticsDashboard from '@/components/AnalyticsDashboard'
 import TriageView from '@/components/TriageView'
 import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
+import { fetchSettings, saveSettings } from '@/lib/api'
+import { useEffect } from 'react'
 
 export default function Home() {
   const [user, setUser] = useState<any>(null)
@@ -31,20 +33,32 @@ export default function Home() {
 
 
 
-  const [settings, setSettings] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('salon_pro_settings')
-      return saved ? JSON.parse(saved) : { darkMode: true, notifications: false, emailReports: true }
+  const [settings, setSettings] = useState({ darkMode: true, notifications: false, emailReports: true })
+
+  useEffect(() => {
+    if (user) {
+      fetchSettings().then(data => {
+        if (Object.keys(data).length > 0) {
+          setSettings(prev => ({ ...prev, ...data }))
+        }
+      })
     }
-    return { darkMode: true, notifications: false, emailReports: true }
-  })
+  }, [user])
 
   const toggleSetting = (key: keyof typeof settings) => {
     const newVal = !settings[key]
     const newSettings = { ...settings, [key]: newVal }
     setSettings(newSettings)
-    localStorage.setItem('salon_pro_settings', JSON.stringify(newSettings))
     console.log(`Setting ${key} changed to ${newVal}`)
+  }
+
+  const handleSaveSettings = async () => {
+    try {
+      await saveSettings(settings)
+      alert('Ajustes guardados correctamente')
+    } catch (err) {
+      alert('Error al guardar ajustes')
+    }
   }
 
   const renderContent = () => {
@@ -110,7 +124,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
-               <button className="btn-premium px-8 py-3">Guardar Todos los Cambios</button>
+               <button onClick={handleSaveSettings} className="btn-premium px-8 py-3">Guardar Todos los Cambios</button>
             </div>
           </div>
         )

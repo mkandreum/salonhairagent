@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus, X, Trash2, Check, AlertCircle } from 'lucide-react'
-import { fetchAppointments, createAppointment, fetchClients, fetchStylists, deleteAppointment as apiDeleteAppointment, updateAppointmentStatus } from '@/lib/api'
+import { Calendar as CalendarIcon, Clock, User, Scissors, MoreVertical, Plus, X, Trash2, Check, AlertCircle, Edit2 } from 'lucide-react'
+import { fetchAppointments, createAppointment, updateAppointment, fetchClients, fetchStylists, deleteAppointment as apiDeleteAppointment, updateAppointmentStatus } from '@/lib/api'
 
 
 interface Appointment {
@@ -10,8 +10,10 @@ interface Appointment {
   time: string
   date: string
   client: string
+  client_id?: number
   service: string
   stylist: string
+  stylist_id?: number
   status: 'confirmed' | 'pending' | 'cancelled'
 }
 
@@ -25,6 +27,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
   const [clients, setClients] = useState<any[]>([])
   const [stylists, setStylists] = useState<any[]>([])
   
@@ -34,7 +37,9 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
     stylist_id: '',
     service: '',
     time: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    price: 30.0,
+    status: 'pending'
   })
 
   const loadData = async () => {
@@ -62,13 +67,32 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await createAppointment(formData)
+      if (editingAppointment) {
+        await updateAppointment(editingAppointment.id, formData)
+      } else {
+        await createAppointment(formData)
+      }
       setIsModalOpen(false)
+      setEditingAppointment(null)
       loadData() // Refresh
-      setFormData({ client_id: '', stylist_id: '', service: '', time: '', date: new Date().toISOString().split('T')[0] })
+      setFormData({ client_id: '', stylist_id: '', service: '', time: '', date: new Date().toISOString().split('T')[0], status: 'pending' })
     } catch (err) {
-      alert('Error al crear la cita')
+      alert(editingAppointment ? 'Error al actualizar la cita' : 'Error al crear la cita')
     }
+  }
+
+  const handleEdit = (appointment: Appointment) => {
+    setEditingAppointment(appointment)
+    setFormData({
+      client_id: appointment.client_id?.toString() || '',
+      stylist_id: appointment.stylist_id?.toString() || '',
+      service: appointment.service,
+      time: appointment.time,
+      date: appointment.date,
+      price: (appointment as any).price || 30.0,
+      status: appointment.status
+    })
+    setIsModalOpen(true)
   }
 
   const handleDelete = async (id: number) => {
@@ -139,8 +163,8 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Nueva Cita</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
@@ -207,8 +231,20 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                 </div>
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Precio (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  required
+                  value={formData.price}
+                  onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})}
+                  className="input-premium py-2"
+                />
+              </div>
+
               <button type="submit" className="btn-premium w-full mt-6 py-3">
-                Crear Cita
+                {editingAppointment ? 'Actualizar Cita' : 'Crear Cita'}
               </button>
             </form>
           </div>
@@ -267,12 +303,20 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                   </button>
                 </td>
                 <td className="py-4 px-2 text-right">
-                  <button 
-                    onClick={() => handleDelete(appointment.id)}
-                    className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all shadow-sm border border-transparent hover:border-rose-100 dark:hover:border-rose-900/20 opacity-0 group-hover:opacity-100 text-rose-500"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  <div className="flex items-center justify-end space-x-1">
+                    <button 
+                      onClick={() => handleEdit(appointment)}
+                      className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-lg transition-all shadow-sm opacity-0 group-hover:opacity-100 text-indigo-500"
+                    >
+                      <Edit2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(appointment.id)}
+                      className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all shadow-sm opacity-0 group-hover:opacity-100 text-rose-500"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
 
               </tr>
