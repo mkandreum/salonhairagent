@@ -24,10 +24,11 @@ export default function DashboardStats() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat) => {
-        const Icon = stat.title.includes('Citas') ? Calendar : 
-                     stat.title.includes('Clientes') ? Users : 
-                     stat.title.includes('Ingresos') ? DollarSign : TrendingUp
+      {Array.isArray(stats) && stats.map((stat) => {
+        const Icon = stat.title?.includes('Citas') ? Calendar : 
+                     stat.title?.includes('Clientes') ? Users : 
+                     stat.title?.includes('Ingresos') ? DollarSign : TrendingUp
+
         return (
           <div key={stat.title} className="stat-card group">
             <div className="flex items-start justify-between">

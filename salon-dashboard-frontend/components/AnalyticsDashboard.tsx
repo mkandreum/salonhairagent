@@ -20,7 +20,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
 
   if (!data) return <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
 
-  const { revenueData, serviceData, totalRevenue, totalAppointments } = data as any
+  const { revenueData = [], serviceData = [], totalRevenue = 0, totalAppointments = 0 } = (data || {}) as any
   
   return (
     <div className="glass-card p-8">
@@ -100,7 +100,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                  {serviceData.map((entry: any, index: number) => (
+                  {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
@@ -108,7 +108,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
             </ResponsiveContainer>
           </div>
           <div className="mt-6 space-y-3">
-            {serviceData.slice(0, 3).map((service: any) => (
+            {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any) => (
               <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: service.color }} />

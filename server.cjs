@@ -165,6 +165,8 @@ db.serialize(() => {
   addColumn('appointments', 'price', 'REAL DEFAULT 30.0');
 });
 
+
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', service: 'salon-backend' });

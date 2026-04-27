@@ -50,9 +50,9 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
         fetchClients(),
         fetchStylists()
       ])
-      setAppointments(apps)
-      setClients(cls)
-      setStylists(sts)
+      setAppointments(Array.isArray(apps) ? apps : [])
+      setClients(Array.isArray(cls) ? cls : [])
+      setStylists(Array.isArray(sts) ? sts : [])
     } catch (err) {
       console.error(err)
     } finally {
@@ -130,11 +130,11 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
     }
   }
 
-  const filteredAppointments = appointments.filter(a => 
+  const filteredAppointments = Array.isArray(appointments) ? appointments.filter(a => 
     (a.client?.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (a.service?.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (a.stylist?.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  ) : []
 
   if (loading && appointments.length === 0) return <div className="glass-card p-8 animate-pulse h-[400px]" />
 
@@ -179,7 +179,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                   className="input-premium py-2"
                 >
                   <option value="">Seleccionar cliente</option>
-                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {Array.isArray(clients) && clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               
@@ -192,7 +192,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                   className="input-premium py-2"
                 >
                   <option value="">Seleccionar estilista</option>
-                  {stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {Array.isArray(stylists) && stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
 

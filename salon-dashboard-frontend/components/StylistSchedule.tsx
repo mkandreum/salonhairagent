@@ -37,7 +37,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
   const loadData = () => {
     setLoading(true)
     fetchStylists().then(data => {
-      setStylists(data)
+      setStylists(Array.isArray(data) ? data : [])
       setLoading(false)
     }).catch(err => {
       console.error("Failed to fetch stylists", err)
@@ -89,10 +89,10 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
     }
   }
 
-  const filteredStylists = stylists.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.specialization.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredStylists = Array.isArray(stylists) ? stylists.filter(s => 
+    (s.name && s.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (s.specialization && s.specialization.toLowerCase().includes(searchQuery.toLowerCase()))
+  ) : []
 
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {

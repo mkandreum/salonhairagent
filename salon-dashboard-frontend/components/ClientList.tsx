@@ -39,7 +39,7 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
     setLoading(true)
     try {
       const data = await fetchClients()
-      setClients(data)
+      setClients(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error(err)
     } finally {
@@ -91,11 +91,11 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
 
   const effectiveSearchQuery = searchQuery || localSearchQuery
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(effectiveSearchQuery.toLowerCase()) ||
+  const filteredClients = Array.isArray(clients) ? clients.filter(client =>
+    (client.name && client.name.toLowerCase().includes(effectiveSearchQuery.toLowerCase())) ||
     (client.email && client.email.toLowerCase().includes(effectiveSearchQuery.toLowerCase())) ||
     (client.phone && client.phone.includes(effectiveSearchQuery))
-  )
+  ) : []
 
 
   if (loading) return <div className="glass-card p-8 animate-pulse h-[400px]" />
