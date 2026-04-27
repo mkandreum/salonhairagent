@@ -15,7 +15,7 @@ services:
       - "3000"
     environment:
       - PORT=3000
-      - JWT_SECRET=${JWT_SECRET:-64821158fad0b8e5d6feac31b5210e9740426f8e01109c7bc1afda1cbef819f1}
+      - JWT_SECRET
     networks:
       - salon-network
     healthcheck:
