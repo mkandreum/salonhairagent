@@ -108,7 +108,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
             </ResponsiveContainer>
           </div>
           <div className="mt-6 space-y-3">
-            {serviceData.slice(0, 3).map((service) => (
+            {serviceData.slice(0, 3).map((service: any) => (
               <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: service.color }} />
