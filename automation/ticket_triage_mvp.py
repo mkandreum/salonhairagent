@@ -19,11 +19,14 @@ class Ticket:
     body: str
 
 def get_db_connection():
-    # Use the database in the root
-    db_path = os.path.join(os.getcwd(), 'salon.db')
+    # Use the database in the data folder
+    db_path = os.path.join(os.getcwd(), 'data', 'salon.db')
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 def init_triage_table():
     conn = get_db_connection()

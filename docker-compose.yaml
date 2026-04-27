@@ -8,7 +8,8 @@ services:
 
     restart: always
     volumes:
-      - ./salon.db:/app/salon.db
+      - ./data:/app/data
+
 
     expose:
       - "3000"

@@ -9,7 +9,13 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const dbPath = path.join(__dirname, 'salon.db');
+const dbPath = path.join(__dirname, 'data', 'salon.db');
+// Ensure the data directory exists
+const fs = require('fs');
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)){
+    fs.mkdirSync(dataDir, { recursive: true });
+}
 const db = new sqlite3.Database(dbPath);
 
 // Health check
