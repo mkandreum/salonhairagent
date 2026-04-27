@@ -62,8 +62,6 @@ app.use((req, res, next) => {
 });
 
 const dbPath = path.join(__dirname, 'data', 'salon.db');
-// Ensure the data directory exists
-const fs = require('fs');
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)){
     try {
