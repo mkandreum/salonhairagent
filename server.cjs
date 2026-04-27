@@ -110,6 +110,7 @@ db.serialize(() => {
     time TEXT NOT NULL,
     date TEXT NOT NULL,
     status TEXT DEFAULT 'pending',
+    price REAL DEFAULT 30.0,
     FOREIGN KEY(client_id) REFERENCES clients(id),
     FOREIGN KEY(stylist_id) REFERENCES stylists(id)
   )`);
