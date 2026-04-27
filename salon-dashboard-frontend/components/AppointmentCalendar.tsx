@@ -75,7 +75,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       setIsModalOpen(false)
       setEditingAppointment(null)
       loadData() // Refresh
-      setFormData({ client_id: '', stylist_id: '', service: '', time: '', date: new Date().toISOString().split('T')[0], status: 'pending' })
+      setFormData({ client_id: '', stylist_id: '', service: '', time: '', date: new Date().toISOString().split('T')[0], price: 30.0, status: 'pending' })
     } catch (err) {
       alert(editingAppointment ? 'Error al actualizar la cita' : 'Error al crear la cita')
     }
