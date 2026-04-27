@@ -8,6 +8,7 @@ import { fetchAppointments, createAppointment, fetchClients, fetchStylists, dele
 interface Appointment {
   id: number
   time: string
+  date: string
   client: string
   service: string
   stylist: string
@@ -32,7 +33,8 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
     client_id: '',
     stylist_id: '',
     service: '',
-    time: ''
+    time: '',
+    date: new Date().toISOString().split('T')[0]
   })
 
   const loadData = async () => {
@@ -63,7 +65,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       await createAppointment(formData)
       setIsModalOpen(false)
       loadData() // Refresh
-      setFormData({ client_id: '', stylist_id: '', service: '', time: '' })
+      setFormData({ client_id: '', stylist_id: '', service: '', time: '', date: new Date().toISOString().split('T')[0] })
     } catch (err) {
       alert('Error al crear la cita')
     }
@@ -105,9 +107,9 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
   }
 
   const filteredAppointments = appointments.filter(a => 
-    a.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    a.service.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    a.stylist.toLowerCase().includes(searchQuery.toLowerCase())
+    (a.client?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (a.service?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (a.stylist?.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   if (loading && appointments.length === 0) return <div className="glass-card p-8 animate-pulse h-[400px]" />
@@ -120,8 +122,8 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             <CalendarIcon className="w-6 h-6 text-indigo-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-800 dark:text-white">Citas de Hoy</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Lunes, 27 de Abril</p>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-white">Agenda de Citas</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Gestión integral de horarios</p>
           </div>
         </div>
         <button 
@@ -170,15 +172,26 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                 </select>
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Servicio</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Ej: Corte"
+                  value={formData.service}
+                  onChange={e => setFormData({...formData, service: e.target.value})}
+                  className="input-premium py-2"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Servicio</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Fecha</label>
                   <input 
-                    type="text" 
+                    type="date" 
                     required
-                    placeholder="Ej: Corte"
-                    value={formData.service}
-                    onChange={e => setFormData({...formData, service: e.target.value})}
+                    value={formData.date}
+                    onChange={e => setFormData({...formData, date: e.target.value})}
                     className="input-premium py-2"
                   />
                 </div>
@@ -207,7 +220,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-100 dark:border-slate-800">
-              <th className="text-left py-4 px-2 text-slate-400 font-bold uppercase tracking-wider text-xs">Hora</th>
+              <th className="text-left py-4 px-2 text-slate-400 font-bold uppercase tracking-wider text-xs">Fecha/Hora</th>
               <th className="text-left py-4 px-2 text-slate-400 font-bold uppercase tracking-wider text-xs">Cliente</th>
               <th className="text-left py-4 px-2 text-slate-400 font-bold uppercase tracking-wider text-xs">Servicio</th>
               <th className="text-left py-4 px-2 text-slate-400 font-bold uppercase tracking-wider text-xs">Estilista</th>
@@ -219,15 +232,21 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             {filteredAppointments.map((appointment) => (
               <tr key={appointment.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                 <td className="py-4 px-2">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-slate-400" />
-                    <span className="font-bold text-slate-700 dark:text-slate-200">{appointment.time}</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center space-x-2">
+                      <CalendarIcon className="w-3 h-3 text-slate-400" />
+                      <span className="text-xs font-medium text-slate-500">{appointment.date}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Clock className="w-4 h-4 text-slate-400" />
+                      <span className="font-bold text-slate-700 dark:text-slate-200">{appointment.time}</span>
+                    </div>
                   </div>
                 </td>
                 <td className="py-4 px-2">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400">
-                      {appointment.client.split(' ').map(n => n[0]).join('')}
+                      {appointment.client?.split(' ').map(n => n[0]).join('') || '??'}
                     </div>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{appointment.client}</span>
                   </div>
@@ -275,4 +294,3 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
     </div>
   )
 }
-

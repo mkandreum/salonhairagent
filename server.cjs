@@ -28,14 +28,19 @@ db.serialize(() => {
     email TEXT UNIQUE,
     phone TEXT,
     notes TEXT,
+    total_spent REAL DEFAULT 0,
+    total_visits INTEGER DEFAULT 0,
+    last_visit TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS stylists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    specialty TEXT,
-    availability TEXT
+    specialization TEXT,
+    rating REAL DEFAULT 5.0,
+    availability TEXT DEFAULT 'available',
+    next_available TEXT DEFAULT 'Ahora'
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS appointments (
@@ -44,6 +49,7 @@ db.serialize(() => {
     stylist_id INTEGER,
     service TEXT NOT NULL,
     time TEXT NOT NULL,
+    date TEXT NOT NULL,
     status TEXT DEFAULT 'pending',
     FOREIGN KEY(client_id) REFERENCES clients(id),
     FOREIGN KEY(stylist_id) REFERENCES stylists(id)
@@ -79,9 +85,30 @@ db.serialize(() => {
   // Seed initial data if empty
   db.get("SELECT COUNT(*) as count FROM stylists", (err, row) => {
     if (row && row.count === 0) {
-      db.run("INSERT INTO stylists (name, specialty) VALUES ('Ana Martínez', 'Coloración'), ('Carlos Ruiz', 'Corte Caballero')");
+      db.run("INSERT INTO stylists (name, specialization) VALUES ('Ana Martínez', 'Coloración'), ('Carlos Ruiz', 'Corte Caballero')");
     }
   });
+
+  // Basic migration logic to add columns if they don't exist (for existing databases)
+  const addColumn = (table, column, type) => {
+    db.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`, (err) => {
+      if (err) {
+        if (!err.message.includes('duplicate column name')) {
+          console.log(`Note: ${err.message}`);
+        }
+      } else {
+        console.log(`Added column ${column} to ${table}`);
+      }
+    });
+  };
+
+  addColumn('clients', 'total_spent', 'REAL DEFAULT 0');
+  addColumn('clients', 'total_visits', 'INTEGER DEFAULT 0');
+  addColumn('clients', 'last_visit', 'TEXT');
+  addColumn('stylists', 'rating', 'REAL DEFAULT 5.0');
+  addColumn('stylists', 'next_available', 'TEXT DEFAULT "Ahora"');
+  addColumn('stylists', 'specialization', 'TEXT');
+  addColumn('appointments', 'date', 'TEXT');
 });
 
 // Health check
@@ -207,7 +234,7 @@ app.post('/api/login', (req, res) => {
     if (!isMatch) return res.status(401).json({ error: 'Credenciales inválidas' });
 
     // Generate token
-    const token = jwt.sign({ id: user.id, email: user.email }, 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'salon-pro-secret-key-2026', { expiresIn: '8h' });
 
     // Don't send the password back
     const { password: _, ...userWithoutPassword } = user;
@@ -220,10 +247,10 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return next(); // Bypass for now to avoid breaking frontend until token storage is added
+  if (!token) return res.status(401).json({ error: 'Acceso denegado. Se requiere autenticación.' });
   
-  jwt.verify(token, 'your-secret-key', (err, user) => {
-    if (err) return res.sendStatus(403);
+  jwt.verify(token, process.env.JWT_SECRET || 'salon-pro-secret-key-2026', (err, user) => {
+    if (err) return res.status(403).json({ error: 'Sesión expirada o token inválido.' });
     req.user = user;
     next();
   });
@@ -379,6 +406,14 @@ app.get('/api/triage', (req, res) => {
   db.all("SELECT * FROM triage_results ORDER BY timestamp DESC", [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
+  });
+});
+
+// Delete triage result (Mark as processed)
+app.delete('/api/triage/:id', authenticateToken, (req, res) => {
+  db.run("DELETE FROM triage_results WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
   });
 });
 

@@ -45,6 +45,11 @@ export default function Login({ onLogin }: LoginProps) {
         return
       }
 
+      // Store token
+      if (data.token) {
+        localStorage.setItem('salon_pro_token', data.token)
+      }
+
       onLogin(data.user)
     } catch (err: any) {
 

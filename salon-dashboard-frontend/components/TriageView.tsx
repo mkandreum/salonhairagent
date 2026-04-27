@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Brain, Shield, Bug, Star, ArrowRight, RefreshCw, X, MessageSquare, Zap } from 'lucide-react'
-import { fetchTriage } from '@/lib/api'
+import { fetchTriage, deleteTriage } from '@/lib/api'
 
 export default function TriageView() {
   const [results, setResults] = useState<any[]>([])
@@ -33,11 +33,14 @@ export default function TriageView() {
     }
   }
 
-  const handleProcess = (id: string) => {
-    // In a real app, we would call an API here
-    setResults(results.filter(r => r.id !== id))
-    setSelectedTicket(null)
-    alert('Ticket procesado con éxito y asignado al departamento correspondiente.')
+  const handleProcess = async (id: string) => {
+    try {
+      await deleteTriage(id)
+      setResults(results.filter(r => r.id !== id))
+      setSelectedTicket(null)
+    } catch (err) {
+      alert('Error al procesar el ticket')
+    }
   }
 
   return (

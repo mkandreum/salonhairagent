@@ -17,10 +17,11 @@ interface Stylist {
 interface StylistScheduleProps {
   fullView?: boolean
   onViewAll?: () => void
+  onTabChange?: (tab: string) => void
   searchQuery?: string
 }
 
-export default function StylistSchedule({ fullView = false, onViewAll, searchQuery = '' }: StylistScheduleProps) {
+export default function StylistSchedule({ fullView = false, onViewAll, onTabChange, searchQuery = '' }: StylistScheduleProps) {
   const [stylists, setStylists] = useState<Stylist[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -216,7 +217,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, searchQue
 
             <div className="mt-6 flex space-x-3">
               <button 
-                onClick={() => alert(`Agendando cita con ${stylist.name}...`)}
+                onClick={() => onTabChange ? onTabChange('appointments') : alert('Cambiando a citas...')}
                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2"
               >
                 <Calendar className="w-4 h-4" />

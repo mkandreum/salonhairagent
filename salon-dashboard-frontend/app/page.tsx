@@ -31,16 +31,19 @@ export default function Home() {
 
 
 
-  const [settings, setSettings] = useState({
-    darkMode: true,
-    notifications: false,
-    emailReports: true
+  const [settings, setSettings] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('salon_pro_settings')
+      return saved ? JSON.parse(saved) : { darkMode: true, notifications: false, emailReports: true }
+    }
+    return { darkMode: true, notifications: false, emailReports: true }
   })
 
   const toggleSetting = (key: keyof typeof settings) => {
     const newVal = !settings[key]
-    setSettings({ ...settings, [key]: newVal })
-    // In a real app, save to API or localStorage
+    const newSettings = { ...settings, [key]: newVal }
+    setSettings(newSettings)
+    localStorage.setItem('salon_pro_settings', JSON.stringify(newSettings))
     console.log(`Setting ${key} changed to ${newVal}`)
   }
 
@@ -56,7 +59,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ClientList searchQuery={searchQuery} onViewAll={() => setActiveTab('clients')} />
-              <StylistSchedule searchQuery={searchQuery} onViewAll={() => setActiveTab('stylists')} />
+              <StylistSchedule searchQuery={searchQuery} onViewAll={() => setActiveTab('stylists')} onTabChange={setActiveTab} />
             </div>
           </div>
         )
@@ -65,7 +68,7 @@ export default function Home() {
       case 'clients':
         return <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><ClientList searchQuery={searchQuery} fullView /></div>
       case 'stylists':
-        return <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><StylistSchedule searchQuery={searchQuery} fullView /></div>
+        return <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><StylistSchedule searchQuery={searchQuery} fullView onTabChange={setActiveTab} /></div>
       case 'analytics':
         return <div className="animate-in fade-in slide-in-from-bottom-4 duration-500"><AnalyticsDashboard fullView /></div>
       case 'triage':
