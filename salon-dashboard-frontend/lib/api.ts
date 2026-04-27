@@ -9,15 +9,12 @@ function getAuthHeader(): Record<string, string> {
   return { 'Authorization': `Bearer ${token}` };
 }
 
-export async function fetchStats() {
-  const res = await fetch(`${API_BASE}/stats`, { headers: getAuthHeader() });
-  return res.json();
-}
 
 export async function fetchStats() {
   const res = await fetch(`${API_BASE}/stats`, { headers: getAuthHeader() });
   return res.json();
 }
+
 
 export async function fetchAppointments() {
   const res = await fetch(`${API_BASE}/appointments`, { headers: getAuthHeader() });
