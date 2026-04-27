@@ -42,3 +42,7 @@ pids
 # Misc
 .cache
 .noportably
+
+# SQLite databases (auto-generated at runtime)
+*.db
+data/

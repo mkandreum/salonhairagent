@@ -50,9 +50,9 @@ export default function Login({ onLogin }: LoginProps) {
         localStorage.setItem('salon_pro_token', data.token)
       }
 
+      setLoading(false)
       onLogin(data.user)
     } catch (err: any) {
-
       setError(err.message)
       setLoading(false)
     }
@@ -82,6 +82,14 @@ export default function Login({ onLogin }: LoginProps) {
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-in shake duration-500">
             <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
+          </div>
+        )}
+
+        {isLogin && (
+          <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl text-center">
+            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+              Demo: <strong>admin@salon.com</strong> / <strong>admin123</strong>
+            </p>
           </div>
         )}
 

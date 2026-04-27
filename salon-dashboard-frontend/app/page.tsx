@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import DashboardStats from '@/components/DashboardStats'
@@ -12,12 +12,12 @@ import TriageView from '@/components/TriageView'
 import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
 import { fetchSettings, saveSettings } from '@/lib/api'
-import { useEffect } from 'react'
 
 export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [searchQuery, setSearchQuery] = useState('')
+  const [settings, setSettings] = useState({ darkMode: true, notifications: false, emailReports: true })
 
   const handleLogin = (userData: any) => {
     setUser(userData)
@@ -26,14 +26,6 @@ export default function Home() {
   const handleLogout = () => {
     setUser(null)
   }
-
-  if (!user) {
-    return <Login onLogin={handleLogin} />
-  }
-
-
-
-  const [settings, setSettings] = useState({ darkMode: true, notifications: false, emailReports: true })
 
   useEffect(() => {
     if (user) {
@@ -44,6 +36,10 @@ export default function Home() {
       })
     }
   }, [user])
+
+  if (!user) {
+    return <Login onLogin={handleLogin} />
+  }
 
   const toggleSetting = (key: 'darkMode' | 'notifications' | 'emailReports') => {
     const newVal = !settings[key]
