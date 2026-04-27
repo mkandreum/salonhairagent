@@ -1,7 +1,7 @@
 'use client'
 
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts'
 
 const revenueData = [
   { month: 'Ene', revenue: 4200, appointments: 120 },
@@ -101,7 +101,7 @@ export default function AnalyticsDashboard({ fullView = false }: AnalyticsDashbo
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                   {serviceData.map((entry, index) => (
-                    <Bar key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>

@@ -1,164 +1,79 @@
-# Salon Owner Dashboard Frontend
+# SalonPro — Premium AI Dashboard
+A state-of-the-art, high-fidelity React/Next.js dashboard for elite salon management, featuring glassmorphism aesthetics, real-time AI triage, and a robust SQLite backend.
 
-A modern, responsive React/Next.js dashboard for salon owners to manage appointments, clients, stylists, and business analytics.
+## 🌟 Premium Features
 
-## Features
+### 💎 Design System (Premium AI)
+- **Glassmorphism**: High-end translucent interfaces with backdrop filters and sophisticated borders.
+- **Dynamic Animations**: Custom keyframes for smooth transitions, blob backgrounds, and interactive micro-animations.
+- **Responsive & Premium Layout**: A professional sidebar with active states, icons, and a "Plan" indicator.
+- **Dark Mode Native**: Designed from the ground up to look stunning in both light and dark modes.
 
-### ✅ Completed Components
-1. **Dashboard Overview**
-   - Real-time statistics (appointments, clients, revenue, occupancy)
-   - Quick overview cards with trends
+### 📅 Real-Time Management
+- **Smart Appointments**: Today's schedule with status tracking and quick actions.
+- **Client Portfolio**: Comprehensive directory with VIP indicators and spending history.
+- **Stylist Schedule**: Live availability, ratings, and workload management.
 
-2. **Appointment Management**
-   - Today's appointments calendar view
-   - Appointment status tracking (confirmed, pending, cancelled)
-   - Time, client, service, and stylist information
-   - Quick actions for each appointment
+### 🤖 AI Triage & Audit
+- **Automatic Classification**: Integrated AI agent that triages incoming tickets (Auth, Bug, Feature, General).
+- **Audit Dashboard**: Real-time view of AI decisions and priority levels.
+- **SQLite Persistence**: All decisions and data are persisted in a real database.
 
-3. **Client Management**
-   - Client directory with contact information
-   - Visit history and spending analytics
-   - Search and filter functionality
-   - Add new client capability
+### 📊 Advanced Analytics
+- **Revenue Trends**: High-fidelity line charts with area gradients.
+- **Service Distribution**: Horizontal bar charts with custom coloring.
+- **Real Stats**: Connected to the real backend database for accurate metrics.
 
-4. **Stylist Schedule**
-   - Stylist availability tracking
-   - Today's appointment counts
-   - Specialization and rating display
-   - Quick scheduling and messaging
+## 🛠 Technology Stack
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS.
+- **Icons**: Lucide React.
+- **Charts**: Recharts.
+- **Backend**: Node.js Express, SQLite3 (Real Database).
+- **Automation**: Python 3, LangGraph logic.
 
-5. **Business Analytics**
-   - Revenue trend charts (Recharts integration)
-   - Service distribution analysis
-   - Month-over-month comparisons
-   - Interactive data visualization
-
-6. **Notifications System**
-   - Real-time notification panel
-   - Notification types (success, warning, info)
-   - Mark as read/delete functionality
-   - Unread count indicator
-
-7. **Responsive Design**
-   - Mobile-friendly sidebar navigation
-   - Responsive grid layouts
-   - Tailwind CSS for styling
-   - Dark mode ready
-
-### 🎨 Design System
-- **Colors**: Primary (blue) and Secondary (pink) color schemes
-- **Typography**: Inter font family
-- **Components**: Reusable button, card, and input components
-- **Icons**: Lucide React icon library
-
-### 🛠 Technology Stack
-- **Framework**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: React Query for data fetching
-- **Charts**: Recharts for data visualization
-- **Forms**: React Hook Form with Zod validation
-- **Icons**: Lucide React
-
-## Project Structure
-
+## 📂 Project Structure
 ```
-salon-dashboard-frontend/
-├── app/
-│   ├── layout.tsx          # Root layout with providers
-│   ├── page.tsx           # Main dashboard page
-│   └── globals.css        # Global styles
-├── components/
-│   ├── Sidebar.tsx        # Navigation sidebar
-│   ├── Header.tsx         # Top header with search
-│   ├── DashboardStats.tsx # Overview statistics
-│   ├── AppointmentCalendar.tsx # Appointment management
-│   ├── ClientList.tsx     # Client management
-│   ├── StylistSchedule.tsx # Stylist scheduling
-│   ├── AnalyticsDashboard.tsx # Business analytics
-│   └── NotificationsPanel.tsx # Notification system
-├── public/                # Static assets
-└── package.json          # Dependencies
+salonhairagent/
+├── salon-dashboard-frontend/ # Next.js Application
+│   ├── app/                 # App Router & Styles
+│   ├── components/          # Premium UI Components
+│   └── lib/                 # API Utility Layer
+├── server.cjs               # Real Express Backend
+├── salon.db                 # SQLite Database
+├── automation/              # AI Triage & Logic
+└── scripts/                 # Maintenance Scripts
 ```
 
-## Getting Started
+## 🚀 Getting Started
 
-### Installation
+### 1. Initialize Database
 ```bash
+node scripts/init_db.cjs
+```
+
+### 2. Start Backend Server
+```bash
+node server.cjs
+```
+
+### 3. Start Frontend (Dashboard)
+```bash
+cd salon-dashboard-frontend
 npm install
-```
-
-### Development
-```bash
 npm run dev
 ```
 
-### Build for Production
+### 4. Run AI Triage (Optional)
 ```bash
-npm run build
-npm start
+python automation/ticket_triage_mvp.py test_tickets.json
 ```
 
-## Key Implementation Details
+## 💎 Premium Aesthetics
+Este proyecto ha sido diseñado para impresionar. Cada componente ha sido cuidadosamente estilizado para ofrecer una sensación de lujo y modernidad tecnológica.
 
-### 1. Responsive Layout
-- Fixed sidebar for desktop, collapsible for mobile
-- Grid-based responsive components
-- Mobile-first design approach
-
-### 2. Data Management
-- Mock data for demonstration
-- Ready for API integration
-- React Query for server state management
-
-### 3. User Experience
-- Real-time notifications
-- Quick actions for common tasks
-- Search and filter functionality
-- Visual feedback for all interactions
-
-### 4. Extensibility
-- Modular component architecture
-- TypeScript for type safety
-- Easy to add new features
-- API-ready structure
-
-## Next Steps for Production
-
-1. **API Integration**
-   - Connect to backend services
-   - Implement authentication
-   - Real-time WebSocket updates
-
-2. **Additional Features**
-   - Calendar view with drag & drop
-   - Client loyalty programs
-   - Inventory management
-   - Staff payroll integration
-
-3. **Performance Optimization**
-   - Code splitting
-   - Image optimization
-   - Caching strategies
-
-4. **Testing**
-   - Unit tests for components
-   - Integration tests
-   - End-to-end testing
-
-## Screenshots
-
-### Dashboard Overview
-![Dashboard](https://via.placeholder.com/800x450/0ea5e9/ffffff?text=Dashboard+Overview)
-
-### Appointment Management
-![Appointments](https://via.placeholder.com/800x450/ec4899/ffffff?text=Appointment+Calendar)
-
-### Client Directory
-![Clients](https://via.placeholder.com/800x450/10b981/ffffff?text=Client+Management)
-
-### Business Analytics
-![Analytics](https://via.placeholder.com/800x450/f59e0b/ffffff?text=Business+Analytics)
+- **Tipografía**: Outfit (Google Fonts).
+- **Efectos**: Glassmorphism, Floating Blobs, Shake Animations.
+- **Localización**: Interfaz completamente en español.
 
 ## License
-
-MIT License - see LICENSE file for details.
+MIT License - Copyright (c) 2024 SalonPro Team

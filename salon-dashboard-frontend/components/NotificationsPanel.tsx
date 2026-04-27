@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, CheckCircle, AlertCircle, Info, X } from 'lucide-react'
+import { Bell, CheckCircle, AlertCircle, Info, X, Trash2, CheckCheck } from 'lucide-react'
 import { useState } from 'react'
 
 interface Notification {
@@ -13,11 +13,11 @@ interface Notification {
 }
 
 const initialNotifications: Notification[] = [
-  { id: 1, type: 'success', title: 'Appointment Confirmed', message: 'Sarah Johnson confirmed her 2:00 PM appointment', time: '10 min ago', read: false },
-  { id: 2, type: 'warning', title: 'No-show Alert', message: 'Michael Brown missed his 11:00 AM appointment', time: '1 hour ago', read: false },
-  { id: 3, type: 'info', title: 'New Client Registered', message: 'Lisa Anderson registered via WhatsApp', time: '2 hours ago', read: true },
-  { id: 4, type: 'success', title: 'Payment Received', message: 'Payment of $85 received from Robert Taylor', time: '3 hours ago', read: true },
-  { id: 5, type: 'warning', title: 'Low Inventory', message: 'Hair color stock running low', time: '5 hours ago', read: true },
+  { id: 1, type: 'success', title: 'Cita Confirmada', message: 'Sarah Johnson confirmó su cita de las 2:00 PM', time: 'hace 10 min', read: false },
+  { id: 2, type: 'warning', title: 'Alerta: No se presentó', message: 'Michael Brown no asistió a su cita de las 11:00 AM', time: 'hace 1 hora', read: false },
+  { id: 3, type: 'info', title: 'Nuevo Cliente Registrado', message: 'Lisa Anderson se registró vía WhatsApp', time: 'hace 2 horas', read: true },
+  { id: 4, type: 'success', title: 'Pago Recibido', message: 'Pago de $85 recibido de Robert Taylor', time: 'hace 3 horas', read: true },
+  { id: 5, type: 'warning', title: 'Inventario Bajo', message: 'Stock de tinte capilar bajo', time: 'hace 5 horas', read: true },
 ]
 
 export default function NotificationsPanel() {
@@ -26,10 +26,10 @@ export default function NotificationsPanel() {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle className="w-5 h-5 text-green-500" />
-      case 'warning': return <AlertCircle className="w-5 h-5 text-yellow-500" />
-      case 'info': return <Info className="w-5 h-5 text-blue-500" />
-      default: return <Bell className="w-5 h-5 text-gray-500" />
+      case 'success': return <CheckCircle className="w-5 h-5 text-emerald-500" />
+      case 'warning': return <AlertCircle className="w-5 h-5 text-amber-500" />
+      case 'info': return <Info className="w-5 h-5 text-indigo-500" />
+      default: return <Bell className="w-5 h-5 text-slate-500" />
     }
   }
 
@@ -50,82 +50,90 @@ export default function NotificationsPanel() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-8 right-8 z-[100]">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative bg-white rounded-full shadow-lg p-4 hover:shadow-xl transition-shadow"
+        className="relative group w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:scale-110 transition-all active:scale-95"
       >
-        <Bell className="w-6 h-6 text-gray-700" />
+        <Bell className={`w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:shake transition-transform`} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-6 h-6 bg-indigo-600 text-white text-[10px] font-bold rounded-lg flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-lg">
             {unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-96 bg-white rounded-lg shadow-xl border">
-          <div className="p-4 border-b flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Bell className="w-5 h-5 text-gray-700" />
-              <h3 className="font-bold text-gray-800">Notifications</h3>
-              {unreadCount > 0 && (
-                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  {unreadCount} new
-                </span>
-              )}
+        <div className="absolute bottom-20 right-0 w-[400px] glass-card overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-300">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-white">Notificaciones</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{unreadCount} nuevas</p>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={markAllAsRead}
-                className="text-sm text-primary-600 hover:text-primary-700"
+                title="Marcar todas como leídas"
+                className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors text-indigo-600 dark:text-indigo-400"
               >
-                Mark all as read
+                <CheckCheck className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Bell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No notifications</p>
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center mx-auto mb-4">
+                  <Bell className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">No tienes notificaciones</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b hover:bg-gray-50 ${!notification.read ? 'bg-blue-50' : ''}`}
+                  className={`p-5 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all relative group ${!notification.read ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : ''}`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                      {getNotificationIcon(notification.type)}
-                      <div>
-                        <h4 className="font-medium text-gray-800">{notification.title}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+                    <div className="flex items-start space-x-4">
+                      <div className="mt-1">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-2">
+                          <h4 className="font-bold text-slate-800 dark:text-white text-sm leading-tight">{notification.title}</h4>
+                          {!notification.read && <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />}
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{notification.message}</p>
+                        <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter">{notification.time}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       {!notification.read && (
                         <button
                           onClick={() => markAsRead(notification.id)}
-                          className="text-xs text-primary-600 hover:text-primary-700"
+                          className="p-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:text-indigo-600 transition-colors"
                         >
-                          Mark read
+                          <CheckCircle className="w-4 h-4" />
                         </button>
                       )}
                       <button
                         onClick={() => deleteNotification(notification.id)}
-                        className="p-1 hover:bg-gray-200 rounded"
+                        className="p-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:text-rose-500 transition-colors"
                       >
-                        <X className="w-4 h-4 text-gray-400" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -134,13 +142,15 @@ export default function NotificationsPanel() {
             )}
           </div>
 
-          <div className="p-4 border-t">
-            <button className="w-full text-center text-primary-600 hover:text-primary-700 font-medium">
-              View All Notifications
-            </button>
-          </div>
+          {notifications.length > 0 && (
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50">
+              <button className="w-full py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm">
+                Ver todo el historial
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
   )
-}
+}
