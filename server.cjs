@@ -23,7 +23,7 @@ const loginAttempts = new Map();
 app.use(cors());
 app.use(express.json());
 
-// Authentication Middleware
+// API Endpoints
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
