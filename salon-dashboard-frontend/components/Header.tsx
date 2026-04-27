@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, User, ChevronDown } from 'lucide-react'
+import { Search, User, ChevronDown, Bell } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Header() {

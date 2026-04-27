@@ -1,0 +1,33 @@
+# VCS and editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Runtime-irrelevant docs and notes
+_default
+docs
+job_descriptions
+memory
+tasks
+*.md
+
+# JavaScript/Node local artifacts
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# Python local artifacts
+**/__pycache__
+**/*.pyc
+.venv
+venv
+
+# Frontend project is built separately by its own Dockerfile context
+salon-dashboard-frontend
+
+# Misc
+.env
+.env.*
+*.log
+.DS_Store
