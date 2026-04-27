@@ -18,6 +18,53 @@ if (!fs.existsSync(dataDir)){
 }
 const db = new sqlite3.Database(dbPath);
 
+// Database initialization
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS clients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE,
+    phone TEXT,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS stylists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    specialty TEXT,
+    availability TEXT
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS appointments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id INTEGER,
+    stylist_id INTEGER,
+    service TEXT NOT NULL,
+    time TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    FOREIGN KEY(client_id) REFERENCES clients(id),
+    FOREIGN KEY(stylist_id) REFERENCES stylists(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS triage_results (
+    id TEXT PRIMARY KEY,
+    subject TEXT,
+    body TEXT,
+    category TEXT,
+    priority TEXT,
+    suggested_action TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // Seed initial data if empty
+  db.get("SELECT COUNT(*) as count FROM stylists", (err, row) => {
+    if (row && row.count === 0) {
+      db.run("INSERT INTO stylists (name, specialty) VALUES ('Ana Martínez', 'Coloración'), ('Carlos Ruiz', 'Corte Caballero')");
+    }
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', service: 'salon-backend' });
@@ -57,20 +104,23 @@ app.get('/api/stylists', (req, res) => {
 
 // Get dashboard stats
 app.get('/api/stats', (req, res) => {
-  // Mocked for now but based on DB counts
   db.get("SELECT COUNT(*) as appointments_today FROM appointments", (err, row1) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
     db.get("SELECT COUNT(*) as active_clients FROM clients", (err, row2) => {
+      if (err) return res.status(500).json({ error: err.message });
+
       res.json([
         {
           title: 'Citas de Hoy',
-          value: row1.appointments_today.toString(),
+          value: (row1?.appointments_today || 0).toString(),
           change: '+3',
           trend: 'up',
           color: 'from-blue-500 to-cyan-500',
         },
         {
           title: 'Clientes Activos',
-          value: row2.active_clients.toString(),
+          value: (row2?.active_clients || 0).toString(),
           change: '+12%',
           trend: 'up',
           color: 'from-emerald-500 to-teal-500',
@@ -93,6 +143,7 @@ app.get('/api/stats', (req, res) => {
     });
   });
 });
+
 
 // Get triage results
 app.get('/api/triage', (req, res) => {
