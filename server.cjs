@@ -4,15 +4,16 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 let JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  const crypto = require('crypto');
   JWT_SECRET = crypto.randomBytes(32).toString('hex');
-  console.warn('ADVERTENCIA: JWT_SECRET no está definido. Usando uno generado automáticamente. Esto no es seguro para producción.');
+  console.warn('ADVERTENCIA: JWT_SECRET no está definido. Usando uno generado automáticamente.');
 }
 
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
@@ -65,9 +66,20 @@ const dbPath = path.join(__dirname, 'data', 'salon.db');
 const fs = require('fs');
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)){
-    fs.mkdirSync(dataDir, { recursive: true });
+    try {
+        fs.mkdirSync(dataDir, { recursive: true });
+        console.log('Data directory created:', dataDir);
+    } catch (e) {
+        console.error('ERROR: No se pudo crear el directorio data:', e.message);
+    }
 }
-const db = new sqlite3.Database(dbPath);
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('ERROR: No se pudo conectar a la base de datos:', err.message);
+  } else {
+    console.log('Base de datos conectada:', dbPath);
+  }
+});
 
 // Database initialization
 db.serialize(() => {
@@ -631,5 +643,11 @@ app.put('/api/stylists/:id', authenticateToken, (req, res) => {
 
 app.listen(port, () => {
   console.log(`Salon Backend running at http://localhost:${port}`);
+});
+
+// Global error handler - must be LAST
+app.use((err, req, res, next) => {
+  console.error('ERROR:', err.stack);
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
