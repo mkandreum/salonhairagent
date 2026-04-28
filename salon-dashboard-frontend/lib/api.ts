@@ -1,25 +1,52 @@
-const API_BASE = (typeof window !== 'undefined' && (window as any).ENV_API_URL) 
-  || process.env.NEXT_PUBLIC_API_URL 
-  || '/api';
+// API_BASE: en producción nginx hace proxy de /api -> backend:3001
+// En desarrollo local Next.js reescribe /api -> localhost:3001
+const API_BASE = '/api';
+
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('salon_pro_token');
+  } catch {
+    return null;
+  }
+}
 
 function getAuthHeader(): Record<string, string> {
-  if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem('salon_pro_token');
+  const token = getToken();
   if (!token) return {};
   return { 'Authorization': `Bearer ${token}` };
 }
 
-
-export async function fetchStats() {
-  const res = await fetch(`${API_BASE}/stats`, { headers: getAuthHeader() });
+async function apiFetch(path: string, options?: RequestInit) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      ...getAuthHeader(),
+      ...(options?.headers || {}),
+    },
+  });
+  if (!res.ok) {
+    let errMsg = `Error ${res.status}`;
+    try {
+      const data = await res.json();
+      errMsg = data.error || errMsg;
+    } catch {}
+    // Token expirado: limpiar sesión
+    if (res.status === 401 || res.status === 403) {
+      try { localStorage.removeItem('salon_pro_token'); } catch {}
+      if (typeof window !== 'undefined') window.location.reload();
+    }
+    throw new Error(errMsg);
+  }
   return res.json();
 }
 
+export async function fetchStats() {
+  return apiFetch('/stats');
+}
 
 export async function fetchAppointments() {
-  const res = await fetch(`${API_BASE}/appointments`, { headers: getAuthHeader() });
-  const data = await res.json();
-  // Transform to frontend format if necessary
+  const data = await apiFetch('/appointments');
   return data.map((a: any) => ({
     id: a.id,
     time: a.time,
@@ -35,151 +62,113 @@ export async function fetchAppointments() {
 }
 
 export async function fetchClients() {
-  const res = await fetch(`${API_BASE}/clients`, { headers: getAuthHeader() });
-  return res.json();
+  return apiFetch('/clients');
 }
 
 export async function fetchStylists() {
-  const res = await fetch(`${API_BASE}/stylists`, { headers: getAuthHeader() });
-  return res.json();
+  return apiFetch('/stylists');
 }
 
 export async function fetchTriage() {
-  const res = await fetch(`${API_BASE}/triage`, { headers: getAuthHeader() });
-  return res.json();
+  return apiFetch('/triage');
 }
 
 export async function fetchNotifications() {
-  const res = await fetch(`${API_BASE}/notifications`, { headers: getAuthHeader() });
-  return res.json();
+  return apiFetch('/notifications');
 }
 
 export async function markNotificationRead(id: number) {
-  const res = await fetch(`${API_BASE}/notifications/${id}/read`, { 
-    method: 'POST',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/notifications/${id}/read`, { method: 'POST' });
 }
 
 export async function deleteNotification(id: number) {
-  const res = await fetch(`${API_BASE}/notifications/${id}`, { 
-    method: 'DELETE',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/notifications/${id}`, { method: 'DELETE' });
 }
 
-export async function fetchAnalytics() {
-  const res = await fetch(`${API_BASE}/analytics`, { headers: getAuthHeader() });
-  return res.json();
+export async function fetchAnalytics(range: string = '30d') {
+  return apiFetch(`/analytics?range=${range}`);
 }
 
 export async function createAppointment(data: any) {
-  const res = await fetch(`${API_BASE}/appointments`, {
+  return apiFetch('/appointments', {
     method: 'POST',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function createClient(data: any) {
-  const res = await fetch(`${API_BASE}/clients`, {
+  return apiFetch('/clients', {
     method: 'POST',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function deleteAppointment(id: number) {
-  const res = await fetch(`${API_BASE}/appointments/${id}`, { 
-    method: 'DELETE',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/appointments/${id}`, { method: 'DELETE' });
 }
 
 export async function updateAppointmentStatus(id: number, status: string) {
-  const res = await fetch(`${API_BASE}/appointments/${id}/status`, {
+  return apiFetch(`/appointments/${id}/status`, {
     method: 'PUT',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
   });
-  return res.json();
 }
 
 export async function updateAppointment(id: number, data: any) {
-  const res = await fetch(`${API_BASE}/appointments/${id}`, {
+  return apiFetch(`/appointments/${id}`, {
     method: 'PUT',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function updateClient(id: number, data: any) {
-  const res = await fetch(`${API_BASE}/clients/${id}`, {
+  return apiFetch(`/clients/${id}`, {
     method: 'PUT',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function createStylist(data: any) {
-  const res = await fetch(`${API_BASE}/stylists`, {
+  return apiFetch('/stylists', {
     method: 'POST',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function updateStylist(id: number, data: any) {
-  const res = await fetch(`${API_BASE}/stylists/${id}`, {
+  return apiFetch(`/stylists/${id}`, {
     method: 'PUT',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function deleteStylist(id: number) {
-  const res = await fetch(`${API_BASE}/stylists/${id}`, { 
-    method: 'DELETE',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/stylists/${id}`, { method: 'DELETE' });
 }
 
 export async function deleteClient(id: number) {
-  const res = await fetch(`${API_BASE}/clients/${id}`, { 
-    method: 'DELETE',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/clients/${id}`, { method: 'DELETE' });
 }
 
 export async function deleteTriage(id: string) {
-  const res = await fetch(`${API_BASE}/triage/${id}`, { 
-    method: 'DELETE',
-    headers: getAuthHeader()
-  });
-  return res.json();
+  return apiFetch(`/triage/${id}`, { method: 'DELETE' });
 }
 
 export async function fetchSettings() {
-  const res = await fetch(`${API_BASE}/settings`, { headers: getAuthHeader() });
-  return res.json();
+  return apiFetch('/settings');
 }
 
 export async function saveSettings(settings: any) {
-  const res = await fetch(`${API_BASE}/settings`, {
+  return apiFetch('/settings', {
     method: 'POST',
-    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(settings)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
   });
-  return res.json();
 }
