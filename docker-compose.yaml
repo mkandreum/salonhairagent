@@ -40,8 +40,8 @@ services:
         condition: service_healthy
     networks:
       - salon-network
-    ports:
-      - "${PORT:-3000}:3000"
+    expose:
+      - "3000"
     labels:
       - "coolify.managed=true"
 
