@@ -11,66 +11,30 @@ const port = process.env.PORT || 3001;
 let JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   JWT_SECRET = crypto.randomBytes(32).toString('hex');
-  console.warn('ADVERTENCIA: JWT_SECRET no está definido. Usando uno generado automáticamente.');
+  console.warn('ADVERTENCIA: JWT_SECRET no está definido. Usando uno generado automáticamente (las sesiones no sobrevivirán reinicios).');
 }
 
-// PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
-// Test DB connection on startup
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('ERROR: No se pudo conectar a PostgreSQL:', err.message);
-    process.exit(1);
+// Wait for DB to be ready (PostgreSQL may take a few seconds to start)
+async function waitForDB(retries = 20, delay = 2000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const client = await pool.connect();
+      client.release();
+      console.log('PostgreSQL conectado correctamente.');
+      return;
+    } catch (err) {
+      console.log(`Esperando a PostgreSQL... intento ${i + 1}/${retries}`);
+      await new Promise(r => setTimeout(r, delay));
+    }
   }
-  console.log('PostgreSQL conectado correctamente.');
-  release();
-});
+  console.error('ERROR: No se pudo conectar a PostgreSQL tras varios intentos.');
+  process.exit(1);
+}
 
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
-const loginAttempts = new Map();
-
-app.use(cors());
-app.use(express.json());
-
-// Authenticate JWT middleware
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Acceso denegado. Se requiere autenticación.' });
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Sesión expirada o token inválido.' });
-    req.user = user;
-    next();
-  });
-};
-
-// Rate limiter for login
-const checkRateLimit = (email) => {
-  const now = Date.now();
-  const attempts = loginAttempts.get(email) || [];
-  const recentAttempts = attempts.filter(t => now - t < RATE_LIMIT_WINDOW);
-  if (recentAttempts.length >= RATE_LIMIT_MAX) return false;
-  recentAttempts.push(now);
-  loginAttempts.set(email, recentAttempts);
-  return true;
-};
-
-app.use((req, res, next) => {
-  const now = Date.now();
-  for (const [email, attempts] of loginAttempts.entries()) {
-    const valid = attempts.filter(t => now - t < RATE_LIMIT_WINDOW);
-    if (valid.length === 0) loginAttempts.delete(email);
-    else loginAttempts.set(email, valid);
-  }
-  next();
-});
-
-// Initialize DB tables
 async function initDB() {
   const client = await pool.connect();
   try {
@@ -146,25 +110,51 @@ async function initDB() {
       )
     `);
     console.log('Tablas de base de datos inicializadas.');
-  } catch (err) {
-    console.error('ERROR al inicializar tablas:', err.message);
-    throw err;
   } finally {
     client.release();
   }
 }
 
-initDB().catch(err => {
-  console.error('No se pudo inicializar la BD:', err.message);
-  process.exit(1);
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const loginAttempts = new Map();
+
+app.use(cors());
+app.use(express.json());
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Acceso denegado. Se requiere autenticación.' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Sesión expirada o token inválido.' });
+    req.user = user;
+    next();
+  });
+};
+
+const checkRateLimit = (email) => {
+  const now = Date.now();
+  const attempts = loginAttempts.get(email) || [];
+  const recentAttempts = attempts.filter(t => now - t < RATE_LIMIT_WINDOW);
+  if (recentAttempts.length >= RATE_LIMIT_MAX) return false;
+  recentAttempts.push(now);
+  loginAttempts.set(email, recentAttempts);
+  return true;
+};
+
+app.use((req, res, next) => {
+  const now = Date.now();
+  for (const [email, attempts] of loginAttempts.entries()) {
+    const valid = attempts.filter(t => now - t < RATE_LIMIT_WINDOW);
+    if (valid.length === 0) loginAttempts.delete(email);
+    else loginAttempts.set(email, valid);
+  }
+  next();
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', service: 'salon-backend' });
-});
+app.get('/health', (req, res) => res.json({ status: 'healthy', service: 'salon-backend' }));
 
-// Get all appointments
 app.get('/api/appointments', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query(`
@@ -174,39 +164,29 @@ app.get('/api/appointments', authenticateToken, async (req, res) => {
       JOIN stylists s ON a.stylist_id = s.id
     `);
     res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Get all clients
 app.get('/api/clients', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM clients');
     res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Get all stylists
 app.get('/api/stylists', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM stylists');
     res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Dashboard stats
 app.get('/api/stats', authenticateToken, async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
-
     const [todayApps, yesterdayApps, totalClients, revenue, stylistCount] = await Promise.all([
       pool.query('SELECT COUNT(*) as count FROM appointments WHERE date = $1', [today]),
       pool.query('SELECT COUNT(*) as count FROM appointments WHERE date = $1', [yesterdayStr]),
@@ -214,33 +194,27 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
       pool.query('SELECT SUM(total_spent) as total FROM clients'),
       pool.query("SELECT COUNT(*) as count FROM stylists WHERE availability != 'off'"),
     ]);
-
     const todayCount = parseInt(todayApps.rows[0].count) || 0;
     const yesterdayCount = parseInt(yesterdayApps.rows[0].count) || 0;
     const appChange = todayCount - yesterdayCount;
     const totalRevenue = parseFloat(revenue.rows[0].total) || 0;
     const activeStylists = parseInt(stylistCount.rows[0].count) || 1;
     const occupationRate = Math.min(100, Math.round((todayCount / (activeStylists * 8)) * 100));
-
     res.json([
       { title: 'Citas Hoy', value: todayCount.toString(), change: (appChange >= 0 ? '+' : '') + appChange, trend: appChange >= 0 ? 'up' : 'down', color: 'from-indigo-500 to-purple-500' },
       { title: 'Clientes Activos', value: (parseInt(totalClients.rows[0].count) || 0).toString(), change: '+12%', trend: 'up', color: 'from-emerald-500 to-teal-500' },
       { title: 'Ingresos Totales', value: `$${Math.round(totalRevenue).toLocaleString()}`, change: '+15.2%', trend: 'up', color: 'from-blue-500 to-cyan-500' },
       { title: 'Tasa de Ocupación', value: `${occupationRate}%`, change: occupationRate > 70 ? '+5%' : '-2%', trend: occupationRate > 70 ? 'up' : 'down', color: 'from-orange-500 to-pink-500' },
     ]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Register
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.status(400).json({ error: 'Faltan datos obligatorios' });
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) return res.status(400).json({ error: 'Email inválido' });
   if (password.length < 6) return res.status(400).json({ error: 'Password debe tener al menos 6 caracteres' });
-
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
@@ -254,12 +228,10 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email y password son requeridos' });
   if (!checkRateLimit(email)) return res.status(429).json({ error: 'Demasiados intentos. Intenta de nuevo en 15 minutos.' });
-
   try {
     const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (rows.length === 0) return res.status(401).json({ error: 'Credenciales inválidas' });
@@ -274,14 +246,11 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Notifications
 app.get('/api/notifications', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM notifications ORDER BY time DESC LIMIT 20');
     res.json(rows.map(r => ({ ...r, read: !!r.read })));
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/notifications/:id/read', authenticateToken, async (req, res) => {
@@ -290,9 +259,7 @@ app.post('/api/notifications/:id/read', authenticateToken, async (req, res) => {
   try {
     await pool.query('UPDATE notifications SET read = 1 WHERE id = $1', [notifId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/notifications/:id', authenticateToken, async (req, res) => {
@@ -301,12 +268,9 @@ app.delete('/api/notifications/:id', authenticateToken, async (req, res) => {
   try {
     await pool.query('DELETE FROM notifications WHERE id = $1', [notifId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Analytics
 app.get('/api/analytics', authenticateToken, async (req, res) => {
   try {
     const revenueQuery = `
@@ -318,45 +282,31 @@ app.get('/api/analytics', authenticateToken, async (req, res) => {
       GROUP BY TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'Mon'), TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'MM')
       ORDER BY TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'MM')
     `;
-    const serviceQuery = `
-      SELECT service as name, COUNT(*) as count
-      FROM appointments
-      GROUP BY service
-    `;
     const [revenueResult, serviceResult, totalRev, totalAppts] = await Promise.all([
       pool.query(revenueQuery),
-      pool.query(serviceQuery),
+      pool.query('SELECT service as name, COUNT(*) as count FROM appointments GROUP BY service'),
       pool.query('SELECT SUM(price) as total FROM appointments'),
       pool.query('SELECT COUNT(*) as count FROM appointments'),
     ]);
-
     const colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'];
     const total = parseInt(totalAppts.rows[0].count) || 1;
     const serviceData = serviceResult.rows.map((s, i) => ({
-      name: s.name,
-      value: Math.round((parseInt(s.count) / total) * 100),
-      color: colors[i % colors.length]
+      name: s.name, value: Math.round((parseInt(s.count) / total) * 100), color: colors[i % colors.length]
     }));
-
     res.json({
       revenueData: revenueResult.rows.length > 0 ? revenueResult.rows : [{ month: 'Ene', revenue: 0, appointments: 0 }],
       serviceData: serviceData.length > 0 ? serviceData : [{ name: 'Sin datos', value: 100, color: '#94a3b8' }],
       totalRevenue: parseFloat(totalRev.rows[0].total) || 0,
       totalAppointments: parseInt(totalAppts.rows[0].count) || 0,
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Triage
 app.get('/api/triage', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM triage_results ORDER BY timestamp DESC');
     res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/triage', authenticateToken, async (req, res) => {
@@ -368,23 +318,17 @@ app.post('/api/triage', authenticateToken, async (req, res) => {
       [id, subject, body, category, priority, suggested_action]
     );
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/triage/:id', authenticateToken, async (req, res) => {
-  const triageId = req.params.id;
-  if (!triageId) return res.status(400).json({ error: 'ID inválido' });
+  if (!req.params.id) return res.status(400).json({ error: 'ID inválido' });
   try {
-    await pool.query('DELETE FROM triage_results WHERE id = $1', [triageId]);
+    await pool.query('DELETE FROM triage_results WHERE id = $1', [req.params.id]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Appointments CRUD
 app.post('/api/appointments', authenticateToken, async (req, res) => {
   const { client_id, stylist_id, service, time, date, price } = req.body;
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos requeridos' });
@@ -395,14 +339,10 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
       'INSERT INTO appointments (client_id, stylist_id, service, time, date, price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
       [client_id, stylist_id, service, time, date, appointmentPrice]
     );
-    await pool.query(
-      'INSERT INTO notifications (type, title, message) VALUES ($1, $2, $3)',
-      ['success', 'Nueva Cita', `Nueva cita para ${service} creada.`]
-    );
+    await pool.query('INSERT INTO notifications (type, title, message) VALUES ($1, $2, $3)',
+      ['success', 'Nueva Cita', `Nueva cita para ${service} creada.`]);
     res.json({ success: true, appointmentId: rows[0].id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/appointments/:id/status', authenticateToken, async (req, res) => {
@@ -413,9 +353,7 @@ app.put('/api/appointments/:id/status', authenticateToken, async (req, res) => {
   try {
     await pool.query('UPDATE appointments SET status = $1 WHERE id = $2', [status, appId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/appointments/:id', authenticateToken, async (req, res) => {
@@ -423,16 +361,13 @@ app.put('/api/appointments/:id', authenticateToken, async (req, res) => {
   if (isNaN(appId)) return res.status(400).json({ error: 'ID inválido' });
   const { client_id, stylist_id, service, time, date, status } = req.body;
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos requeridos' });
-  if (status && !['pending', 'confirmed', 'cancelled'].includes(status)) return res.status(400).json({ error: 'Estado inválido' });
   try {
     await pool.query(
       'UPDATE appointments SET client_id=$1, stylist_id=$2, service=$3, time=$4, date=$5, status=$6 WHERE id=$7',
       [client_id, stylist_id, service, time, date, status || 'pending', appId]
     );
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/appointments/:id', authenticateToken, async (req, res) => {
@@ -441,23 +376,15 @@ app.delete('/api/appointments/:id', authenticateToken, async (req, res) => {
   try {
     await pool.query('DELETE FROM appointments WHERE id = $1', [appId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Clients CRUD
 app.post('/api/clients', authenticateToken, async (req, res) => {
   const { name, email, phone } = req.body;
   try {
-    const { rows } = await pool.query(
-      'INSERT INTO clients (name, email, phone) VALUES ($1, $2, $3) RETURNING id',
-      [name, email, phone]
-    );
+    const { rows } = await pool.query('INSERT INTO clients (name, email, phone) VALUES ($1, $2, $3) RETURNING id', [name, email, phone]);
     res.json({ success: true, clientId: rows[0].id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/clients/:id', authenticateToken, async (req, res) => {
@@ -468,9 +395,7 @@ app.put('/api/clients/:id', authenticateToken, async (req, res) => {
   try {
     await pool.query('UPDATE clients SET name=$1, email=$2, phone=$3 WHERE id=$4', [name, email, phone, clientId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
@@ -479,12 +404,9 @@ app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
   try {
     await pool.query('DELETE FROM clients WHERE id = $1', [clientId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Stylists CRUD
 app.post('/api/stylists', authenticateToken, async (req, res) => {
   const { name, specialization, rating, availability, next_available } = req.body;
   if (!name) return res.status(400).json({ error: 'Nombre es requerido' });
@@ -496,9 +418,7 @@ app.post('/api/stylists', authenticateToken, async (req, res) => {
       [name, specialization, stylistRating, availability || 'available', next_available || 'Ahora']
     );
     res.json({ success: true, stylistId: rows[0].id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/stylists/:id', authenticateToken, async (req, res) => {
@@ -509,9 +429,7 @@ app.put('/api/stylists/:id', authenticateToken, async (req, res) => {
       [name, specialization, rating, availability, next_available, req.params.id]
     );
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/stylists/:id', authenticateToken, async (req, res) => {
@@ -520,23 +438,16 @@ app.delete('/api/stylists/:id', authenticateToken, async (req, res) => {
   try {
     await pool.query('DELETE FROM stylists WHERE id = $1', [stylistId]);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Settings
 app.get('/api/settings', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM settings');
     const settings = {};
-    rows.forEach(row => {
-      try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; }
-    });
+    rows.forEach(row => { try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; } });
     res.json(settings);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/settings', authenticateToken, async (req, res) => {
@@ -549,16 +460,17 @@ app.post('/api/settings', authenticateToken, async (req, res) => {
       );
     }
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.listen(port, () => {
-  console.log(`Salon Backend running at http://localhost:${port}`);
+// Start server only after DB is ready
+waitForDB().then(() => initDB()).then(() => {
+  app.listen(port, () => console.log(`Salon Backend running at http://localhost:${port}`));
+}).catch(err => {
+  console.error('Error fatal al iniciar:', err.message);
+  process.exit(1);
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('ERROR:', err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
