@@ -4,11 +4,9 @@ version: '3.8'
 # COOLIFY DEPLOYMENT — single container, all-in-one
 # PostgreSQL + Node backend + Next.js frontend
 #
-# IMPORTANTE en Coolify:
-#   1. Activa "Preserve Repository During Deployment" (General > Settings)
-#      Esto evita que Coolify recree volúmenes en cada deploy.
-#   2. Añade las 2 variables de entorno (JWT_SECRET y DB_PASSWORD)
-#   3. El puerto expuesto es el 80
+# NO pongas ports aquí — Coolify usa Traefik como proxy y
+# gestiona el routing automáticamente. Solo define el puerto
+# interno en la configuración de Coolify (Port: 80).
 # =============================================================
 
 services:
@@ -17,12 +15,9 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     volumes:
-      # Bind mount con path absoluto — compatible con Coolify
-      # Coolify almacena los datos en /data/coolify/applications/<app-id>/
-      # El directorio 'pgdata' se crea automáticamente si no existe
       - type: bind
         source: ./pgdata
         target: /var/lib/postgresql/data
