@@ -2,14 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  // En produccion (contenedor unico), nginx hace el proxy de /api/* al backend
+  // En dev local, Next.js reescribe /api/* al backend en localhost:3001
   async rewrites() {
-    // In Docker/Coolify: NEXT_PUBLIC_API_URL=http://backend:3001
-    // In local dev:       NEXT_PUBLIC_API_URL=http://localhost:3001
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    if (process.env.NODE_ENV === 'production') {
+      return []; // nginx se encarga en produccion
+    }
     return [
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*`,
+        destination: 'http://localhost:3001/api/:path*',
       },
     ];
   },
