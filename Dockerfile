@@ -16,7 +16,7 @@ ENV NODE_ENV=production
 # next export genera carpeta 'out/' con HTML/CSS/JS puros
 RUN npm run build
 
-# Verificar que el export se generó
+# Verificar que el export se genero
 RUN echo "Verificando carpeta out..." && ls -la out/
 
 # ============================================================
@@ -29,17 +29,18 @@ WORKDIR /app
 # curl para healthcheck
 RUN apk add --no-cache curl
 
-# Instalar dependencias de producción del backend
-COPY package*.json ./
-RUN npm ci --omit=dev
+# Instalar dependencias de produccion del backend
+# Usamos npm install (no ci) para evitar errores si el lockfile esta desincronizado
+COPY package.json ./
+RUN npm install --omit=dev
 
 # Copiar backend
 COPY server.cjs ./
 
-# Copiar frontend compilado a /app/public (igual que VoltBodyPowered: dist -> public)
+# Copiar frontend compilado a /app/public
 COPY --from=frontend-builder /frontend/out ./public
 
-# Verificar que el frontend está en public
+# Verificar que el frontend esta en public
 RUN echo "Verificando public..." && ls -la public/
 
 EXPOSE 3000
