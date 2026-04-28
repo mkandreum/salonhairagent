@@ -1,6 +1,8 @@
-// API_BASE: en producción nginx hace proxy de /api -> backend:3001
-// En desarrollo local Next.js reescribe /api -> localhost:3001
-const API_BASE = '/api';
+// En producción Express sirve el frontend y hace de API en el mismo origen
+// En desarrollo local apuntamos al backend directamente
+const API_BASE = typeof window !== 'undefined'
+  ? '/api'
+  : 'http://localhost:3001/api';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -31,7 +33,6 @@ async function apiFetch(path: string, options?: RequestInit) {
       const data = await res.json();
       errMsg = data.error || errMsg;
     } catch {}
-    // Token expirado: limpiar sesión
     if (res.status === 401 || res.status === 403) {
       try { localStorage.removeItem('salon_pro_token'); } catch {}
       if (typeof window !== 'undefined') window.location.reload();

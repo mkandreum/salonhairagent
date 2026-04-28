@@ -4,9 +4,11 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 let JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -116,7 +118,6 @@ const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const loginAttempts = new Map();
 
-// CORS: en producción solo orígenes conocidos, en dev abierto
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
   : null;
@@ -130,6 +131,18 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// ============================================================
+// Servir frontend estático - igual que VoltBodyPowered
+// ============================================================
+const staticPath = path.join(__dirname, 'public');
+console.log(`Static files path: ${staticPath}`);
+console.log(`Static path exists: ${fs.existsSync(staticPath)}`);
+if (fs.existsSync(staticPath)) {
+  const files = fs.readdirSync(staticPath);
+  console.log(`Files in public: ${files.join(', ')}`);
+}
+app.use(express.static(staticPath));
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -196,8 +209,6 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-    // Primer dia del mes actual y anterior
     const now = new Date();
     const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const firstLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
@@ -218,20 +229,17 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
     const todayCount = parseInt(todayApps.rows[0].count) || 0;
     const yesterdayCount = parseInt(yesterdayApps.rows[0].count) || 0;
     const appChange = todayCount - yesterdayCount;
-
     const totalClientsCount = parseInt(totalClients.rows[0].count) || 0;
     const thisMonthClientsCount = parseInt(thisMonthClients.rows[0].count) || 0;
     const lastMonthClientsCount = parseInt(lastMonthClients.rows[0].count) || 0;
     const clientChange = lastMonthClientsCount > 0
       ? Math.round(((thisMonthClientsCount - lastMonthClientsCount) / lastMonthClientsCount) * 100)
       : (thisMonthClientsCount > 0 ? 100 : 0);
-
     const thisMonthRevenue = parseFloat(revenue.rows[0].total) || 0;
     const prevMonthRevenue = parseFloat(lastMonthRevenue.rows[0].total) || 0;
     const revenueChange = prevMonthRevenue > 0
       ? Math.round(((thisMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100)
       : (thisMonthRevenue > 0 ? 100 : 0);
-
     const activeStylists = parseInt(stylistCount.rows[0].count) || 1;
     const occupationRate = Math.min(100, Math.round((todayCount / (activeStylists * 8)) * 100));
 
@@ -308,7 +316,6 @@ app.delete('/api/notifications/:id', authenticateToken, async (req, res) => {
 
 app.get('/api/analytics', authenticateToken, async (req, res) => {
   try {
-    // range: 7d, 30d, 3m, 1y (default: 30d)
     const range = req.query.range || '30d';
     let startDate;
     const now = new Date();
@@ -319,73 +326,39 @@ app.get('/api/analytics', authenticateToken, async (req, res) => {
     else startDate = new Date(now - 30 * 24 * 3600 * 1000);
     const startStr = startDate.toISOString().split('T')[0];
 
-    // Revenue agrupado por mes dentro del rango
-    const revenueQuery = `
-      SELECT
-        TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'Mon') as month,
-        TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'MM') as month_num,
-        SUM(price) as revenue,
-        COUNT(*) as appointments
-      FROM appointments
-      WHERE date >= $1
-      GROUP BY TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'Mon'), TO_CHAR(TO_DATE(date, 'YYYY-MM-DD'), 'MM')
-      ORDER BY month_num
-    `;
-
-    // Para 7d o 30d agrupamos por dia
-    const dailyQuery = `
-      SELECT
-        date as day,
-        SUM(price) as revenue,
-        COUNT(*) as appointments
-      FROM appointments
-      WHERE date >= $1
-      GROUP BY date
-      ORDER BY date
-    `;
-
     const useDaily = range === '7d' || range === '30d';
-    const [revenueResult, serviceResult, totalRev, totalAppts,
-           prevRev, prevAppts] = await Promise.all([
-      pool.query(useDaily ? dailyQuery : revenueQuery, [startStr]),
+    const groupQuery = useDaily
+      ? `SELECT date as month, SUM(price) as revenue, COUNT(*) as appointments FROM appointments WHERE date >= $1 GROUP BY date ORDER BY date`
+      : `SELECT TO_CHAR(TO_DATE(date,'YYYY-MM-DD'),'Mon') as month, TO_CHAR(TO_DATE(date,'YYYY-MM-DD'),'MM') as month_num, SUM(price) as revenue, COUNT(*) as appointments FROM appointments WHERE date >= $1 GROUP BY 1,2 ORDER BY 2`;
+
+    const [revenueResult, serviceResult, totalRev, totalAppts, prevRev, prevAppts] = await Promise.all([
+      pool.query(groupQuery, [startStr]),
       pool.query('SELECT service as name, COUNT(*) as count FROM appointments WHERE date >= $1 GROUP BY service', [startStr]),
-      pool.query('SELECT COALESCE(SUM(price), 0) as total FROM appointments WHERE date >= $1', [startStr]),
+      pool.query('SELECT COALESCE(SUM(price),0) as total FROM appointments WHERE date >= $1', [startStr]),
       pool.query('SELECT COUNT(*) as count FROM appointments WHERE date >= $1', [startStr]),
-      // Periodo anterior (mismo intervalo antes de startDate)
-      pool.query('SELECT COALESCE(SUM(price), 0) as total FROM appointments WHERE date < $1 AND date >= $2',
+      pool.query('SELECT COALESCE(SUM(price),0) as total FROM appointments WHERE date < $1 AND date >= $2',
         [startStr, new Date(startDate - (now - startDate)).toISOString().split('T')[0]]),
       pool.query('SELECT COUNT(*) as count FROM appointments WHERE date < $1 AND date >= $2',
         [startStr, new Date(startDate - (now - startDate)).toISOString().split('T')[0]]),
     ]);
 
-    const colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'];
+    const colors = ['#6366f1','#ec4899','#10b981','#f59e0b','#8b5cf6'];
     const total = parseInt(totalAppts.rows[0].count) || 1;
     const serviceData = serviceResult.rows.map((s, i) => ({
-      name: s.name, value: Math.round((parseInt(s.count) / total) * 100), color: colors[i % colors.length]
+      name: s.name, value: Math.round((parseInt(s.count)/total)*100), color: colors[i%colors.length]
     }));
-
     const thisRevenue = parseFloat(totalRev.rows[0].total) || 0;
     const prevRevenue = parseFloat(prevRev.rows[0].total) || 0;
-    const revenueChangePct = prevRevenue > 0
-      ? Math.round(((thisRevenue - prevRevenue) / prevRevenue) * 100)
-      : (thisRevenue > 0 ? 100 : 0);
+    const revenueChangePct = prevRevenue > 0 ? Math.round(((thisRevenue-prevRevenue)/prevRevenue)*100) : (thisRevenue > 0 ? 100 : 0);
     const thisAppts = parseInt(totalAppts.rows[0].count) || 0;
     const prevApptsCount = parseInt(prevAppts.rows[0].count) || 0;
-    const apptsChangePct = prevApptsCount > 0
-      ? Math.round(((thisAppts - prevApptsCount) / prevApptsCount) * 100)
-      : (thisAppts > 0 ? 100 : 0);
-
-    const revenueData = useDaily
-      ? revenueResult.rows.map(r => ({ month: r.day, revenue: parseFloat(r.revenue) || 0, appointments: parseInt(r.appointments) || 0 }))
-      : revenueResult.rows.map(r => ({ month: r.month, revenue: parseFloat(r.revenue) || 0, appointments: parseInt(r.appointments) || 0 }));
+    const apptsChangePct = prevApptsCount > 0 ? Math.round(((thisAppts-prevApptsCount)/prevApptsCount)*100) : (thisAppts > 0 ? 100 : 0);
+    const revenueData = revenueResult.rows.map(r => ({ month: r.month, revenue: parseFloat(r.revenue)||0, appointments: parseInt(r.appointments)||0 }));
 
     res.json({
-      revenueData: revenueData.length > 0 ? revenueData : [{ month: 'Sin datos', revenue: 0, appointments: 0 }],
-      serviceData: serviceData.length > 0 ? serviceData : [{ name: 'Sin datos', value: 100, color: '#94a3b8' }],
-      totalRevenue: thisRevenue,
-      totalAppointments: thisAppts,
-      revenueChangePct,
-      apptsChangePct,
+      revenueData: revenueData.length > 0 ? revenueData : [{month:'Sin datos',revenue:0,appointments:0}],
+      serviceData: serviceData.length > 0 ? serviceData : [{name:'Sin datos',value:100,color:'#94a3b8'}],
+      totalRevenue: thisRevenue, totalAppointments: thisAppts, revenueChangePct, apptsChangePct,
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -402,7 +375,7 @@ app.post('/api/triage', authenticateToken, async (req, res) => {
   if (!id || !subject || !category || !priority) return res.status(400).json({ error: 'Faltan campos requeridos' });
   try {
     await pool.query(
-      'INSERT INTO triage_results (id, subject, body, category, priority, suggested_action) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO UPDATE SET subject=$2, body=$3, category=$4, priority=$5, suggested_action=$6',
+      'INSERT INTO triage_results (id,subject,body,category,priority,suggested_action) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO UPDATE SET subject=$2,body=$3,category=$4,priority=$5,suggested_action=$6',
       [id, subject, body, category, priority, suggested_action]
     );
     res.json({ success: true });
@@ -421,14 +394,13 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
   const { client_id, stylist_id, service, time, date, price } = req.body;
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos requeridos' });
   const appointmentPrice = parseFloat(price) || 30.0;
-  if (appointmentPrice < 0 || appointmentPrice > 10000) return res.status(400).json({ error: 'Precio inválido' });
   try {
     const { rows } = await pool.query(
-      'INSERT INTO appointments (client_id, stylist_id, service, time, date, price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+      'INSERT INTO appointments (client_id,stylist_id,service,time,date,price) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
       [client_id, stylist_id, service, time, date, appointmentPrice]
     );
-    await pool.query('INSERT INTO notifications (type, title, message) VALUES ($1, $2, $3)',
-      ['success', 'Nueva Cita', `Nueva cita para ${service} creada.`]);
+    await pool.query('INSERT INTO notifications (type,title,message) VALUES ($1,$2,$3)',
+      ['success','Nueva Cita',`Nueva cita para ${service} creada.`]);
     res.json({ success: true, appointmentId: rows[0].id });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -437,9 +409,9 @@ app.put('/api/appointments/:id/status', authenticateToken, async (req, res) => {
   const appId = parseInt(req.params.id);
   if (isNaN(appId)) return res.status(400).json({ error: 'ID inválido' });
   const { status } = req.body;
-  if (!['pending', 'confirmed', 'cancelled'].includes(status)) return res.status(400).json({ error: 'Estado inválido' });
+  if (!['pending','confirmed','cancelled'].includes(status)) return res.status(400).json({ error: 'Estado inválido' });
   try {
-    await pool.query('UPDATE appointments SET status = $1 WHERE id = $2', [status, appId]);
+    await pool.query('UPDATE appointments SET status=$1 WHERE id=$2', [status, appId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -451,8 +423,8 @@ app.put('/api/appointments/:id', authenticateToken, async (req, res) => {
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos requeridos' });
   try {
     await pool.query(
-      'UPDATE appointments SET client_id=$1, stylist_id=$2, service=$3, time=$4, date=$5, status=$6 WHERE id=$7',
-      [client_id, stylist_id, service, time, date, status || 'pending', appId]
+      'UPDATE appointments SET client_id=$1,stylist_id=$2,service=$3,time=$4,date=$5,status=$6 WHERE id=$7',
+      [client_id, stylist_id, service, time, date, status||'pending', appId]
     );
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -462,7 +434,7 @@ app.delete('/api/appointments/:id', authenticateToken, async (req, res) => {
   const appId = parseInt(req.params.id);
   if (isNaN(appId)) return res.status(400).json({ error: 'ID inválido' });
   try {
-    await pool.query('DELETE FROM appointments WHERE id = $1', [appId]);
+    await pool.query('DELETE FROM appointments WHERE id=$1', [appId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -471,7 +443,7 @@ app.post('/api/clients', authenticateToken, async (req, res) => {
   const { name, email, phone } = req.body;
   if (!name) return res.status(400).json({ error: 'Nombre es requerido' });
   try {
-    const { rows } = await pool.query('INSERT INTO clients (name, email, phone) VALUES ($1, $2, $3) RETURNING id', [name, email, phone]);
+    const { rows } = await pool.query('INSERT INTO clients (name,email,phone) VALUES ($1,$2,$3) RETURNING id', [name,email,phone]);
     res.json({ success: true, clientId: rows[0].id });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -482,7 +454,7 @@ app.put('/api/clients/:id', authenticateToken, async (req, res) => {
   const { name, email, phone } = req.body;
   if (!name || !email) return res.status(400).json({ error: 'Nombre y email son requeridos' });
   try {
-    await pool.query('UPDATE clients SET name=$1, email=$2, phone=$3 WHERE id=$4', [name, email, phone, clientId]);
+    await pool.query('UPDATE clients SET name=$1,email=$2,phone=$3 WHERE id=$4', [name,email,phone,clientId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -491,7 +463,7 @@ app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
   const clientId = parseInt(req.params.id);
   if (isNaN(clientId)) return res.status(400).json({ error: 'ID inválido' });
   try {
-    await pool.query('DELETE FROM clients WHERE id = $1', [clientId]);
+    await pool.query('DELETE FROM clients WHERE id=$1', [clientId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -499,12 +471,10 @@ app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
 app.post('/api/stylists', authenticateToken, async (req, res) => {
   const { name, specialization, rating, availability, next_available } = req.body;
   if (!name) return res.status(400).json({ error: 'Nombre es requerido' });
-  const stylistRating = parseFloat(rating) || 5.0;
-  if (stylistRating < 0 || stylistRating > 5) return res.status(400).json({ error: 'Rating inválido' });
   try {
     const { rows } = await pool.query(
-      'INSERT INTO stylists (name, specialization, rating, availability, next_available) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [name, specialization, stylistRating, availability || 'available', next_available || 'Ahora']
+      'INSERT INTO stylists (name,specialization,rating,availability,next_available) VALUES ($1,$2,$3,$4,$5) RETURNING id',
+      [name, specialization, parseFloat(rating)||5.0, availability||'available', next_available||'Ahora']
     );
     res.json({ success: true, stylistId: rows[0].id });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -515,8 +485,8 @@ app.put('/api/stylists/:id', authenticateToken, async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Nombre es requerido' });
   try {
     await pool.query(
-      'UPDATE stylists SET name=$1, specialization=$2, rating=$3, availability=$4, next_available=$5 WHERE id=$6',
-      [name, specialization, rating, availability, next_available, req.params.id]
+      'UPDATE stylists SET name=$1,specialization=$2,rating=$3,availability=$4,next_available=$5 WHERE id=$6',
+      [name,specialization,rating,availability,next_available,req.params.id]
     );
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -526,13 +496,12 @@ app.delete('/api/stylists/:id', authenticateToken, async (req, res) => {
   const stylistId = parseInt(req.params.id);
   if (isNaN(stylistId)) return res.status(400).json({ error: 'ID inválido' });
   try {
-    await pool.query('DELETE FROM stylists WHERE id = $1', [stylistId]);
+    await pool.query('DELETE FROM stylists WHERE id=$1', [stylistId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Settings: clave sensible enmascarada en GET
-const SENSITIVE_KEYS = ['openai_key', 'gemini_key', 'twilio_sid', 'twilio_token', 'smtp_password', 'whatsapp_token'];
+const SENSITIVE_KEYS = ['openai_key','gemini_key','twilio_sid','twilio_token','smtp_password','whatsapp_token'];
 
 app.get('/api/settings', authenticateToken, async (req, res) => {
   try {
@@ -540,7 +509,6 @@ app.get('/api/settings', authenticateToken, async (req, res) => {
     const settings = {};
     rows.forEach(row => {
       try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; }
-      // Enmascarar API keys en la respuesta
       if (SENSITIVE_KEYS.includes(row.key) && settings[row.key] && settings[row.key].length > 4) {
         settings[row.key] = '••••••••' + settings[row.key].slice(-4);
       }
@@ -553,12 +521,9 @@ app.post('/api/settings', authenticateToken, async (req, res) => {
   const settings = req.body;
   try {
     for (const [key, value] of Object.entries(settings)) {
-      // No sobrescribir API key si el usuario mandó el valor enmascarado
-      if (SENSITIVE_KEYS.includes(key) && typeof value === 'string' && value.startsWith('••••')) {
-        continue;
-      }
+      if (SENSITIVE_KEYS.includes(key) && typeof value === 'string' && value.startsWith('••••')) continue;
       await pool.query(
-        'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
+        'INSERT INTO settings (key,value) VALUES ($1,$2) ON CONFLICT (key) DO UPDATE SET value=$2',
         [key, JSON.stringify(value)]
       );
     }
@@ -566,14 +531,28 @@ app.post('/api/settings', authenticateToken, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-waitForDB().then(() => initDB()).then(() => {
-  app.listen(port, () => console.log(`Salon Backend running at http://localhost:${port}`));
-}).catch(err => {
-  console.error('Error fatal al iniciar:', err.message);
-  process.exit(1);
+// SPA fallback - igual que VoltBodyPowered: todas las rutas que no sean /api ni assets
+// devuelven index.html para que React Router funcione
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api') || req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Frontend no encontrado. Verifica el build.');
+  }
 });
 
 app.use((err, req, res, next) => {
   console.error('ERROR:', err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+waitForDB().then(() => initDB()).then(() => {
+  app.listen(port, '0.0.0.0', () => console.log(`Salon Backend + Frontend en http://0.0.0.0:${port}`));
+}).catch(err => {
+  console.error('Error fatal al iniciar:', err.message);
+  process.exit(1);
 });

@@ -1,33 +1,54 @@
 version: '3.8'
 
-# =============================================================
-# COOLIFY DEPLOYMENT — single container, all-in-one
-# PostgreSQL + Node backend + Next.js frontend
-#
-# NO pongas ports aquí — Coolify usa Traefik como proxy y
-# gestiona el routing automáticamente. Solo define el puerto
-# interno en la configuración de Coolify (Port: 80).
-# =============================================================
-
 services:
-  salonhair:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-salon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-salon123}
+      POSTGRES_DB: ${POSTGRES_DB:-salon}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - salon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-salon}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
-    expose:
-      - "80"
-    volumes:
-      - type: bind
-        source: ./pgdata
-        target: /var/lib/postgresql/data
-        is_directory: true
-    environment:
-      - JWT_SECRET=${JWT_SECRET}
-      - DB_PASSWORD=${DB_PASSWORD:-salonapp_change_me}
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 90s
+      start_period: 60s
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-salon}:${POSTGRES_PASSWORD:-salon123}@db:5432/${POSTGRES_DB:-salon}
+      JWT_SECRET: ${JWT_SECRET:-cambia-esto-en-produccion}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - salon-network
+    ports:
+      - "${PORT:-3000}:3000"
+    labels:
+      - "coolify.managed=true"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  salon-network:
+    driver: bridge
