@@ -4,35 +4,43 @@ set -e
 PGDATA=/var/lib/postgresql/data
 PGPORT=5432
 PGUSER=salonapp
-PGPASS="${DB_PASSWORD:-salonapp_secret_change_me}"
+PGPASS="${DB_PASSWORD:-salonapp_change_me}"
 PGDB=salonhair
 
-echo "==> Iniciando PostgreSQL..."
+echo "==> [1/4] Preparando directorio de datos PostgreSQL..."
+mkdir -p "$PGDATA"
+chown -R postgres:postgres "$PGDATA"
+chmod 700 "$PGDATA"
 
-# Init PostgreSQL data directory if empty
+# Inicializar solo si está vacío
 if [ ! -f "$PGDATA/PG_VERSION" ]; then
-    echo "==> Inicializando directorio de datos de PostgreSQL..."
-    su postgres -c "initdb -D $PGDATA --encoding=UTF8 --locale=C"
+    echo "==> [2/4] Primera ejecución: inicializando base de datos..."
+    su postgres -c "initdb -D $PGDATA --encoding=UTF8 --locale=C --username=postgres"
 
-    # Allow local connections
-    echo "host all all 127.0.0.1/32 md5" >> $PGDATA/pg_hba.conf
-    echo "local all all trust" >> $PGDATA/pg_hba.conf
+    # Permitir conexiones locales por contraseña
+    echo "host all all 127.0.0.1/32 md5" >> "$PGDATA/pg_hba.conf"
+    echo "local all postgres trust" >> "$PGDATA/pg_hba.conf"
+    echo "local all all md5" >> "$PGDATA/pg_hba.conf"
+else
+    echo "==> [2/4] Base de datos existente detectada, saltando inicialización."
 fi
 
-# Start PostgreSQL temporarily to create user/db
-su postgres -c "pg_ctl -D $PGDATA -l /var/log/pg_init.log start -w"
+# Arrancar PostgreSQL temporalmente para crear usuario/BD
+echo "==> [3/4] Arrancando PostgreSQL para configuración inicial..."
+su postgres -c "pg_ctl -D $PGDATA -l /tmp/pg_setup.log start -w -t 30"
 
-# Create user and database if they don't exist
-su postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='$PGUSER'\" | grep -q 1 || psql -c \"CREATE USER $PGUSER WITH PASSWORD '$PGPASS';\""
+# Crear usuario si no existe
+su postgres -c "psql -c \"DO \\\$\\\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='$PGUSER') THEN CREATE USER $PGUSER WITH PASSWORD '$PGPASS'; END IF; END \\\$\\\$;\""
+
+# Crear base de datos si no existe
 su postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='$PGDB'\" | grep -q 1 || psql -c \"CREATE DATABASE $PGDB OWNER $PGUSER;\""
 
-# Stop temporary PostgreSQL (supervisor will restart it)
-su postgres -c "pg_ctl -D $PGDATA stop -m fast"
+# Detener PostgreSQL temporal (supervisor lo arrancará definitivamente)
+su postgres -c "pg_ctl -D $PGDATA stop -m fast -w"
 
-echo "==> PostgreSQL inicializado correctamente."
+echo "==> [4/4] Iniciando todos los servicios (supervisor)..."
 
-# Set DATABASE_URL for backend (passed through supervisor env)
+# Pasar DATABASE_URL al entorno para que supervisor la use
 export DATABASE_URL="postgresql://$PGUSER:$PGPASS@127.0.0.1:$PGPORT/$PGDB"
 
-# Start all services via supervisor
 exec /usr/bin/supervisord -c /etc/supervisord.conf

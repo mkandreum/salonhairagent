@@ -1,8 +1,15 @@
 version: '3.8'
 
-# Single-container setup: PostgreSQL + backend + frontend all in one image.
-# In Coolify, just deploy this as a single service pointing to the Dockerfile.
-# Only TWO environment variables are required (see below).
+# =============================================================
+# COOLIFY DEPLOYMENT — single container, all-in-one
+# PostgreSQL + Node backend + Next.js frontend
+#
+# IMPORTANTE en Coolify:
+#   1. Activa "Preserve Repository During Deployment" (General > Settings)
+#      Esto evita que Coolify recree volúmenes en cada deploy.
+#   2. Añade las 2 variables de entorno (JWT_SECRET y DB_PASSWORD)
+#   3. El puerto expuesto es el 80
+# =============================================================
 
 services:
   salonhair:
@@ -13,18 +20,19 @@ services:
     ports:
       - "80:80"
     volumes:
-      # Persist PostgreSQL data between restarts/redeploys
-      - pgdata:/var/lib/postgresql/data
+      # Bind mount con path absoluto — compatible con Coolify
+      # Coolify almacena los datos en /data/coolify/applications/<app-id>/
+      # El directorio 'pgdata' se crea automáticamente si no existe
+      - type: bind
+        source: ./pgdata
+        target: /var/lib/postgresql/data
+        is_directory: true
     environment:
-      # ❗ REQUIRED - Change these two before deploying:
       - JWT_SECRET=${JWT_SECRET}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PASSWORD=${DB_PASSWORD:-salonapp_change_me}
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
-
-volumes:
-  pgdata:
+      retries: 5
+      start_period: 90s
