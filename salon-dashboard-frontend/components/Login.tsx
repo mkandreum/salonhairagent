@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Scissors, Mail, Lock, ArrowRight, Github, Chrome, Users } from 'lucide-react'
+import { Scissors, Mail, Lock, ArrowRight, Users } from 'lucide-react'
 
 interface LoginProps {
   onLogin: (user: any) => void
 }
-
 
 export default function Login({ onLogin }: LoginProps) {
   const [isLogin, setIsLogin] = useState(true)
@@ -20,7 +19,7 @@ export default function Login({ onLogin }: LoginProps) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     const endpoint = isLogin ? '/api/login' : '/api/register'
     const body = isLogin ? { email, password } : { name, email, password }
 
@@ -28,16 +27,21 @@ export default function Login({ onLogin }: LoginProps) {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       })
-      
+
+      // Check content-type before parsing JSON to avoid SyntaxError
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Error del servidor (${res.status}). Verifica que el backend esté en funcionamiento.`)
+      }
+
       const data = await res.json()
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Algo salió mal')
       }
 
-      // If it was registration, automatically log in or switch to login
       if (!isLogin) {
         setIsLogin(true)
         setLoading(false)
@@ -45,9 +49,14 @@ export default function Login({ onLogin }: LoginProps) {
         return
       }
 
-      // Store token
-      if (data.token) {
-        localStorage.setItem('salon_pro_token', data.token)
+      // Store token safely (only in browser)
+      if (data.token && typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('salon_pro_token', data.token)
+        } catch {
+          // localStorage puede no estar disponible en algunos contextos; continúa igualmente
+          console.warn('No se pudo guardar el token en localStorage.')
+        }
       }
 
       setLoading(false)
@@ -58,7 +67,6 @@ export default function Login({ onLogin }: LoginProps) {
     }
   }
 
-
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
       {/* Background blobs */}
@@ -68,8 +76,8 @@ export default function Login({ onLogin }: LoginProps) {
 
       <div className="w-full max-w-md glass-card p-10 relative z-10 transition-all duration-500">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-6 group">
-            <Scissors className="w-8 h-8 text-white group-hover:shake" />
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-6">
+            <Scissors className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
             {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
@@ -80,20 +88,19 @@ export default function Login({ onLogin }: LoginProps) {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-in shake duration-500">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
             <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
           {!isLogin && (
             <div className="animate-in fade-in slide-in-from-top-4 duration-300">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Nombre Completo</label>
               <div className="relative group">
                 <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -108,8 +115,8 @@ export default function Login({ onLogin }: LoginProps) {
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Email</label>
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input 
-                type="email" 
+              <input
+                type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -123,8 +130,8 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="flex items-center justify-between mb-2 px-1">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Contraseña</label>
               {isLogin && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => alert('Por favor, contacta con el administrador del sistema para restablecer tu contraseña.')}
                   className="text-xs font-bold text-indigo-500 hover:text-indigo-600"
                 >
@@ -134,8 +141,8 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input 
-                type="password" 
+              <input
+                type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -145,8 +152,8 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="btn-premium w-full group mt-4"
           >
@@ -164,7 +171,7 @@ export default function Login({ onLogin }: LoginProps) {
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
-            <button 
+            <button
               onClick={() => setIsLogin(!isLogin)}
               className="ml-2 font-bold text-indigo-500 hover:text-indigo-600 underline underline-offset-4"
             >
@@ -176,4 +183,3 @@ export default function Login({ onLogin }: LoginProps) {
     </div>
   )
 }
-

@@ -5,26 +5,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
     restart: always
-    volumes:
-      - ./data:/app/data
-
-
     expose:
-      - "3000"
+      - "3001"
     environment:
-      - PORT=3000
+      - PORT=3001
       - JWT_SECRET=${JWT_SECRET}
+      # PostgreSQL connection string.
+      # Para BD externa de Coolify, pega aquí la URL completa:
+      # postgresql://usuario:password@host:5432/nombre_db
+      - DATABASE_URL=${DATABASE_URL}
+      # Pon DATABASE_SSL=true si tu BD de Coolify requiere SSL
+      - DATABASE_SSL=${DATABASE_SSL:-false}
     networks:
       - salon-network
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-
 
   frontend:
     build:
@@ -37,7 +37,8 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
-      - NEXT_PUBLIC_API_URL=http://backend:3000
+      # Apunta al backend dentro de la red Docker
+      - NEXT_PUBLIC_API_URL=http://backend:3001
     depends_on:
       backend:
         condition: service_healthy
