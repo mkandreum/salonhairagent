@@ -118,29 +118,34 @@ const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const loginAttempts = new Map();
 
+// CORS: si no hay ALLOWED_ORIGINS definido, permitir todo (mismo contenedor/dominio)
+// Si está definido, solo permitir esos orígenes
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
   : null;
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!allowedOrigins || !origin) return callback(null, true);
-    if (allowedOrigins.some(o => origin.startsWith(o.trim()))) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
+    // Sin origin = petición del mismo servidor (SSR, curl, healthcheck) -> permitir
+    if (!origin) return callback(null, true);
+    // Sin lista de allowed = permitir todo
+    if (!allowedOrigins || allowedOrigins.length === 0) return callback(null, true);
+    // Verificar si el origin está en la lista
+    if (allowedOrigins.some(o => origin.startsWith(o))) return callback(null, true);
+    callback(null, false);
   },
   credentials: true
 }));
 app.use(express.json());
 
 // ============================================================
-// Servir frontend estático - igual que VoltBodyPowered
+// Servir frontend estático
 // ============================================================
 const staticPath = path.join(__dirname, 'public');
 console.log(`Static files path: ${staticPath}`);
 console.log(`Static path exists: ${fs.existsSync(staticPath)}`);
 if (fs.existsSync(staticPath)) {
-  const files = fs.readdirSync(staticPath);
-  console.log(`Files in public: ${files.join(', ')}`);
+  console.log(`Files in public: ${fs.readdirSync(staticPath).join(', ')}`);
 }
 app.use(express.static(staticPath));
 
@@ -531,17 +536,16 @@ app.post('/api/settings', authenticateToken, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// SPA fallback - igual que VoltBodyPowered: todas las rutas que no sean /api ni assets
-// devuelven index.html para que React Router funcione
-app.get('*', (req, res) => {
-  if (req.path.startsWith('/api') || req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-    return res.status(404).json({ error: 'Not found' });
-  }
+// SPA fallback - devuelve index.html para cualquier ruta que no sea /api ni assets
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (req.path.startsWith('/api')) return next();
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map|json|txt)$/)) return next();
   const indexPath = path.join(__dirname, 'public', 'index.html');
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    res.status(404).send('Frontend no encontrado. Verifica el build.');
+    res.status(404).send('Frontend no encontrado.');
   }
 });
 
