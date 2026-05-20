@@ -48,7 +48,7 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
     switch (type) {
       case 'success': return <CheckCircle className="w-5 h-5 text-emerald-500" />
       case 'warning': return <AlertCircle className="w-5 h-5 text-amber-500" />
-      case 'info': return <Info className="w-5 h-5 text-slate-550" />
+      case 'info': return <Info className="w-5 h-5 text-slate-500" />
       default: return <Bell className="w-5 h-5 text-slate-500" />
     }
   }
@@ -88,17 +88,17 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
             <Bell className="w-5 h-5 text-amber-500" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-850 dark:text-white text-sm md:text-base leading-none">Notificaciones</h3>
+            <h3 className="font-bold text-slate-800 dark:text-white text-sm md:text-base leading-none">Notificaciones</h3>
             <p className="text-xs text-slate-500 mt-1">{unreadCount} nuevas</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           {unreadCount > 0 && (
-            <button onClick={markAllAsRead} className="p-2 hover:bg-slate-150/15 dark:hover:bg-slate-800 rounded-lg text-slate-650 dark:text-slate-400 transition-colors" title="Marcar todas como leídas">
+            <button onClick={markAllAsRead} className="p-2 hover:bg-slate-100/30 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 transition-colors" title="Marcar todas como leídas">
               <CheckCheck className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           )}
-          <button onClick={onClose} className="p-2 hover:bg-slate-150/15 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-slate-100/30 dark:hover:bg-slate-800 rounded-lg transition-colors">
             <X className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
           </button>
         </div>
@@ -108,14 +108,14 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
         {!hasLoaded ? (
           <div className="p-8 text-center">
             <div className="w-8 h-8 border-2 border-slate-300 dark:border-slate-700 border-t-amber-500 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-slate-550 dark:text-slate-400 text-sm font-medium">Cargando...</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Cargando...</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-8 text-center animate-fadeIn">
             <div className="w-14 h-14 rounded-full bg-slate-100/10 dark:bg-slate-800/20 border border-slate-200/50 dark:border-slate-800/40 flex items-center justify-center mx-auto mb-4">
-              <Bell className="w-7 h-7 text-slate-350 dark:text-slate-600" />
+              <Bell className="w-7 h-7 text-slate-400 dark:text-slate-600" />
             </div>
-            <p className="text-slate-550 dark:text-slate-400 text-sm font-medium">No tienes notificaciones</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No tienes notificaciones</p>
           </div>
         ) : (
           notifications.map((notification: any) => (
@@ -139,11 +139,11 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
                   {!notification.read && (
-                    <button onClick={() => markAsRead(notification.id)} className="p-1.5 bg-slate-100/50 dark:bg-slate-850/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 border border-slate-200/20 dark:border-slate-700/30 rounded-lg transition-all" title="Marcar como leída">
+                    <button onClick={() => markAsRead(notification.id)} className="p-1.5 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 border border-slate-200/20 dark:border-slate-700/30 rounded-lg transition-all" title="Marcar como leída">
                       <CheckCircle className="w-4 h-4 text-slate-500" />
                     </button>
                   )}
-                  <button onClick={() => deleteNotification(notification.id)} className="p-1.5 bg-slate-100/50 dark:bg-slate-850/50 hover:bg-red-100 dark:hover:bg-red-900/20 border border-slate-200/20 dark:border-slate-700/30 rounded-lg transition-all" title="Eliminar">
+                  <button onClick={() => deleteNotification(notification.id)} className="p-1.5 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-red-100 dark:hover:bg-red-900/20 border border-slate-200/20 dark:border-slate-700/30 rounded-lg transition-all" title="Eliminar">
                     <Trash2 className="w-4 h-4 text-slate-500" />
                   </button>
                 </div>

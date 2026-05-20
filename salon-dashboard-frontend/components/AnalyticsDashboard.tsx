@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell } from 'recharts'
 import { fetchAnalytics } from '@/lib/api'
 
 interface AnalyticsDashboardProps {
@@ -50,7 +50,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
-          className="input-premium py-2 px-4 text-xs font-bold w-40 bg-slate-50 dark:bg-slate-900/60"
+          className="input-premium py-2 px-4 text-xs font-bold w-44"
         >
           <option>Últimos 7 días</option>
           <option>Últimos 30 días</option>
@@ -64,10 +64,10 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 text-sm uppercase tracking-wider">Tendencia de Ingresos</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={revenueData}>
+              <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.2}/>
+                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.28}/>
                     <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
@@ -75,17 +75,17 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderRadius: '16px', border: '1px solid rgba(201, 162, 39, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ backgroundColor: 'rgba(5, 8, 12, 0.95)', borderRadius: '16px', border: '1px solid rgba(212, 175, 55, 0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
                   itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#d4af37', fontWeight: 'bold' }}
                 />
-                <Line type="monotone" dataKey="revenue" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, fill: '#d4af37', strokeWidth: 2, stroke: '#151b2d' }} activeDot={{ r: 6 }} />
-              </LineChart>
+                <Area type="monotone" dataKey="revenue" stroke="#d4af37" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" dot={{ r: 4, fill: '#d4af37', strokeWidth: 2, stroke: '#0c101b' }} activeDot={{ r: 6 }} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex items-center justify-between mt-6 p-4 bg-slate-100/50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/40 dark:border-slate-800/80">
+          <div className="flex items-center justify-between mt-6 p-5 bg-slate-100/35 dark:bg-slate-950/45 rounded-3xl border border-slate-200/20 dark:border-slate-800/40 shadow-inner">
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-450 font-bold uppercase tracking-widest">Total Ingresos</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Total Ingresos</p>
               <p className="text-2xl font-extrabold text-slate-800 dark:text-white">€{(totalRevenue || 0).toLocaleString()}</p>
               <div className={`flex items-center text-xs font-bold mt-1 ${revenueChangePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                 {revenueChangePct >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
@@ -93,7 +93,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-slate-500 dark:text-slate-450 font-bold uppercase tracking-widest">Citas Totales</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Citas Totales</p>
               <p className="text-2xl font-extrabold text-slate-800 dark:text-white">{(totalAppointments || 0).toLocaleString()}</p>
               <div className={`flex items-center text-xs font-bold mt-1 justify-end ${apptsChangePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                 {apptsChangePct >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
@@ -109,12 +109,12 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
               <BarChart data={serviceData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" horizontal={false} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} width={80} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 500}} width={80} />
                 <Tooltip
                   cursor={{fill: 'rgba(255, 255, 255, 0.03)'}}
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderRadius: '16px', border: '1px solid rgba(201, 162, 39, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ backgroundColor: 'rgba(5, 8, 12, 0.95)', borderRadius: '16px', border: '1px solid rgba(212, 175, 55, 0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
                   itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#d4af37', fontWeight: 'bold' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                   {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => (
@@ -126,14 +126,14 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           </div>
           <div className="mt-6 space-y-3">
             {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any) => (
-              <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 rounded-xl transition-colors">
+              <div key={service.name} className="flex items-center justify-between p-2.5 hover:bg-slate-100/40 dark:hover:bg-slate-950/40 rounded-[14px] transition-colors border border-transparent hover:border-slate-200/20 dark:hover:border-slate-800/40">
                 <div className="flex items-center space-x-3">
                   <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: service.color || '#d4af37' }} />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-350">{service.name}</span>
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{service.name}</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-sm font-bold text-slate-800 dark:text-white">{service.value}%</span>
-                  <div className="w-24 bg-slate-200 dark:bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                  <div className="w-24 bg-slate-200 dark:bg-slate-950/80 rounded-full h-1.5 overflow-hidden border border-slate-200/10 dark:border-slate-800/30">
                     <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color || '#d4af37' }} />
                   </div>
                 </div>

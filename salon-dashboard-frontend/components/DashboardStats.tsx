@@ -37,22 +37,24 @@ export default function DashboardStats() {
           <div key={stat.title} className="app-card interactive-card p-4 md:p-6 group animate-fade-float-in" style={{ animationDelay: `${index * 60}ms` }}>
             <div className="flex items-start justify-between mb-3 md:mb-4">
               <div className="flex-1 min-w-0">
-                <p className="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{stat.title}</p>
-                <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mt-1 md:mt-2 group-hover:scale-105 transition-transform origin-left">{stat.value}</h3>
+                <p className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-405 uppercase tracking-widest truncate">{stat.title}</p>
+                <h3 className="text-xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-amber-200 dark:via-amber-400 dark:to-amber-250 mt-1 md:mt-2 group-hover:scale-[1.03] transition-transform origin-left leading-none tracking-tight">{stat.value}</h3>
               </div>
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-sm flex-shrink-0 ml-2">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-950 border border-amber-500/20 flex items-center justify-center shadow-lg flex-shrink-0 ml-2 group-hover:border-amber-500/40 group-hover:scale-105 transition-all duration-300">
                 <Icon className="w-5 h-5 md:w-6 md:h-6 text-amber-400" />
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-              <div className={`flex items-center px-2 py-1 rounded-lg text-xs font-bold ${
-                stat.trend === 'up' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'
+              <div className={`flex items-center px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-extrabold uppercase tracking-wider border ${
+                stat.trend === 'up' 
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25 shadow-[0_0_8px_rgba(16,185,129,0.06)]' 
+                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25 shadow-[0_0_8px_rgba(244,63,94,0.06)]'
               }`}>
-                {stat.trend === 'up' ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                {stat.trend === 'up' ? <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" /> : <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />}
                 {stat.change}
               </div>
-              <span className="text-xs text-slate-400 font-medium hidden md:inline">vs. ayer</span>
+              <span className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider hidden md:inline">vs. ayer</span>
             </div>
           </div>
         )

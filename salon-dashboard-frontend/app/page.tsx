@@ -60,7 +60,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: () => void }) {
       className={`w-11 h-6 rounded-full relative transition-all duration-300 cursor-pointer ${
         value 
           ? 'bg-gradient-to-r from-amber-500 to-amber-600 shadow-[0_0_8px_rgba(212,175,55,0.4)]' 
-          : 'bg-slate-200 dark:bg-slate-800/80 border border-slate-350 dark:border-slate-700/60'
+          : 'bg-slate-200 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/60'
       }`}
     >
       <div className={`absolute top-1 w-4 h-4 bg-white dark:bg-slate-900 rounded-full shadow-md transition-all duration-300 ${value ? 'left-6' : 'left-1'}`} />
@@ -80,7 +80,7 @@ function SecretInput({ label, value, onChange, placeholder }: { label: string; v
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder || 'No configurado'}
-          className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0c101b] border border-slate-200 dark:border-slate-800 rounded-xl text-sm pr-10 font-mono text-slate-800 dark:text-white transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+          className="input-premium pr-10 font-mono"
         />
         {!isMasked && (
           <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-500 transition-colors">
@@ -104,7 +104,7 @@ function TextInput({ label, value, onChange, placeholder, icon: Icon }: any) {
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder || ''}
-          className={`w-full px-4 py-3 bg-slate-50 dark:bg-[#0c101b] border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-800 dark:text-white transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${Icon ? 'pl-10' : ''}`}
+          className={`input-premium ${Icon ? 'pl-10' : ''}`}
         />
       </div>
     </div>
@@ -121,7 +121,7 @@ function CopyableInput({ label, value, placeholder }: { label: string; value: st
     <div className="space-y-1">
       <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>
       <div className="relative">
-        <input type="text" value={value} readOnly placeholder={placeholder} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0c101b]/50 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono pr-10 text-slate-800 dark:text-white/80" />
+        <input type="text" value={value} readOnly placeholder={placeholder} className="input-premium pr-10 font-mono bg-white/40 dark:bg-[#0c101b]/30" />
         <button type="button" onClick={copy} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-500 transition-colors">
           {copied ? <CheckCircle className="w-4 h-4 text-emerald-500 animate-fadeIn" /> : <Copy className="w-4 h-4" />}
         </button>
@@ -234,7 +234,7 @@ export default function Home() {
             { key: 'notifications', label: 'Notificaciones en tiempo real' },
             { key: 'emailReports', label: 'Informes semanales por Email' },
           ] as { key: keyof Settings; label: string }[]).map(({ key, label }) => (
-            <div key={key} className="p-4 bg-slate-50/50 dark:bg-[#0c101b]/40 rounded-xl border border-slate-250/20 dark:border-slate-800/40 flex items-center justify-between hover:border-amber-500/10 transition-colors">
+            <div key={key} className="p-4 bg-slate-50/50 dark:bg-[#0c101b]/40 rounded-xl border border-slate-200/20 dark:border-slate-800/40 flex items-center justify-between hover:border-amber-500/10 transition-colors">
               <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">{label}</span>
               <Toggle value={!!settings[key]} onChange={() => updateSetting(key, !settings[key])} />
             </div>
@@ -290,7 +290,7 @@ export default function Home() {
       <button 
         onClick={handleSaveSettings} 
         disabled={savingSettings} 
-        className="btn-accent w-full py-4 font-bold flex items-center justify-center space-x-2 disabled:opacity-60 shadow-lg shadow-amber-500/10"
+        className="btn-premium primary-btn w-full py-4 font-bold flex items-center justify-center space-x-2 disabled:opacity-60 shadow-lg shadow-amber-500/15"
       >
         <Save className="w-5 h-5" />
         <span>{savingSettings ? 'Guardando Ajustes...' : 'Guardar Todos los Cambios'}</span>
@@ -371,7 +371,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#080b11] flex transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080b11] flex transition-colors duration-300 relative overflow-hidden">
+      {/* Dynamic ambient glowing background orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-amber-500/5 to-transparent blur-[120px] pointer-events-none select-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] rounded-full bg-gradient-to-tr from-amber-500/5 to-transparent blur-[120px] pointer-events-none select-none" />
+
       <div className="hidden lg:block lg:w-72 lg:flex-shrink-0">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
       </div>
@@ -393,10 +397,54 @@ export default function Home() {
             </div>
 
             {/* Mobile-only page header */}
-            <div className="lg:hidden mb-4 animate-fadeIn">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white capitalize">
-                {getPageTitle()}
-              </h2>
+            <div className="lg:hidden mb-6 animate-fadeIn">
+              {activeTab === 'dashboard' ? (
+                /* Luxury Mobile Welcome Card */
+                <div className="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-[#0c101b] via-[#111728] to-[#080b11] border border-amber-500/10 shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
+                  {/* Subtle golden ambient blur behind */}
+                  <div className="absolute -top-12 -right-12 w-28 h-28 bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
+                  
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 inline-block animate-pulse" />
+                        Salón Luxe • IA Concierge Activa
+                      </span>
+                      <h1 className="text-xl font-black text-white tracking-tight">
+                        Hola, {user?.name || 'Admin'}
+                      </h1>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Gestiona tu salón de belleza con elegancia y control absoluto.
+                      </p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 text-base font-bold select-none">
+                      ✨
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-slate-800/60">
+                    <div>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Citas de Hoy</p>
+                      <p className="text-sm font-extrabold text-slate-200 mt-0.5">8 Confirmadas</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Respuesta Automatizada</p>
+                      <p className="text-sm font-extrabold text-amber-400 mt-0.5">94% Eficacia IA</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Sleek Mobile Standard Header */
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/30 dark:border-slate-800/40">
+                  <h2 className="text-xl font-extrabold text-slate-800 dark:text-white capitalize tracking-tight flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full inline-block" />
+                    {getPageTitle()}
+                  </h2>
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                    Luxe
+                  </span>
+                </div>
+              )}
             </div>
 
             {renderContent()}
@@ -414,14 +462,14 @@ export default function Home() {
           />
           
           {/* Drawer Panel */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-900 rounded-t-[32px] border-t border-slate-200/50 dark:border-slate-800/50 p-6 pb-28 shadow-2xl z-90 max-h-[85vh] overflow-y-auto animate-fade-float-in">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#0c101b] rounded-t-[32px] border-t border-slate-200/50 dark:border-amber-500/10 p-6 pb-28 shadow-2xl z-90 max-h-[85vh] overflow-y-auto animate-fade-float-in">
             {/* Elegant drag handle decorator */}
-            <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-6" />
+            <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700/60 rounded-full mx-auto mb-6" />
             
             <div className="mb-6 flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Menú Adicional</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Accede al resto de herramientas de gestión</p>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Herramientas</h3>
+                <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">Accede al resto de herramientas de gestión</p>
               </div>
               <button 
                 onClick={() => setIsMoreOpen(false)}
@@ -435,7 +483,6 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4 mb-6">
               {[
                 { id: 'stylists', label: 'Estilistas', icon: Users, desc: 'Equipo y horarios' },
-                { id: 'analytics', label: 'Análisis & IA', icon: BarChart3, desc: 'Métricas e informes IA' },
                 { id: 'settings', label: 'Ajustes', icon: Settings, desc: 'Configuración general' }
               ].map((item) => {
                 const Icon = item.icon
@@ -449,15 +496,15 @@ export default function Home() {
                     }}
                     className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
                       isActive 
-                        ? 'bg-slate-100 dark:bg-slate-800 border-amber-500/30 text-amber-500 shadow-sm' 
-                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+                        ? 'bg-slate-100 dark:bg-slate-800/80 border-amber-500/30 text-amber-500 shadow-sm' 
+                        : 'bg-slate-50 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isActive ? 'bg-slate-800 dark:bg-slate-700 text-amber-400' : 'bg-slate-200/50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isActive ? 'bg-slate-800 dark:bg-slate-800 text-amber-400' : 'bg-slate-200/50 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <p className="text-sm font-bold truncate">{item.label}</p>
-                    <p className="text-[10px] text-slate-450 dark:text-slate-400 truncate mt-0.5">{item.desc}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">{item.desc}</p>
                   </button>
                 )
               })}
@@ -469,7 +516,7 @@ export default function Home() {
                 setIsMoreOpen(false)
                 handleLogout()
               }}
-              className="w-full py-4 bg-rose-500/10 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-500 rounded-2xl font-bold text-sm transition-all duration-200 flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-rose-500/10 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-500 rounded-2xl font-bold text-sm transition-all duration-200 flex items-center justify-center space-x-2 border border-rose-500/10"
             >
               <span>Cerrar Sesión</span>
             </button>
@@ -485,6 +532,7 @@ export default function Home() {
               { id: 'dashboard', label: 'Inicio', icon: HomeIcon },
               { id: 'appointments', label: 'Citas', icon: Calendar },
               { id: 'clients', label: 'Clientes', icon: Users },
+              { id: 'analytics', label: 'IA Bot', icon: Bot },
               { id: 'more', label: 'Más', icon: MoreHorizontal }
             ].map((item) => {
               const Icon = item.icon

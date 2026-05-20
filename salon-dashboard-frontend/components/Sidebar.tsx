@@ -35,7 +35,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
       <div>
         <div className="p-8">
           <div className="flex items-center space-x-4 group cursor-pointer">
-            <div className="w-12 h-12 bg-gradient-to-br from-slate-850 to-slate-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-slate-800 to-slate-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
               <Scissors className="w-6 h-6 text-amber-400" />
             </div>
             <div>
@@ -59,11 +59,11 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
                 onClick={() => onTabChange(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-sm ${
                   isActive 
-                    ? 'bg-slate-900/60 text-amber-450 font-semibold shadow-sm border-l-2 border-amber-500' 
+                    ? 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-2 border-amber-500 text-amber-400 font-semibold shadow-[inset_4px_0_12px_rgba(212,175,55,0.03)]' 
                     : 'text-slate-400 hover:bg-slate-900/30 hover:text-slate-200'
                 }`}
               >
-                <div className={`p-2 rounded-xl transition-colors ${isActive ? 'bg-slate-850 text-amber-400 border border-amber-500/10' : 'bg-slate-900/30'}`}>
+                <div className={`p-2 rounded-xl transition-colors ${isActive ? 'bg-slate-900 text-amber-400 border border-amber-500/20 shadow-[0_0_8px_rgba(212,175,55,0.15)]' : 'bg-slate-900/30'}`}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <span className="flex-1 text-left">{item.label}</span>
@@ -75,14 +75,14 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
       </div>
       
       <div className="p-6">
-        <div className="p-4 bg-slate-900/40 dark:bg-slate-900/30 rounded-2xl border border-slate-800/40 mb-4 backdrop-blur-md">
+        <div className="p-4 bg-slate-950/60 rounded-2xl border border-amber-500/10 mb-4 backdrop-blur-md shadow-lg shadow-black/40 animate-pulse-surface">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Plan Activo</p>
           <div className="flex justify-between items-baseline mt-1">
-            <p className="text-sm font-bold text-slate-200">Suscripción Luxe</p>
-            <span className="text-[9px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold">Premium</span>
+            <p className="text-xs sm:text-sm font-extrabold text-slate-200">Suscripción Luxe</p>
+            <span className="text-[9px] bg-gradient-to-r from-amber-500/10 to-amber-600/10 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full font-bold shadow-[0_0_8px_rgba(212,175,55,0.1)]">Premium</span>
           </div>
-          <div className="mt-3 w-full bg-slate-850 h-1 rounded-full overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-500 to-amber-300 h-full w-4/5 rounded-full" />
+          <div className="mt-3 w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800/40">
+            <div className="bg-gradient-to-r from-amber-600 via-amber-400 to-amber-300 h-full w-4/5 rounded-full shadow-[0_0_6px_rgba(212,175,55,0.4)]" />
           </div>
         </div>
         <button 

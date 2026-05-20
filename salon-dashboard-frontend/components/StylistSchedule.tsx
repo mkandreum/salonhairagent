@@ -154,11 +154,11 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-slate-950/65 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
           {/* Close on clicking backdrop */}
           <div className="absolute inset-0" onClick={() => { setIsModalOpen(false); setEditingStylist(null); }} />
           
-          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in z-10 max-h-[90vh] overflow-y-auto relative border border-amber-500/20 shadow-2xl">
+          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in z-10 max-h-[90vh] overflow-y-auto relative border border-amber-500/10 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-slate-800 dark:text-white">
                 {editingStylist ? 'Editar Estilista' : 'Añadir Estilista'}
@@ -180,7 +180,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   placeholder="Ej: Sofía Martínez"
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="input-premium py-2 bg-slate-50 dark:bg-slate-900/60"
+                  className="input-premium w-full"
                 />
               </div>
               
@@ -192,7 +192,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   placeholder="Ej: Coloración, Corte, Estilismo"
                   value={formData.specialization}
                   onChange={e => setFormData({...formData, specialization: e.target.value})}
-                  className="input-premium py-2 bg-slate-50 dark:bg-slate-900/60"
+                  className="input-premium w-full"
                 />
               </div>
 
@@ -207,7 +207,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                     required
                     value={formData.rating}
                     onChange={e => setFormData({...formData, rating: parseFloat(e.target.value)})}
-                    className="input-premium py-2 bg-slate-50 dark:bg-slate-900/60"
+                    className="input-premium w-full"
                   />
                 </div>
                 <div>
@@ -215,7 +215,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   <select 
                     value={formData.availability}
                     onChange={e => setFormData({...formData, availability: e.target.value as any})}
-                    className="input-premium py-2 bg-slate-50 dark:bg-slate-900/60 font-semibold"
+                    className="input-premium w-full font-semibold"
                   >
                     <option value="available">Disponible</option>
                     <option value="busy">Ocupado/a</option>
@@ -232,41 +232,40 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   placeholder="Ej: Ahora, 15:30, Mañana"
                   value={formData.next_available}
                   onChange={e => setFormData({...formData, next_available: e.target.value})}
-                  className="input-premium py-2 bg-slate-50 dark:bg-slate-900/60"
+                  className="input-premium w-full"
                 />
               </div>
 
-               <button type="submit" className="btn-premium primary-btn w-full mt-6 py-3 ripple-host">
-                {editingStylist ? 'Actualizar Estilista' : 'Guardar Estilista'}
+               <button type="submit" className="btn-premium primary-btn w-full mt-6 py-3.5 flex items-center justify-center space-x-2">
+                <span>{editingStylist ? 'Actualizar Estilista' : 'Guardar Estilista'}</span>
               </button>
             </form>
           </div>
         </div>
       )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredStylists.map((stylist: any) => (
-          <div key={stylist.id} className="p-6 bg-slate-50/30 dark:bg-slate-900/30 rounded-3xl border border-slate-200/50 dark:border-slate-800/60 hover:border-amber-500/30 hover:shadow-lg transition-all duration-300 group relative">
+          <div key={stylist.id} className="p-6 bg-slate-50/15 dark:bg-slate-950/40 rounded-[24px] border border-slate-200/40 dark:border-amber-500/10 hover:border-amber-500/35 dark:hover:border-amber-500/30 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:shadow-amber-500/5 transition-all duration-300 group relative">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-500 flex items-center justify-center text-white shadow-md font-bold text-xl uppercase">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0c101b] to-[#1e293b] border border-amber-500/30 shadow-md flex items-center justify-center text-amber-400 font-bold text-xl uppercase">
                     <span>{stylist.name ? stylist.name[0] : 'E'}</span>
                   </div>
-                  <div className={`absolute -bottom-1 -right-1 w-5.5 h-5.5 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center ${
+                  <div className={`absolute -bottom-1 -right-1 w-5.5 h-5.5 rounded-full border-4 border-white dark:border-slate-950 flex items-center justify-center ${
                     stylist.availability === 'available' ? 'bg-emerald-500' : stylist.availability === 'busy' ? 'bg-amber-500' : 'bg-rose-500'
                   }`}>
                     {getAvailabilityIcon(stylist.availability)}
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-850 dark:text-white leading-tight text-base">{stylist.name}</h3>
+                   <h3 className="font-bold text-slate-800 dark:text-white leading-tight text-base">{stylist.name}</h3>
                   <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mt-1.5 px-2 py-0.5 rounded-md ${getAvailabilityColor(stylist.availability)}`}>
                     {stylist.specialization}
                   </span>
                   <div className="flex items-center space-x-1 mt-2">
                     {[...Array(5)].map((_, i: number) => (
-                      <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(stylist.rating) ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'}`} />
+                      <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(stylist.rating) ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_3px_rgba(251,191,36,0.45)]' : 'text-slate-300 dark:text-slate-800'}`} />
                     ))}
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-1">{parseFloat(stylist.rating).toFixed(1)}</span>
                   </div>
@@ -293,11 +292,11 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="p-3.5 bg-slate-100/50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/40 dark:border-slate-800/80">
+              <div className="p-3.5 bg-slate-100/30 dark:bg-slate-950/60 rounded-2xl border border-slate-200/10 dark:border-slate-800/40">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Citas Hoy</p>
                 <p className="text-lg font-extrabold text-slate-800 dark:text-white mt-1">{stylist.todayAppointments || 0}</p>
               </div>
-              <div className="p-3.5 bg-slate-100/50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/40 dark:border-slate-800/80">
+              <div className="p-3.5 bg-slate-100/30 dark:bg-[#06080e]/60 rounded-2xl border border-slate-200/10 dark:border-slate-800/40">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Próxima Libre</p>
                 <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400 mt-1">{stylist.nextAvailable || 'Ahora'}</p>
               </div>
@@ -306,16 +305,16 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
             <div className="mt-6 flex space-x-3">
               <button 
                 onClick={() => onTabChange ? onTabChange('appointments') : alert('Cambiando a citas...')}
-                className="flex-1 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-white border border-slate-700 dark:border-slate-800/80 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2 ripple-host"
+                className="btn-accent py-2.5 px-3 flex-1 text-xs font-bold"
               >
                 <Calendar className="w-4 h-4 text-amber-500" />
                 <span>Agendar</span>
               </button>
               <button 
                 onClick={() => alert(`Abriendo chat con ${stylist.name}...`)}
-                className="flex-1 bg-slate-150 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2 border border-transparent dark:border-slate-800/80 ripple-host"
+                className="bg-slate-100/50 dark:bg-slate-950/45 hover:bg-slate-200/50 dark:hover:bg-slate-900/60 border border-slate-200/20 dark:border-slate-800/60 text-slate-700 dark:text-slate-300 py-2.5 px-3 flex-1 text-xs font-bold transition-all duration-300 rounded-[16px] flex items-center justify-center space-x-2 ripple-host"
               >
-                <MessageSquare className="w-4 h-4 text-slate-450 dark:text-slate-400" />
+                <MessageSquare className="w-4 h-4 text-slate-400 dark:text-slate-400" />
                 <span>Mensaje</span>
               </button>
             </div>

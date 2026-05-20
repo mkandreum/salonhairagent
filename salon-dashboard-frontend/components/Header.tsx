@@ -70,7 +70,7 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
               setSearchQuery(e.target.value);
               onSearch(e.target.value);
             }}
-            className="w-full pl-10 pr-4 py-2 sm:py-2.5 bg-slate-100/60 dark:bg-slate-900/60 border border-slate-200/40 dark:border-slate-800/80 rounded-full focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500/40 transition-all duration-200 outline-none text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
+            className="w-full pl-10 pr-4 py-2 sm:py-2.5 bg-white/70 dark:bg-[#0a0d16]/75 border border-slate-200/40 dark:border-amber-500/10 rounded-full focus:outline-none focus:border-amber-500/50 dark:focus:border-amber-500/60 focus:ring-4 focus:ring-amber-500/10 text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 transition-all duration-300 shadow-md focus:shadow-amber-500/5"
           />
         </div>
       </div>
@@ -82,8 +82,8 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
             onClick={toggleNotifications}
             className={`p-2 sm:p-2.5 rounded-full transition-all duration-200 relative ${
               isNotificationsOpen 
-                ? 'bg-amber-500/10 text-amber-500' 
-                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'
             }`}
             title="Notificaciones"
           >
@@ -100,7 +100,7 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
         {/* Settings */}
         <button 
           onClick={() => onTabChange('settings')}
-          className="p-2 sm:p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all duration-200"
+          className="p-2 sm:p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all duration-200 border border-transparent"
           title="Ajustes"
         >
           <Settings className="w-5 h-5" />
@@ -118,7 +118,7 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
               <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 leading-none tracking-tight">{user?.name || 'Usuario'}</p>
               <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider leading-none mt-1">Profesional</p>
             </div>
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold shadow-md">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#0c101b] to-[#1e293b] border-2 border-amber-500/40 hover:border-amber-500 flex items-center justify-center text-amber-400 font-bold shadow-lg shadow-amber-500/5 transition-all duration-300">
               <User className="w-4 h-4" />
             </div>
             <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />

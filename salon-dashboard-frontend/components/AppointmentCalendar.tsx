@@ -112,10 +112,10 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-      case 'pending': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-      case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-      default: return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
+      case 'confirmed': return 'badge-success'
+      case 'pending': return 'badge-warning'
+      case 'cancelled': return 'badge-danger'
+      default: return 'badge-info'
     }
   }
 
@@ -147,41 +147,39 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
           <span className="hidden sm:inline">Nueva Cita</span>
           <span className="sm:hidden">+</span>
         </button>
-      </div>
-
-      {/* Mobile Cards View */}
+      </div>      {/* Mobile Cards View */}
       <div className="block md:hidden space-y-3">
         {filteredAppointments.slice(0, fullView ? undefined : 5).map((appointment: any) => (
-          <div key={appointment.id} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+          <div key={appointment.id} className="bg-slate-50/50 dark:bg-slate-950/40 rounded-2xl p-4 border border-slate-200/40 dark:border-slate-800/60 shadow-sm hover:border-amber-500/20 transition-all">
             <div className="flex justify-between items-start mb-3">
               <div>
                 <p className="font-bold text-slate-800 dark:text-white">{appointment.client || 'Cliente'}</p>
-                <p className="text-sm text-slate-500">{appointment.service}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{appointment.service}</p>
               </div>
-              <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={`px-2 py-1 rounded-lg text-xs font-bold ${getStatusColor(appointment.status)}`}>
+              <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={`${getStatusColor(appointment.status)}`}>
                 {appointment.status}
               </button>
             </div>
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <div className="flex items-center space-x-2">
-                <CalendarIcon className="w-3 h-3" />
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center space-x-1.5">
+                <CalendarIcon className="w-3.5 h-3.5 text-amber-500/70" />
                 <span>{appointment.date}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-3 h-3" />
+              <div className="flex items-center space-x-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-500/70" />
                 <span>{appointment.time}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Scissors className="w-3 h-3" />
+              <div className="flex items-center space-x-1.5">
+                <Scissors className="w-3.5 h-3.5 text-amber-500/70" />
                 <span>{appointment.stylist}</span>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-3">
-              <button onClick={() => handleEdit(appointment)} className="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg">
-                <Edit2 className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40">
+              <button onClick={() => handleEdit(appointment)} className="p-2 hover:bg-amber-500/10 hover:text-amber-500 rounded-lg text-slate-400 dark:text-slate-500 transition-colors bg-slate-100 dark:bg-slate-900 border border-slate-200/30 dark:border-slate-800">
+                <Edit2 className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => handleDelete(appointment.id)} className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                <Trash2 className="w-4 h-4 text-red-600" />
+              <button onClick={() => handleDelete(appointment.id)} className="p-2 hover:bg-rose-500/15 hover:text-rose-500 rounded-lg text-slate-400 dark:text-slate-500 transition-colors bg-slate-100 dark:bg-slate-900 border border-slate-200/30 dark:border-slate-800">
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -192,18 +190,18 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800">
-              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Fecha/Hora</th>
-              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Cliente</th>
-              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Servicio</th>
-              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Estilista</th>
-              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado</th>
+            <tr className="border-b border-slate-200/40 dark:border-slate-800/50">
+              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Fecha/Hora</th>
+              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Cliente</th>
+              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Servicio</th>
+              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Estilista</th>
+              <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Estado</th>
               <th className="text-right py-3 px-2"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+          <tbody className="divide-y divide-slate-100/40 dark:divide-slate-800/30">
             {filteredAppointments.slice(0, fullView ? undefined : 5).map((appointment: any) => (
-              <tr key={appointment.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+              <tr key={appointment.id} className="hover:bg-slate-50/50 dark:hover:bg-[#0c101b]/50 border-b border-slate-100 dark:border-slate-800/40 transition-colors">
                 <td className="py-3 px-2">
                   <div className="flex flex-col">
                     <div className="flex items-center space-x-2">
@@ -211,38 +209,38 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                       <span className="text-xs font-medium text-slate-500">{appointment.date}</span>
                     </div>
                     <div className="flex items-center space-x-2 mt-1">
-                      <Clock className="w-4 h-4 text-slate-400" />
+                      <Clock className="w-4 h-4 text-amber-500" />
                       <span className="font-bold text-slate-700 dark:text-slate-200">{appointment.time}</span>
                     </div>
                   </div>
                 </td>
                 <td className="py-3 px-2">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/40 dark:border-slate-700/50 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-amber-400 shadow-sm">
                       {appointment.client?.split(' ').map((n: string) => n[0]).join('') || '??'}
                     </div>
-                    <span className="font-semibold text-slate-800 dark:text-slate-100">{appointment.client}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-100">{appointment.client}</span>
                   </div>
                 </td>
-                <td className="py-3 px-2 text-slate-600 dark:text-slate-400 font-medium">{appointment.service}</td>
+                <td className="py-3 px-2 text-slate-600 dark:text-slate-400 font-bold text-sm">{appointment.service}</td>
                 <td className="py-3 px-2">
                   <div className="flex items-center space-x-2">
                     <Scissors className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">{appointment.stylist}</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-semibold">{appointment.stylist}</span>
                   </div>
                 </td>
                 <td className="py-3 px-2">
-                  <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${getStatusColor(appointment.status)}`}>
+                  <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={`transition-all ${getStatusColor(appointment.status)}`}>
                     {appointment.status.toUpperCase()}
                   </button>
                 </td>
                 <td className="py-3 px-2 text-right">
                   <div className="flex items-center justify-end space-x-1">
-                    <button onClick={() => handleEdit(appointment)} className="p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-lg text-indigo-500">
-                      <Edit2 className="w-5 h-5" />
+                    <button onClick={() => handleEdit(appointment)} className="p-2 hover:bg-amber-500/10 hover:text-amber-500 rounded-lg text-slate-400 dark:text-slate-500 transition-colors">
+                      <Edit2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(appointment.id)} className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg text-rose-500">
-                      <Trash2 className="w-5 h-5" />
+                    <button onClick={() => handleDelete(appointment.id)} className="p-2 hover:bg-rose-500/15 hover:text-rose-500 rounded-lg text-slate-400 dark:text-slate-500 transition-colors">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
@@ -262,10 +260,10 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 bg-slate-950/65 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto animate-fade-float-in border-t border-slate-200/50 dark:border-amber-500/10">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-slate-850 dark:text-slate-100">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
               <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
@@ -273,43 +271,43 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Cliente</label>
-                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all">
-                  <option value="">Seleccionar cliente</option>
-                  {Array.isArray(clients) && clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Cliente</label>
+                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="input-premium py-2.5 dark:bg-[#0c101b]">
+                  <option value="" className="dark:bg-[#0c101b]">Seleccionar cliente</option>
+                  {Array.isArray(clients) && clients.map(c => <option key={c.id} value={c.id} className="dark:bg-[#0c101b]">{c.name}</option>)}
                 </select>
               </div>
               
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Estilista</label>
-                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all">
-                  <option value="">Seleccionar estilista</option>
-                  {Array.isArray(stylists) && stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Estilista</label>
+                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="input-premium py-2.5 dark:bg-[#0c101b]">
+                  <option value="" className="dark:bg-[#0c101b]">Seleccionar estilista</option>
+                  {Array.isArray(stylists) && stylists.map(s => <option key={s.id} value={s.id} className="dark:bg-[#0c101b]">{s.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Servicio</label>
-                <input type="text" required placeholder="Ej: Corte" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Servicio</label>
+                <input type="text" required placeholder="Ej: Corte" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="input-premium" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Fecha</label>
-                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Fecha</label>
+                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="input-premium" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Hora</label>
-                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Hora</label>
+                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="input-premium" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Precio (€)</label>
-                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Precio (€)</label>
+                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="input-premium" />
               </div>
 
-              <button type="submit" className="w-full py-3.5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:shadow-lg hover:shadow-amber-500/10 text-white rounded-xl font-bold text-sm transition-all border border-amber-500/20 active:scale-[0.985] flex items-center justify-center space-x-2">
+              <button type="submit" className="btn-premium primary-btn w-full py-4 mt-2 font-bold flex items-center justify-center space-x-2">
                 <span>{editingAppointment ? 'Actualizar Cita' : 'Crear Cita'}</span>
               </button>
             </form>

@@ -72,18 +72,18 @@ export default function Login({ onLogin }: LoginProps) {
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fadeIn">
-          <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-5 transition-transform duration-300 hover:scale-105">
-            <Scissors className="w-8 h-8 text-amber-450" />
+          <div className="w-16 h-16 bg-gradient-to-br from-[#0c101b] to-[#1e293b] border border-amber-500/30 rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] shadow-amber-500/5 mx-auto mb-5 transition-transform duration-300 hover:scale-105 hover:border-amber-500/60">
+            <Scissors className="w-8 h-8 text-amber-400 drop-shadow-[0_0_4px_rgba(212,175,55,0.4)]" />
           </div>
           <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-100 via-amber-300 to-amber-100 tracking-tight uppercase">
             {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </h1>
-          <p className="text-slate-400 mt-2 text-xs sm:text-sm tracking-wide">
+          <p className="text-slate-400 mt-2 text-xs sm:text-sm tracking-wide font-medium">
             {isLogin ? 'Luxe Concierge — Gestión de Salón' : 'Únete a nuestra plataforma premium'}
           </p>
         </div>
 
-        <div className="bg-slate-900/40 backdrop-blur-2xl border border-slate-800/80 dark:border-amber-500/10 rounded-[28px] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="app-card rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-amber-500/10">
           {/* subtle interior card shimmer/reflection */}
           <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/2 to-transparent pointer-events-none" />
           
@@ -105,7 +105,7 @@ export default function Login({ onLogin }: LoginProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Tu nombre completo"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
+                    className="input-premium w-full pl-11"
                   />
                 </div>
               </div>
@@ -121,7 +121,7 @@ export default function Login({ onLogin }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@luxe.com"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
+                  className="input-premium w-full pl-11"
                 />
               </div>
             </div>
@@ -147,7 +147,7 @@ export default function Login({ onLogin }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
+                  className="input-premium w-full pl-11"
                 />
               </div>
             </div>
@@ -155,10 +155,10 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-sm transition-all border border-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 active:scale-[0.985] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:pointer-events-none"
+              className="btn-premium primary-btn w-full mt-4 py-3.5 flex items-center justify-center space-x-2 ripple-host disabled:opacity-50 disabled:pointer-events-none"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
               ) : (
                 <>
                   <span>{isLogin ? 'Ingresar al Portal' : 'Registrar Cuenta'}</span>
@@ -169,7 +169,7 @@ export default function Login({ onLogin }: LoginProps) {
           </form>
 
           <div className="mt-8 text-center border-t border-slate-800/60 pt-6">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 font-medium">
               {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
               <button
                 onClick={() => setIsLogin(!isLogin)}
