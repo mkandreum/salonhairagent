@@ -314,8 +314,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
+      {/* Sidebar - hidden on mobile, fixed width on desktop */}
+      <div className="hidden lg:block lg:w-72 lg:flex-shrink-0">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
       </div>
 
@@ -360,7 +360,8 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-h-screen w-full lg:ml-[288px]">
+      {/* Main Content - takes remaining space */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between lg:hidden sticky top-0 z-40">
           <div className="flex items-center space-x-3">
