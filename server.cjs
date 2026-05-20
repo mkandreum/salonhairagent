@@ -1164,10 +1164,10 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
     const aS=parseInt(sC.rows[0].count)||1;
     const occ=Math.min(100,Math.round((tc/(aS*8))*100));
     res.json([
-      {title:'Citas Hoy',value:tc.toString(),change:(aC>=0?'+':'')+aC,trend:aC>=0?'up':'down',color:'from-indigo-500 to-purple-500'},
-      {title:'Clientes Activos',value:totC.toString(),change:(cC>=0?'+':'')+cC+'%',trend:cC>=0?'up':'down',color:'from-emerald-500 to-teal-500'},
-      {title:'Ingresos del Mes',value:`€${Math.round(tR).toLocaleString()}`,change:(rC>=0?'+':'')+rC+'%',trend:rC>=0?'up':'down',color:'from-blue-500 to-cyan-500'},
-      {title:'Tasa de Ocupación',value:`${occ}%`,change:occ>70?'+5%':'-2%',trend:occ>70?'up':'down',color:'from-orange-500 to-pink-500'},
+      {title:'Citas Hoy',value:tc.toString(),change:(aC>=0?'+':'')+aC,trend:aC>=0?'up':'down',color:'from-slate-700 to-slate-900'},
+      {title:'Clientes Activos',value:totC.toString(),change:(cC>=0?'+':'')+cC+'%',trend:cC>=0?'up':'down',color:'from-slate-600 to-slate-800'},
+      {title:'Ingresos del Mes',value:`€${Math.round(tR).toLocaleString()}`,change:(rC>=0?'+':'')+rC+'%',trend:rC>=0?'up':'down',color:'from-amber-600 to-amber-700'},
+      {title:'Tasa de Ocupación',value:`${occ}%`,change:occ>70?'+5%':'-2%',trend:occ>70?'up':'down',color:'from-amber-500 to-amber-600'},
     ]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

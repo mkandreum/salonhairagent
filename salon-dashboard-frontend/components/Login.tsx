@@ -30,7 +30,6 @@ export default function Login({ onLogin }: LoginProps) {
         body: JSON.stringify(body),
       })
 
-      // Check content-type before parsing JSON to avoid SyntaxError
       const contentType = res.headers.get('content-type') || ''
       if (!contentType.includes('application/json')) {
         throw new Error(`Error del servidor (${res.status}). Verifica que el backend esté en funcionamiento.`)
@@ -49,12 +48,10 @@ export default function Login({ onLogin }: LoginProps) {
         return
       }
 
-      // Store token safely (only in browser)
       if (data.token && typeof window !== 'undefined') {
         try {
           localStorage.setItem('salon_pro_token', data.token)
         } catch {
-          // localStorage puede no estar disponible en algunos contextos; continúa igualmente
           console.warn('No se pudo guardar el token en localStorage.')
         }
       }
@@ -68,116 +65,113 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
-      {/* Background blobs */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
-
-      <div className="w-full max-w-md glass-card p-10 relative z-10 transition-all duration-500">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-6">
-            <Scissors className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100 dark:bg-slate-950">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-slate-800 dark:bg-slate-700 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-6">
+            <Scissors className="w-8 h-8 text-amber-400" />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
             {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-center">
-            {isLogin ? 'Gestiona tu salón con inteligencia artificial' : 'Únete a la nueva era de gestión inteligente'}
+            {isLogin ? 'Gestiona tu salón con estilo' : 'Únete a nuestra plataforma'}
           </p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-            <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
-          </div>
-        )}
+        <div className="glass-card p-10">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {!isLogin && (
-            <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Nombre Completo</label>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Nombre Completo</label>
+                <div className="relative group">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Tu nombre"
+                    className="input-premium pl-12"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Email</label>
               <div className="relative group">
-                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
                 <input
-                  type="text"
+                  type="email"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Tu nombre"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@email.com"
                   className="input-premium pl-12"
                 />
               </div>
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Email</label>
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
-                className="input-premium pl-12"
-              />
+            <div>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Contraseña</label>
+                {isLogin && (
+                  <button
+                    type="button"
+                    onClick={() => alert('Contacta con el administrador para restablecer tu contraseña.')}
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-700"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                )}
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="input-premium pl-12"
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-2 px-1">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Contraseña</label>
-              {isLogin && (
-                <button
-                  type="button"
-                  onClick={() => alert('Por favor, contacta con el administrador del sistema para restablecer tu contraseña.')}
-                  className="text-xs font-bold text-indigo-500 hover:text-indigo-600"
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              )}
-            </div>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="input-premium pl-12"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-premium w-full group mt-4"
-          >
-            {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
             <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="ml-2 font-bold text-indigo-500 hover:text-indigo-600 underline underline-offset-4"
+              type="submit"
+              disabled={loading}
+              className="btn-premium w-full group mt-4"
             >
-              {isLogin ? 'Regístrate gratis' : 'Inicia sesión'}
+              {loading ? (
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
-          </p>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="ml-2 font-semibold text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 underline underline-offset-4"
+              >
+                {isLogin ? 'Regístrate' : 'Inicia sesión'}
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
