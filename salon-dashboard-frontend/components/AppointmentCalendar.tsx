@@ -154,7 +154,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             <div className="flex justify-between items-start mb-3">
               <div>
                 <p className="font-bold text-slate-800 dark:text-white">{appointment.client || 'Cliente'}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{appointment.service}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{appointment.service}</p>
               </div>
               <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={`${getStatusColor(appointment.status)}`}>
                 {appointment.status}

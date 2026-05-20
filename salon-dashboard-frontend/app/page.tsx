@@ -424,11 +424,11 @@ export default function Home() {
 
                   <div className="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-slate-800/60">
                     <div>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Citas de Hoy</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Citas de Hoy</p>
                       <p className="text-sm font-extrabold text-slate-200 mt-0.5">8 Confirmadas</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Respuesta Automatizada</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Respuesta Automatizada</p>
                       <p className="text-sm font-extrabold text-amber-400 mt-0.5">94% Eficacia IA</p>
                     </div>
                   </div>

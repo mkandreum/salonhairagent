@@ -48,8 +48,8 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
     switch (type) {
       case 'success': return <CheckCircle className="w-5 h-5 text-emerald-500" />
       case 'warning': return <AlertCircle className="w-5 h-5 text-amber-500" />
-      case 'info': return <Info className="w-5 h-5 text-slate-500" />
-      default: return <Bell className="w-5 h-5 text-slate-500" />
+      case 'info': return <Info className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+      default: return <Bell className="w-5 h-5 text-slate-500 dark:text-slate-400" />
     }
   }
 

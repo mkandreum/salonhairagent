@@ -76,7 +76,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
       
       <div className="p-6">
         <div className="p-4 bg-slate-950/60 rounded-2xl border border-amber-500/10 mb-4 backdrop-blur-md shadow-lg shadow-black/40 animate-pulse-surface">
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Plan Activo</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Plan Activo</p>
           <div className="flex justify-between items-baseline mt-1">
             <p className="text-xs sm:text-sm font-extrabold text-slate-200">Suscripción Luxe</p>
             <span className="text-[9px] bg-gradient-to-r from-amber-500/10 to-amber-600/10 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full font-bold shadow-[0_0_8px_rgba(212,175,55,0.1)]">Premium</span>

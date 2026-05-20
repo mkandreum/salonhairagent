@@ -68,7 +68,7 @@ export default function Login({ onLogin }: LoginProps) {
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-[#04060a] relative overflow-hidden">
       {/* Decorative ambient gold glow circles */}
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#1e3a5f]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800/10 blur-[120px] pointer-events-none" />
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fadeIn">
@@ -98,7 +98,7 @@ export default function Login({ onLogin }: LoginProps) {
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Nombre Completo</label>
                 <div className="relative group">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                   <input
                     type="text"
                     required
@@ -114,7 +114,7 @@ export default function Login({ onLogin }: LoginProps) {
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                 <input
                   type="email"
                   required
@@ -133,14 +133,14 @@ export default function Login({ onLogin }: LoginProps) {
                   <button
                     type="button"
                     onClick={() => alert('Contacta con el administrador para restablecer tu contraseña.')}
-                    className="text-[9px] font-bold text-slate-500 hover:text-amber-400 transition-colors uppercase tracking-wider"
+                    className="text-[9px] font-bold text-slate-400 hover:text-amber-400 transition-colors uppercase tracking-wider"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
                 )}
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                 <input
                   type="password"
                   required
