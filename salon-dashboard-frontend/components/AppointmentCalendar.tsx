@@ -130,7 +130,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
   )
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+    <div className="app-card p-4 md:p-6 animate-fade-float-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
         <div className="flex items-center space-x-3">
@@ -142,7 +142,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
             <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium hidden sm:block">Gestión integral</p>
           </div>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-premium py-2 px-4 text-sm whitespace-nowrap">
+        <button onClick={() => setIsModalOpen(true)} className="btn-premium primary-btn py-2 px-4 text-sm whitespace-nowrap ripple-host">
           <Plus className="w-4 h-4 mr-2 inline" />
           <span className="hidden sm:inline">Nueva Cita</span>
           <span className="sm:hidden">+</span>
@@ -263,7 +263,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto">
+          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto animate-fade-float-in">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
               <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
@@ -309,7 +309,7 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
                 <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
 
-              <button type="submit" className="btn-premium w-full py-3 mt-4">
+              <button type="submit" className="btn-premium primary-btn w-full py-3 mt-4 ripple-host">
                 {editingAppointment ? 'Actualizar' : 'Crear Cita'}
               </button>
             </form>

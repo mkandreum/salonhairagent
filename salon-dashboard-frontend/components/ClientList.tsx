@@ -94,7 +94,7 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
   const displayClients = filteredClients.slice(0, fullView ? undefined : 6)
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+    <div className="app-card p-4 md:p-6 animate-fade-float-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
         <div className="flex items-center space-x-3">
@@ -119,7 +119,7 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
               />
             </div>
           )}
-          <button onClick={() => setIsModalOpen(true)} className="btn-premium py-2 px-4 text-sm">
+          <button onClick={() => setIsModalOpen(true)} className="btn-premium primary-btn py-2 px-4 text-sm ripple-host">
             <Plus className="w-4 h-4 mr-2 inline" />
             <span className="hidden sm:inline">Añadir</span>
           </button>
@@ -253,7 +253,7 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">{editingClient ? 'Editar Cliente' : 'Añadir Cliente'}</h3>
               <button onClick={() => { setIsModalOpen(false); setEditingClient(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
@@ -273,7 +273,7 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Teléfono</label>
                 <input type="text" placeholder="+34 600 000 000" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
-              <button type="submit" className="btn-premium w-full py-3 mt-4">Guardar</button>
+              <button type="submit" className="btn-premium primary-btn w-full py-3 mt-4 ripple-host">Guardar</button>
             </form>
           </div>
         </div>

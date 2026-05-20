@@ -27,12 +27,12 @@ export default function DashboardStats() {
   return (
     <div className="col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
       {Array.isArray(stats) && stats.map((stat, index) => {
-        const Icon = stat.title?.includes('Citas') ? Calendar : 
-                     stat.title?.includes('Clientes') ? Users : 
+        const Icon = stat.title?.includes('Citas') ? Calendar :
+                     stat.title?.includes('Clientes') ? Users :
                      stat.title?.includes('Ingresos') ? DollarSign : TrendingUp
 
         return (
-          <div key={stat.title} className="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 dark:border-slate-800 group">
+          <div key={stat.title} className="app-card interactive-card p-4 md:p-6 group animate-fade-float-in" style={{ animationDelay: `${index * 60}ms` }}>
             <div className="flex items-start justify-between mb-3 md:mb-4">
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{stat.title}</p>
@@ -42,7 +42,7 @@ export default function DashboardStats() {
                 <Icon className="w-5 h-5 md:w-6 md:h-6 text-amber-400" />
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <div className={`flex items-center px-2 py-1 rounded-lg text-xs font-bold ${
                 stat.trend === 'up' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'

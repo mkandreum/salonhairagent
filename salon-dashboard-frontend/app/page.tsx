@@ -361,7 +361,7 @@ export default function Home() {
 
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
         <div className="flex justify-center px-3 pb-3 sm:pb-4">
-          <nav className="flex items-center px-1 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-2xl" style={{ width: 'min(100vw - 24px, 560px)' }}>
+          <nav className="ios-pill-nav flex items-center px-1 py-1.5 rounded-full" style={{ width: 'min(100vw - 24px, 560px)' }}>
             {menuItems.map((item) => {
               const Icon = item.icon
               const isActive = activeTab === item.id
@@ -369,11 +369,12 @@ export default function Home() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative flex flex-col items-center justify-center rounded-2xl transition-all duration-200 ${isActive ? 'bg-slate-800 text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}
+                  className={`relative flex flex-col items-center justify-center rounded-2xl transition-all duration-200 nav-soft-btn ${isActive ? 'nav-soft-btn-active' : ''}`}
                   style={{ flex: 1, height: '56px' }}
                 >
                   <Icon className="w-5 h-5 mb-0.5" />
                   <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
+                  {isActive && <span className="nav-dot-indicator" style={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', margin: 0 }} />}
                 </button>
               )
             })}

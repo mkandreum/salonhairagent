@@ -36,7 +36,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           revenueChangePct = 0, apptsChangePct = 0 } = data
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+    <div className="app-card p-4 sm:p-6 animate-fade-float-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
