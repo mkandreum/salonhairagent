@@ -65,82 +65,89 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100 dark:bg-slate-950">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-slate-800 dark:bg-slate-700 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-6">
-            <Scissors className="w-8 h-8 text-amber-400" />
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-[#04060a] relative overflow-hidden">
+      {/* Decorative ambient gold glow circles */}
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#1e3a5f]/10 blur-[120px] pointer-events-none" />
+      
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-8 animate-fadeIn">
+          <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-5 transition-transform duration-300 hover:scale-105">
+            <Scissors className="w-8 h-8 text-amber-450" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
-            {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-100 via-amber-300 to-amber-100 tracking-tight uppercase">
+            {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-center">
-            {isLogin ? 'Gestiona tu salón con estilo' : 'Únete a nuestra plataforma'}
+          <p className="text-slate-400 mt-2 text-xs sm:text-sm tracking-wide">
+            {isLogin ? 'Luxe Concierge — Gestión de Salón' : 'Únete a nuestra plataforma premium'}
           </p>
         </div>
 
-        <div className="glass-card p-10">
+        <div className="bg-slate-900/40 backdrop-blur-2xl border border-slate-800/80 dark:border-amber-500/10 rounded-[28px] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          {/* subtle interior card shimmer/reflection */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/2 to-transparent pointer-events-none" />
+          
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-              <p className="text-sm text-red-600 dark:text-red-400 text-center font-semibold">{error}</p>
+            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl animate-fadeIn">
+              <p className="text-xs sm:text-sm text-rose-400 text-center font-semibold">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Nombre Completo</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Nombre Completo</label>
                 <div className="relative group">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Tu nombre"
-                    className="input-premium pl-12"
+                    placeholder="Tu nombre completo"
+                    className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">Email</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
-                  className="input-premium pl-12"
+                  placeholder="admin@luxe.com"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2 px-1">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Contraseña</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contraseña</label>
                 {isLogin && (
                   <button
                     type="button"
                     onClick={() => alert('Contacta con el administrador para restablecer tu contraseña.')}
-                    className="text-xs font-semibold text-slate-500 hover:text-slate-700"
+                    className="text-[9px] font-bold text-slate-500 hover:text-amber-400 transition-colors uppercase tracking-wider"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
                 )}
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-amber-500 transition-colors" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-premium pl-12"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-800/60 rounded-xl focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm text-white placeholder:text-slate-600"
                 />
               </div>
             </div>
@@ -148,27 +155,27 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="btn-premium w-full group mt-4"
+              className="w-full py-3.5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-sm transition-all border border-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 active:scale-[0.985] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:pointer-events-none"
             >
               {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span>{isLogin ? 'Ingresar al Portal' : 'Registrar Cuenta'}</span>
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="mt-8 text-center border-t border-slate-800/60 pt-6">
+            <p className="text-xs text-slate-400">
               {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 font-semibold text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 underline underline-offset-4"
+                className="ml-2 font-bold text-amber-400 hover:text-amber-300 transition-colors underline underline-offset-4"
               >
-                {isLogin ? 'Regístrate' : 'Inicia sesión'}
+                {isLogin ? 'Regístrate aquí' : 'Inicia sesión'}
               </button>
             </p>
           </div>

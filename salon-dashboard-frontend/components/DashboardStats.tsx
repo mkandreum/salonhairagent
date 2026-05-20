@@ -19,8 +19,10 @@ export default function DashboardStats() {
   }, [])
 
   if (loading) return (
-    <div className="col-span-2 md:col-span-1 lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-      {[1, 2, 3, 4].map(i => <div key={i} className="h-28 md:h-32 bg-white dark:bg-slate-900 rounded-2xl animate-pulse" />)}
+    <div className="col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="app-card border border-amber-500/10 rounded-2xl h-28 md:h-32 anim-shimmer opacity-75" />
+      ))}
     </div>
   )
 

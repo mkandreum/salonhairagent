@@ -113,7 +113,7 @@ export default function TriageView() {
       {/* Modal Analizar con IA */}
       {showAnalyzer && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in">
+          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-lg p-6 max-h-[85vh] overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in border-t border-slate-200/50 dark:border-amber-500/10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
@@ -182,8 +182,8 @@ export default function TriageView() {
 
       {/* Modal Detalle Ticket */}
       {selectedTicket && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="glass-card p-8 w-full max-w-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-2xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in border-t border-slate-200/50 dark:border-amber-500/10">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
