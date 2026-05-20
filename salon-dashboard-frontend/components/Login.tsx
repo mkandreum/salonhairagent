@@ -65,28 +65,26 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-[#04060a] relative overflow-hidden">
-      {/* Decorative ambient gold glow circles */}
-      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800/10 blur-[120px] pointer-events-none" />
-      
+    <div className="min-h-screen bg-[#080608] relative overflow-hidden flex items-center justify-center p-4 sm:p-6">
+      {/* Ambient orbs */}
+      <div className="absolute top-[-80px] right-[-100px] w-[320px] h-[320px] rounded-full bg-[#D4A843]/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[240px] h-[240px] rounded-full bg-purple-500/6 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-60px] left-[-80px] w-[200px] h-[200px] rounded-full bg-teal-400/5 blur-3xl pointer-events-none" />
+
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fadeIn">
-          <div className="w-16 h-16 bg-gradient-to-br from-[#0c101b] to-[#1e293b] border border-amber-500/30 rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)] shadow-amber-500/5 mx-auto mb-5 transition-transform duration-300 hover:scale-105 hover:border-amber-500/60">
-            <Scissors className="w-8 h-8 text-amber-400 drop-shadow-[0_0_4px_rgba(212,175,55,0.4)]" />
+          <div className="w-16 h-16 bg-[#D4A843]/10 border border-[#D4A843]/30 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-transform duration-300 hover:scale-105">
+            <Scissors className="w-8 h-8 text-[#D4A843] drop-shadow-[0_0_4px_rgba(212,168,67,0.4)]" />
           </div>
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-100 via-amber-300 to-amber-100 tracking-tight uppercase">
+          <h1 className="text-white text-2xl font-bold tracking-tight uppercase">
             {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </h1>
-          <p className="text-slate-400 mt-2 text-xs sm:text-sm tracking-wide font-medium">
+          <p className="text-white/40 mt-2 text-xs sm:text-sm tracking-wide font-medium">
             {isLogin ? 'Luxe Concierge — Gestión de Salón' : 'Únete a nuestra plataforma premium'}
           </p>
         </div>
 
-        <div className="app-card rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-amber-500/10">
-          {/* subtle interior card shimmer/reflection */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/2 to-transparent pointer-events-none" />
-          
+        <div className="app-card rounded-[32px] p-6 sm:p-8 relative overflow-hidden border border-[#D4A843]/20">
           {error && (
             <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl animate-fadeIn">
               <p className="text-xs sm:text-sm text-rose-400 text-center font-semibold">{error}</p>
@@ -96,9 +94,9 @@ export default function Login({ onLogin }: LoginProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Nombre Completo</label>
+                <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest mb-2 px-1">Nombre Completo</label>
                 <div className="relative group">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
                   <input
                     type="text"
                     required
@@ -112,9 +110,9 @@ export default function Login({ onLogin }: LoginProps) {
             )}
 
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Email</label>
+              <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest mb-2 px-1">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
                 <input
                   type="email"
                   required
@@ -128,19 +126,19 @@ export default function Login({ onLogin }: LoginProps) {
 
             <div>
               <div className="flex items-center justify-between mb-2 px-1">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contraseña</label>
+                <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest">Contraseña</label>
                 {isLogin && (
                   <button
                     type="button"
                     onClick={() => alert('Contacta con el administrador para restablecer tu contraseña.')}
-                    className="text-[9px] font-bold text-slate-400 hover:text-amber-400 transition-colors uppercase tracking-wider"
+                    className="text-white/40 hover:text-[#D4A843] font-mono text-[9px] uppercase tracking-wider transition-colors"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
                 )}
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
                 <input
                   type="password"
                   required
@@ -158,7 +156,7 @@ export default function Login({ onLogin }: LoginProps) {
               className="btn-premium primary-btn w-full mt-4 py-3.5 flex items-center justify-center space-x-2 ripple-host disabled:opacity-50 disabled:pointer-events-none"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <span>{isLogin ? 'Ingresar al Portal' : 'Registrar Cuenta'}</span>
@@ -168,12 +166,12 @@ export default function Login({ onLogin }: LoginProps) {
             </button>
           </form>
 
-          <div className="mt-8 text-center border-t border-slate-800/60 pt-6">
-            <p className="text-xs text-slate-400 font-medium">
+          <div className="mt-8 text-center border-t border-white/5 pt-6">
+            <p className="text-xs text-white/50 font-medium">
               {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 font-bold text-amber-400 hover:text-amber-300 transition-colors underline underline-offset-4"
+                className="ml-2 font-bold text-[#D4A843] hover:text-[#D4A843]/80 transition-colors underline underline-offset-4"
               >
                 {isLogin ? 'Regístrate aquí' : 'Inicia sesión'}
               </button>

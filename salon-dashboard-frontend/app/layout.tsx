@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Salon Dashboard - Appointment Management',
@@ -23,14 +20,14 @@ export default function RootLayout({
             try {
               let theme = localStorage.getItem('salon_theme');
               if (!theme) {
-                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark';
               }
               document.documentElement.classList.add(theme);
             } catch(e) {}
           `
         }} />
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>
           {children}
         </Providers>

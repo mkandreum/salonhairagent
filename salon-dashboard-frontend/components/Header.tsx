@@ -58,10 +58,10 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
   }
 
   return (
-    <header className="h-16 sm:h-20 bg-white/80 dark:bg-[#080b11]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-amber-500/10 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300">
+    <header className="h-16 sm:h-20 bg-[#080608]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300">
       <div className="flex-1 max-w-xs sm:max-w-md md:max-w-lg mr-4">
         <div className="relative group">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-amber-500 transition-colors duration-200" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-[#D4A843] transition-colors duration-200" />
           <input 
             type="text" 
             placeholder="Buscar..." 
@@ -70,7 +70,7 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
               setSearchQuery(e.target.value);
               onSearch(e.target.value);
             }}
-            className="w-full pl-10 pr-4 py-2 sm:py-2.5 bg-white/70 dark:bg-[#0a0d16]/75 border border-slate-200/40 dark:border-amber-500/10 rounded-full focus:outline-none focus:border-amber-500/50 dark:focus:border-amber-500/60 focus:ring-4 focus:ring-amber-500/10 text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 transition-all duration-300 shadow-md focus:shadow-amber-500/5"
+            className="input-premium w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-full focus:border-[#D4A843]/50"
           />
         </div>
       </div>
@@ -80,16 +80,16 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
         <div className="relative" ref={notifRef}>
           <button 
             onClick={toggleNotifications}
-            className={`p-2 sm:p-2.5 rounded-full transition-all duration-200 relative ${
+            className={`p-2 sm:p-2.5 rounded-xl transition-all duration-200 relative ${
               isNotificationsOpen 
-                ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
-                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'
+                ? 'bg-[#D4A843]/10 text-[#D4A843] border border-[#D4A843]/20' 
+                : 'text-white/40 hover:bg-white/[0.04] border border-transparent'
             }`}
             title="Notificaciones"
           >
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-amber-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-[#080b11] animate-pulse">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-[#D4A843] text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-[#080608] animate-pulse">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -100,51 +100,51 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
         {/* Settings */}
         <button 
           onClick={() => onTabChange('settings')}
-          className="p-2 sm:p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all duration-200 border border-transparent"
+          className="p-2 sm:p-2.5 text-white/40 hover:bg-white/[0.04] rounded-xl transition-all duration-200 border border-transparent"
           title="Ajustes"
         >
           <Settings className="w-5 h-5" />
         </button>
         
-        <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-800" />
+        <div className="hidden sm:block w-px h-6 bg-white/5" />
         
         {/* Profile */}
         <div className="relative" ref={profileRef}>
           <button 
             onClick={toggleProfile}
-            className="flex items-center space-x-2 sm:space-x-3 pl-1.5 pr-1 py-1 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-full transition-all duration-200 border border-transparent dark:hover:border-slate-800"
+            className="flex items-center space-x-2 sm:space-x-3 pl-1.5 pr-1 py-1 hover:bg-white/[0.04] rounded-xl transition-all duration-200 border border-transparent"
           >
             <div className="text-right hidden md:block">
-              <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 leading-none tracking-tight">{user?.name || 'Usuario'}</p>
-              <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider leading-none mt-1">Profesional</p>
+              <p className="text-xs sm:text-sm font-bold text-white leading-none tracking-tight">{user?.name || 'Usuario'}</p>
+              <p className="text-[#D4A843] font-mono text-[10px] uppercase tracking-wider leading-none mt-1">Profesional</p>
             </div>
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#0c101b] to-[#1e293b] border-2 border-amber-500/40 hover:border-amber-500 flex items-center justify-center text-amber-400 font-bold shadow-lg shadow-amber-500/5 transition-all duration-300">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#D4A843]/10 border-2 border-[#D4A843]/40 flex items-center justify-center text-[#D4A843] font-bold transition-all duration-300">
               <User className="w-4 h-4" />
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 app-card border border-amber-500/10 backdrop-blur-xl overflow-hidden shadow-2xl z-50 animate-fade-float-in">
+            <div className="absolute right-0 mt-2 w-48 app-card border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl z-50 animate-fade-float-in">
               <div className="p-2 space-y-1">
                 <button 
                   onClick={() => { onTabChange('settings'); setIsProfileOpen(false); }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-white/70 hover:bg-white/[0.04] rounded-xl transition-all duration-200"
                 >
-                  <User className="w-4 h-4 text-amber-500/70" />
+                  <User className="w-4 h-4 text-[#D4A843]/70" />
                   <span>Mi Perfil</span>
                 </button>
                 <button 
                   onClick={() => { onTabChange('settings'); setIsProfileOpen(false); }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-white/70 hover:bg-white/[0.04] rounded-xl transition-all duration-200"
                 >
-                  <Settings className="w-4 h-4 text-amber-500/70" />
+                  <Settings className="w-4 h-4 text-[#D4A843]/70" />
                   <span>Ajustes</span>
                 </button>
-                <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+                <div className="h-px bg-white/5 my-1" />
                 <button 
                   onClick={onLogout}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-all duration-200"
+                  className="w-full flex items-center space-x-2.5 px-3 py-2.5 text-xs sm:text-sm text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all duration-200"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Cerrar Sesión</span>
