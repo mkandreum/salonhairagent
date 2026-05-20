@@ -593,7 +593,16 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.set('query parser', 'simple');
+
+app.use((req, res, next) => {
+  res.timeout(60000, () => {
+    console.warn(`Timeout en ${req.method} ${req.path}`);
+    res.status(504).json({ error: 'El servidor tardó demasiado en responder.' });
+  });
+  next();
+});
 
 // ── AUTHENTICATION ────────────────────────────────────────
 app.post('/api/login', async (req, res) => {

@@ -12,7 +12,7 @@ import TriageView from '@/components/TriageView'
 import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
 import { fetchSettings, saveSettings } from '@/lib/api'
-import { Eye, EyeOff, Save, Building2, Phone, MapPin, Mail, Key, MessageSquare, Bot, Megaphone, Copy, CheckCircle, Menu, X, Home as HomeIcon, Calendar, Users, BarChart3, Bell, Settings, ChevronLeft } from 'lucide-react'
+import { Eye, EyeOff, Save, Building2, Phone, MapPin, Mail, Key, MessageSquare, Bot, Megaphone, Copy, CheckCircle, Home as HomeIcon, Calendar, Users, BarChart3, Bell, Settings } from 'lucide-react'
 
 interface Settings {
   darkMode: boolean
@@ -44,13 +44,13 @@ const DEFAULT_SETTINGS: Settings = {
 }
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
+  { id: 'dashboard', label: 'Home', icon: HomeIcon },
   { id: 'appointments', label: 'Citas', icon: Calendar },
   { id: 'clients', label: 'Clientes', icon: Users },
   { id: 'stylists', label: 'Estilistas', icon: Users },
-  { id: 'analytics', label: 'Análisis', icon: BarChart3 },
-  { id: 'triage', label: 'Auditoría IA', icon: Bot },
-  { id: 'notifications', label: 'Notificaciones', icon: Bell },
+  { id: 'analytics', label: 'Stats', icon: BarChart3 },
+  { id: 'triage', label: 'IA', icon: Bot },
+  { id: 'notifications', label: 'Alertas', icon: Bell },
   { id: 'settings', label: 'Ajustes', icon: Settings },
 ]
 
@@ -132,8 +132,6 @@ export default function Home() {
   const [savingSettings, setSavingSettings] = useState(false)
   const [settingsSaved, setSettingsSaved] = useState(false)
   const [appUrl, setAppUrl] = useState('')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
 
   const handleLogin = (userData: any) => setUser(userData)
   const handleLogout = () => {
@@ -143,10 +141,6 @@ export default function Home() {
 
   useEffect(() => {
     setAppUrl(window.location.origin)
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   useEffect(() => {
@@ -174,7 +168,7 @@ export default function Home() {
   const webhookUrl = `${appUrl}/api/webhook/whatsapp`
 
   const renderSettings = () => (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-24">
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
         <div className="flex items-center space-x-3 mb-4">
@@ -314,71 +308,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex">
-      {/* Sidebar - hidden on mobile, fixed width on desktop */}
+      {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden lg:block lg:w-72 lg:flex-shrink-0">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute left-0 top-0 h-full w-80 bg-white dark:bg-slate-900 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
-                  <span className="text-amber-400 text-lg">S</span>
-                </div>
-                <span className="font-bold text-slate-800 dark:text-white">Salon</span>
-              </div>
-              <button onClick={() => setMobileMenuOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                <X className="w-6 h-6 text-slate-500" />
-              </button>
-            </div>
-            <nav className="p-4 space-y-1">
-              {menuItems.map((item) => {
-                const Icon = item.icon
-                const isActive = activeTab === item.id
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${isActive ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-semibold border-l-4 border-amber-500' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </button>
-                )
-              })}
-            </nav>
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800">
-              <button onClick={handleLogout} className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl">
-                <span>🚪</span>
-                <span>Cerrar Sesión</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content - takes remaining space */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile Header */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between lg:hidden sticky top-0 z-40">
-          <div className="flex items-center space-x-3">
-            <button onClick={() => setMobileMenuOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-              <Menu className="w-6 h-6 text-slate-600 dark:text-slate-300" />
-            </button>
-            <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
-              <span className="text-amber-400 text-sm font-bold">S</span>
-            </div>
-            <span className="font-bold text-slate-800 dark:text-white">Salon</span>
-          </div>
-          <button onClick={() => setActiveTab('notifications')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
-            <Bell className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
-          </button>
-        </header>
-
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-0">
         {/* Desktop Header */}
         <div className="hidden lg:block">
           <Header user={user} onLogout={handleLogout} onTabChange={setActiveTab} onSearch={setSearchQuery} />
@@ -386,12 +322,12 @@ export default function Home() {
 
         <main className="p-4 md:p-6 lg:p-8 flex-1">
           <div className="max-w-[1600px] mx-auto">
-            {/* Page Header */}
-            <div className="mb-4 md:mb-6">
+            {/* Page Header - Desktop only */}
+            <div className="hidden lg:block mb-4 md:mb-6">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-800 dark:text-white capitalize">
                 {getPageTitle()}
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 hidden md:block">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Bienvenido de nuevo, {user?.name || 'Admin'}.
               </p>
             </div>
@@ -401,33 +337,34 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 lg:hidden z-40 safe-area-pb">
-        <div className="flex items-center justify-around py-2">
-          {[
-            { id: 'dashboard', icon: HomeIcon, label: 'Home' },
-            { id: 'appointments', icon: Calendar, label: 'Citas' },
-            { id: 'clients', icon: Users, label: 'Clientes' },
-            { id: 'analytics', icon: BarChart3, label: 'Stats' },
-            { id: 'settings', icon: Settings, label: 'Ajustes' },
-          ].map((item) => {
+      {/* Mobile Pill Navigation - iOS style floating bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden flex justify-center pb-6 px-4">
+        <nav className="flex items-center gap-1 px-2 py-2 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/20 dark:border-slate-700/30 shadow-2xl shadow-black/20">
+          {menuItems.map((item) => {
             const Icon = item.icon
             const isActive = activeTab === item.id
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center px-3 py-2 rounded-lg transition-colors ${isActive ? 'text-slate-800 dark:text-white' : 'text-slate-400'}`}
+                className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-200 ${
+                  isActive 
+                    ? 'bg-slate-800 text-amber-400 shadow-lg' 
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-1 ${isActive ? 'bg-slate-800 text-amber-400' : ''}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span className="text-xs font-medium">{item.label}</span>
+                <Icon className="w-5 h-5" />
+                {isActive && (
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-400 rounded-full" />
+                )}
               </button>
             )
           })}
-        </div>
+        </nav>
       </div>
+
+      {/* Notifications Panel */}
+      <NotificationsPanel />
     </div>
   )
 }

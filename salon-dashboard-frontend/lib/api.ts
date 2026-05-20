@@ -19,27 +19,44 @@ function getAuthHeader(): Record<string, string> {
   return { 'Authorization': `Bearer ${token}` };
 }
 
-async function apiFetch(path: string, options?: RequestInit) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      ...getAuthHeader(),
-      ...(options?.headers || {}),
-    },
-  });
-  if (!res.ok) {
-    let errMsg = `Error ${res.status}`;
-    try {
-      const data = await res.json();
-      errMsg = data.error || errMsg;
-    } catch {}
-    if (res.status === 401 || res.status === 403) {
-      try { localStorage.removeItem('salon_pro_token'); } catch {}
-      if (typeof window !== 'undefined') window.location.reload();
+async function apiFetch(path: string, options: RequestInit = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...getAuthHeader(),
+        ...(options.headers || {}),
+      },
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      let errMsg = `Error ${res.status}`;
+      try {
+        const data = await res.json();
+        errMsg = data.error || errMsg;
+      } catch {}
+      if (res.status === 401 || res.status === 403) {
+        try { localStorage.removeItem('salon_pro_token'); } catch {}
+        if (typeof window !== 'undefined') window.location.reload();
+      }
+      if (res.status === 504) {
+        throw new Error('El servidor tardó demasiado. Intenta de nuevo.');
+      }
+      throw new Error(errMsg);
     }
-    throw new Error(errMsg);
+    return res.json();
+  } catch (err: any) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      throw new Error('La petición tardó demasiado. Verifica tu conexión.');
+    }
+    throw err;
   }
-  return res.json();
 }
 
 export async function fetchStats() {
