@@ -7,6 +7,8 @@ const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const { google } = require('googleapis');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -34,6 +36,30 @@ async function waitForDB(retries = 20, delay = 2000) {
   console.error('ERROR: No se pudo conectar a PostgreSQL.');
   process.exit(1);
 }
+
+// Google OAuth Configuration
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
+const APP_URL = process.env.APP_URL || `http://localhost:${port}`;
+const REDIRECT_URI = `${APP_URL}/api/auth/google/callback`;
+
+const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+oauth2Client.on('tokens', (newTokens) => {
+  const current = (async () => {
+    try {
+      const { rows } = await pool.query("SELECT tokens FROM admin_auth WHERE id = 1");
+      return rows[0] ? JSON.parse(rows[0].tokens) : null;
+    } catch { return null; }
+  })();
+  if (current) {
+    pool.query("UPDATE admin_auth SET tokens = ? WHERE id = 1")
+      .then(() => pool.query("UPDATE admin_auth SET tokens = ? WHERE id = 1", [JSON.stringify({ ...current, ...newTokens })]))
+      .catch(console.error);
+  }
+});
 
 async function initDB() {
   const client = await pool.connect();
@@ -75,6 +101,13 @@ async function initDB() {
       phone TEXT PRIMARY KEY, step TEXT DEFAULT 'menu',
       data JSONB DEFAULT '{}', updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
+    await client.query(`CREATE TABLE IF NOT EXISTS admin_auth (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      tokens TEXT
+    )`);
+    try {
+      await client.query(`ALTER TABLE appointments ADD COLUMN event_id TEXT`);
+    } catch (e) { /* column may already exist */ }
     console.log('Tablas de base de datos inicializadas.');
   } finally {
     client.release();
@@ -89,6 +122,105 @@ async function getSetting(key) {
     try { return JSON.parse(rows[0].value); } catch { return rows[0].value; }
   } catch { return null; }
 }
+
+// Google OAuth helpers
+async function getAdminTokens() {
+  try {
+    const { rows } = await pool.query("SELECT tokens FROM admin_auth WHERE id = 1");
+    return rows[0] ? JSON.parse(rows[0].tokens) : null;
+  } catch { return null; }
+}
+
+async function getAdminEmail() {
+  const data = await getAdminTokens();
+  return data?.adminEmail || null;
+}
+
+// Email Template
+const getHtmlTemplate = (title, content, clientName, dateStr, appointmentId, service) => {
+  const manageUrl = appointmentId ? `${APP_URL}/?manage=${appointmentId}` : APP_URL;
+  const salonName = 'Salon Hair';
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0D1117;font-family:system-ui,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0D1117;padding:20px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#161B22;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;">
+        <tr>
+          <td style="background:#1C2128;padding:30px 40px;border-bottom:1px solid rgba(255,255,255,0.1);">
+            <p style="margin:0;font-size:24px;color:#F0F6FC;letter-spacing:0.5px;">${salonName}</p>
+            <p style="margin:4px 0 0;font-size:10px;color:#8B949E;letter-spacing:2px;text-transform:uppercase;">Beauty Studio</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:35px 40px;">
+            <h1 style="margin:0 0 20px;font-size:24px;color:#F0F6FC;font-weight:600;">${title}</h1>
+            <p style="margin:0 0 20px;font-size:15px;color:#8B949E;line-height:1.6;">Hola <strong style="color:#F0F6FC;">${clientName}</strong>,</p>
+            <div style="font-size:15px;color:#8B949E;line-height:1.7;">${content}</div>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#21262D;border:1px solid rgba(255,255,255,0.1);border-radius:12px;margin:25px 0;">
+              <tr>
+                <td style="padding:20px 25px;">
+                  <table width="100%" cellpadding="6" cellspacing="0">
+                    <tr>
+                      <td style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:1px;font-weight:600;width:100px;">Fecha</td>
+                      <td style="font-size:14px;color:#F0F6FC;font-weight:500;">${dateStr}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Servicio</td>
+                      <td style="font-size:14px;color:#F0F6FC;font-weight:500;">${service || 'Servicio de belleza'}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Ubicación</td>
+                      <td style="font-size:14px;color:#F0F6FC;font-weight:500;">Salon Hair</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            ${appointmentId ? `<a href="${manageUrl}" style="display:inline-block;background:#238636;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:10px;">Gestionar mi Cita</a>` : ''}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;border-top:1px solid rgba(255,255,255,0.06);background:#0D1117;text-align:center;">
+            <p style="margin:0;font-size:11px;color:#484F58;">© 2026 ${salonName}. Todos los derechos reservados.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+};
+
+// Send Email Function
+const sendEmail = async (to, subject, html) => {
+  const tokens = await getAdminTokens();
+  if (!tokens || !CLIENT_ID) return;
+  
+  oauth2Client.setCredentials(tokens);
+  const fromEmail = await getAdminEmail() || "me";
+  
+  const encodedSubject = Buffer.from(subject, 'utf-8').toString('base64');
+  
+  const message = [
+    `To: ${to}`,
+    `From: "Salon Hair" <${fromEmail}>`,
+    `Subject: =?utf-8?B?${encodedSubject}?=`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset=utf-8`,
+    `Content-Transfer-Encoding: 8bit`,
+    ``,
+    html
+  ].join('\r\n');
+
+  const encodedMessage = Buffer.from(message, "utf-8").toString("base64url");
+
+  await gmail.users.messages.send({
+    userId: "me",
+    requestBody: { raw: encodedMessage }
+  });
+};
 
 async function sendWhatsAppMessage(to, body, token, phoneNumberId) {
   const payload = JSON.stringify({
@@ -255,16 +387,77 @@ _Responde con el número o escribe la hora (ej: 15:30)_`;
     const times = ['09:00', '10:00', '11:00', '12:00', '16:00', '17:00', '18:00', '19:00'];
     const num = parseInt(msg);
     const time = (!isNaN(num) && num >= 1 && num <= 8) ? times[num - 1] : msg;
-    // Crear la cita
-    const clientRow = (await pool.query('SELECT id FROM clients WHERE phone=$1 OR phone=$2 OR phone=$3',
-      [from, from.replace('+', ''), '+' + from.replace('+', '')])).rows[0];
-    if (clientRow && data.stylist?.id && data.date?.value) {
+    
+    const clientRow = (await pool.query('SELECT id, name, email, phone FROM clients WHERE phone=$1 OR phone=$2 OR phone=$3',
+      [from, from.replace('+', ''), '+' + from.replace('+', '')]));
+    const clientData = clientRow.rows[0];
+    
+    let eventId = null;
+    const tokens = await getAdminTokens();
+    
+    if (clientData && data.stylist?.id && data.date?.value) {
+      if (tokens && CLIENT_ID) {
+        try {
+          oauth2Client.setCredentials(tokens);
+          const startDateTime = `${data.date.value}T${time}:00`;
+          const [h, m] = time.split(':');
+          const endDate = new Date(data.date.value);
+          endDate.setHours(parseInt(h) + 1, parseInt(m), 0, 0);
+          const endDateTime = endDate.toISOString().split('T')[0] + 'T' + endDate.toTimeString().slice(0, 5) + ':00';
+          
+          const { rows: stylistData } = await pool.query('SELECT * FROM stylists WHERE id=$1', [data.stylist.id]);
+          const stylist = stylistData[0];
+          
+          const event = await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: {
+              summary: `${data.service} - ${clientData.name}`,
+              description: `Cliente: ${clientData.name}\nEmail: ${clientData.email || 'N/A'}\nTeléfono: ${clientData.phone}\nEstilista: ${stylist?.name || 'N/A'}`,
+              start: { dateTime: startDateTime, timeZone: 'Europe/Madrid' },
+              end: { dateTime: endDateTime, timeZone: 'Europe/Madrid' },
+              attendees: clientData.email ? [{ email: clientData.email }] : []
+            }
+          });
+          eventId = event.data.id;
+        } catch (err) { console.error('Calendar error:', err.message); }
+      }
+      
       await pool.query(
-        'INSERT INTO appointments (client_id, stylist_id, service, time, date, status, price) VALUES ($1,$2,$3,$4,$5,$6,$7)',
-        [clientRow.id, data.stylist.id, data.service, time, data.date.value, 'confirmed', 30]
+        'INSERT INTO appointments (client_id, stylist_id, service, time, date, status, price, event_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+        [clientData.id, data.stylist.id, data.service, time, data.date.value, 'confirmed', 30, eventId]
       );
       await pool.query('INSERT INTO notifications (type,title,message) VALUES ($1,$2,$3)',
-        ['success', 'Nueva cita WhatsApp', `${client?.name || from} reservó ${data.service} el ${data.date.label} a las ${time}`]);
+        ['success', 'Nueva cita WhatsApp', `${clientData.name || from} reservó ${data.service} el ${data.date.label} a las ${time}`]);
+      
+      if (tokens && clientData.email) {
+        const dateStr = new Date(`${data.date.value}T${time}`).toLocaleString('es-ES', { 
+          weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+        });
+        
+        const clientHtml = getHtmlTemplate(
+          'Cita Confirmada', 
+          '<p>Tu cita en Salon Hair ha sido reservada con éxito. ¡Estamos deseando recibirte!</p>',
+          clientData.name,
+          dateStr,
+          null,
+          data.service
+        );
+        sendEmail(clientData.email, 'Confirmación de Reserva - Salon Hair', clientHtml).catch(e => console.error('Email error:', e));
+
+        const adminEmail = await getAdminEmail();
+        if (adminEmail) {
+          const adminHtml = getHtmlTemplate(
+            'Nueva Reserva',
+            `<p>Has recibido una nueva reserva de <span style="color: #F0F6FC;">${clientData.name}</span>.</p>
+             <p>Email: ${clientData.email || 'No registrado'}<br>Tel: ${clientData.phone}<br>Servicio: ${data.service}<br>Estilista: ${data.stylist?.name || 'N/A'}</p>`,
+            'Salon Hair',
+            dateStr,
+            null,
+            data.service
+          );
+          sendEmail(adminEmail, `Nueva Cita: ${clientData.name}`, adminHtml).catch(e => console.error('Admin email error:', e));
+        }
+      }
     }
     await setSession(from, 'menu', {});
     return `✅ *¡Cita confirmada!*
@@ -327,6 +520,51 @@ Escribe *0* para volver al menú.`;
       return 'Por favor responde con el número de la cita. 🔢';
     }
     const app = data.apps[idx];
+    
+    const { rows: appData } = await pool.query(
+      `SELECT a.*, c.name as client_name, c.email as client_email FROM appointments a JOIN clients c ON a.client_id=c.id WHERE a.id=$1`,
+      [app.id]
+    );
+    const appointment = appData[0];
+    
+    const tokens = await getAdminTokens();
+    
+    if (tokens && appointment?.event_id) {
+      try {
+        oauth2Client.setCredentials(tokens);
+        await calendar.events.delete({ calendarId: 'primary', eventId: appointment.event_id });
+      } catch (err) { console.error('Calendar delete error:', err.message); }
+      
+      if (appointment?.client_email) {
+        const dateStr = new Date(`${appointment.date}T${appointment.time}`).toLocaleString('es-ES', { 
+          weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+        });
+        const html = getHtmlTemplate(
+          'Cita Cancelada',
+          '<p>Lamentamos informarte que tu cita ha sido cancelada.</p>',
+          appointment.client_name,
+          dateStr,
+          null,
+          appointment.service
+        );
+        sendEmail(appointment.client_email, 'Cita Cancelada - Salon Hair', html).catch(e => console.error('Cancel email error:', e));
+        
+        const adminEmail = await getAdminEmail();
+        if (adminEmail) {
+          const adminHtml = getHtmlTemplate(
+            'Cita Cancelada',
+            `<p>La cita de <span style="color: #F0F6FC;">${appointment.client_name}</span> ha sido cancelada.</p>
+             <p>Fecha: ${dateStr}<br>Servicio: ${appointment.service}</p>`,
+            'Salon Hair',
+            dateStr,
+            null,
+            appointment.service
+          );
+          sendEmail(adminEmail, `Cita Cancelada: ${appointment.client_name}`, adminHtml).catch(e => console.error('Admin cancel email error:', e));
+        }
+      }
+    }
+    
     await pool.query("UPDATE appointments SET status='cancelled' WHERE id=$1", [app.id]);
     await pool.query('INSERT INTO notifications (type,title,message) VALUES ($1,$2,$3)',
       ['warning', 'Cita cancelada por WhatsApp', `${client?.name || from} canceló ${app.service} el ${app.date} a las ${app.time}`]);
@@ -357,6 +595,56 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// ── AUTHENTICATION ────────────────────────────────────────
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email y contraseña requeridos' });
+  
+  try {
+    const { rows } = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
+    const user = rows[0];
+    
+    if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+    
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(401).json({ error: 'Credenciales inválidas' });
+    
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    
+    res.json({ 
+      token, 
+      user: { id: user.id, name: user.name, email: user.email } 
+    });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
+app.post('/api/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: 'Nombre, email y contraseña requeridos' });
+  
+  try {
+    const { rows: existing } = await pool.query('SELECT id FROM users WHERE email=$1', [email]);
+    if (existing.length > 0) return res.status(400).json({ error: 'Este email ya está registrado' });
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const { rows } = await pool.query(
+      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
+      [name, email, hashedPassword]
+    );
+    
+    const user = rows[0];
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    
+    res.json({ token, user });
+  } catch (err) {
+    console.error('Register error:', err.message);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
 // ── STATIC ─────────────────────────────────────────────────
 const staticPath = path.join(__dirname, 'public');
 console.log(`Static files path: ${staticPath}`);
@@ -386,6 +674,60 @@ const checkRateLimit = (email) => {
   loginAttempts.set(email, attempts);
   return true;
 };
+
+// ── AUTH GOOGLE OAUTH ──────────────────────────────────────
+app.get('/api/auth/google', (req, res) => {
+  if (!CLIENT_ID) {
+    return res.status(500).send('Falta GOOGLE_CLIENT_ID en variables de entorno.');
+  }
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: [
+      'https://www.googleapis.com/auth/calendar',
+      'https://www.googleapis.com/auth/gmail.send',
+      'https://www.googleapis.com/auth/userinfo.email'
+    ]
+  });
+  res.redirect(url);
+});
+
+app.get('/api/auth/google/callback', async (req, res) => {
+  const code = req.query.code;
+  if (code) {
+    try {
+      const { tokens } = await oauth2Client.getToken(code);
+      
+      const oauth2 = google.oauth2({ auth: oauth2Client, version: 'v2' });
+      oauth2Client.setCredentials(tokens);
+      const userInfo = await oauth2.userinfo.get();
+      const userEmail = userInfo.data.email;
+      
+      const authorizedEmail = process.env.ADMIN_EMAIL;
+      
+      if (!authorizedEmail || userEmail !== authorizedEmail) {
+        return res.status(403).send('No autorizado. Este email no tiene acceso.');
+      }
+
+      await pool.query(
+        'INSERT INTO admin_auth (id, tokens) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET tokens = $1',
+        [JSON.stringify({ ...tokens, adminEmail: userEmail })]
+      );
+      
+      res.redirect('/?admin=true');
+    } catch (e) {
+      res.status(500).send('Error en la autenticación: ' + String(e));
+    }
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.get('/api/config', async (req, res) => {
+  res.json({ 
+    hasCredentials: !!(CLIENT_ID && CLIENT_SECRET),
+    isGoogleConnected: !!(await getAdminTokens())
+  });
+});
 
 // ── WHATSAPP WEBHOOK ───────────────────────────────────────
 app.get('/api/webhook/whatsapp', async (req, res) => {
@@ -506,7 +848,7 @@ app.get('/health', (req, res) => res.json({ status: 'healthy', service: 'salon-b
 // ── APPOINTMENTS ───────────────────────────────────────────
 app.get('/api/appointments', authenticateToken, async (req, res) => {
   try {
-    const { rows } = await pool.query(`SELECT a.*, c.name as client_name, s.name as stylist_name FROM appointments a JOIN clients c ON a.client_id=c.id JOIN stylists s ON a.stylist_id=s.id`);
+    const { rows } = await pool.query(`SELECT a.*, c.name as client_name, c.email as client_email, c.phone as client_phone, s.name as stylist_name FROM appointments a JOIN clients c ON a.client_id=c.id JOIN stylists s ON a.stylist_id=s.id`);
     res.json(rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -515,12 +857,76 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
   const { client_id, stylist_id, service, time, date, price } = req.body;
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos' });
   try {
+    let eventId = null;
+    const tokens = await getAdminTokens();
+    
+    const { rows: clientData } = await pool.query('SELECT * FROM clients WHERE id=$1', [client_id]);
+    const { rows: stylistData } = await pool.query('SELECT * FROM stylists WHERE id=$1', [stylist_id]);
+    
+    const client = clientData[0];
+    const stylist = stylistData[0];
+    
+    if (tokens && CLIENT_ID) {
+      try {
+        oauth2Client.setCredentials(tokens);
+        const startDateTime = `${date}T${time}:00`;
+        const [hours, minutes] = time.split(':');
+        const endDate = new Date(date);
+        endDate.setHours(parseInt(hours) + 1, parseInt(minutes), 0, 0);
+        const endDateTime = endDate.toISOString().split('T')[0] + 'T' + endDate.toTimeString().slice(0, 5) + ':00';
+        
+        const event = await calendar.events.insert({
+          calendarId: 'primary',
+          requestBody: {
+            summary: `${service} - ${client?.name || 'Cliente'}`,
+            description: `Cliente: ${client?.name || 'N/A'}\nEmail: ${client?.email || 'N/A'}\nTeléfono: ${client?.phone || 'N/A'}\nEstilista: ${stylist?.name || 'N/A'}`,
+            start: { dateTime: startDateTime, timeZone: 'Europe/Madrid' },
+            end: { dateTime: endDateTime, timeZone: 'Europe/Madrid' },
+            attendees: client?.email ? [{ email: client.email }] : []
+          }
+        });
+        eventId = event.data.id;
+      } catch (err) { console.error('Calendar Error:', err.message); }
+    }
+    
     const { rows } = await pool.query(
-      'INSERT INTO appointments (client_id,stylist_id,service,time,date,price) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
-      [client_id, stylist_id, service, time, date, parseFloat(price) || 30.0]
+      'INSERT INTO appointments (client_id,stylist_id,service,time,date,price,event_id) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+      [client_id, stylist_id, service, time, date, parseFloat(price) || 30.0, eventId]
     );
+    
     await pool.query('INSERT INTO notifications (type,title,message) VALUES ($1,$2,$3)', ['success','Nueva Cita',`Cita para ${service} creada.`]);
-    res.json({ success: true, appointmentId: rows[0].id });
+    
+    if (tokens && client?.email) {
+      const dateStr = new Date(`${date}T${time}`).toLocaleString('es-ES', { 
+        weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+      });
+      
+      const clientHtml = getHtmlTemplate(
+        'Cita Confirmada', 
+        '<p>Tu cita en Salon Hair ha sido reservada con éxito. ¡Estamos deseando recibirte!</p>',
+        client?.name || 'Cliente',
+        dateStr,
+        rows[0].id,
+        service
+      );
+      sendEmail(client?.email, 'Confirmación de Reserva - Salon Hair', clientHtml).catch(e => console.error('Email error:', e));
+
+      const adminEmail = await getAdminEmail();
+      if (adminEmail) {
+        const adminHtml = getHtmlTemplate(
+          'Nueva Reserva',
+          `<p>Has recibido una nueva reserva de <span style="color: #F0F6FC;">${client?.name}</span>.</p>
+           <p>Email: ${client?.email}<br>Tel: ${client?.phone || 'No prop.'}<br>Servicio: ${service}<br>Estilista: ${stylist?.name || 'N/A'}</p>`,
+          'Salon Hair',
+          dateStr,
+          rows[0].id,
+          service
+        );
+        sendEmail(adminEmail, `Nueva Cita: ${client?.name}`, adminHtml).catch(e => console.error('Admin email error:', e));
+      }
+    }
+    
+    res.json({ success: true, appointmentId: rows[0].id, eventId });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -530,7 +936,36 @@ app.put('/api/appointments/:id/status', authenticateToken, async (req, res) => {
   const { status } = req.body;
   if (!['pending','confirmed','cancelled'].includes(status)) return res.status(400).json({ error: 'Estado inválido' });
   try {
+    const { rows } = await pool.query('SELECT a.*, c.name as client_name, c.email as client_email FROM appointments a JOIN clients c ON a.client_id=c.id WHERE a.id=$1', [appId]);
+    const appointment = rows[0];
+    
     await pool.query('UPDATE appointments SET status=$1 WHERE id=$2', [status, appId]);
+    
+    if (status === 'cancelled' && appointment?.event_id) {
+      const tokens = await getAdminTokens();
+      if (tokens) {
+        try {
+          oauth2Client.setCredentials(tokens);
+          await calendar.events.delete({ calendarId: 'primary', eventId: appointment.event_id });
+        } catch (err) { console.error('Calendar delete error:', err.message); }
+        
+        if (appointment?.client_email) {
+          const dateStr = new Date(`${appointment.date}T${appointment.time}`).toLocaleString('es-ES', { 
+            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+          });
+          const html = getHtmlTemplate(
+            'Cita Cancelada',
+            '<p>Lamentamos informarte que tu cita ha sido cancelada.</p>',
+            appointment.client_name,
+            dateStr,
+            null,
+            appointment.service
+          );
+          sendEmail(appointment.client_email, 'Cita Cancelada - Salon Hair', html).catch(e => console.error('Cancel email error:', e));
+        }
+      }
+    }
+    
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -541,6 +976,47 @@ app.put('/api/appointments/:id', authenticateToken, async (req, res) => {
   const { client_id, stylist_id, service, time, date, status } = req.body;
   if (!client_id || !stylist_id || !service || !time || !date) return res.status(400).json({ error: 'Faltan campos' });
   try {
+    const { rows: current } = await pool.query('SELECT * FROM appointments WHERE id=$1', [appId]);
+    const currentAppt = current[0];
+    
+    const tokens = await getAdminTokens();
+    if (tokens && currentAppt?.event_id) {
+      try {
+        oauth2Client.setCredentials(tokens);
+        const startDateTime = `${date}T${time}:00`;
+        const [hours, minutes] = time.split(':');
+        const endDate = new Date(date);
+        endDate.setHours(parseInt(hours) + 1, parseInt(minutes), 0, 0);
+        const endDateTime = endDate.toISOString().split('T')[0] + 'T' + endDate.toTimeString().slice(0, 5) + ':00';
+        
+        await calendar.events.patch({
+          calendarId: 'primary',
+          eventId: currentAppt.event_id,
+          requestBody: {
+            start: { dateTime: startDateTime, timeZone: 'Europe/Madrid' },
+            end: { dateTime: endDateTime, timeZone: 'Europe/Madrid' }
+          }
+        });
+        
+        const { rows: clientData } = await pool.query('SELECT * FROM clients WHERE id=$1', [client_id]);
+        const client = clientData[0];
+        if (client?.email) {
+          const dateStr = new Date(startDateTime).toLocaleString('es-ES', { 
+            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+          });
+          const html = getHtmlTemplate(
+            'Cita Reagendada',
+            '<p>Tu cita ha sido modificada a un nuevo horario. Por favor, asegúrate de anotar la nueva fecha.</p>',
+            client?.name || 'Cliente',
+            dateStr,
+            appId,
+            service
+          );
+          sendEmail(client.email, 'Actualización de tu Cita - Salon Hair', html).catch(e => console.error('Reschedule email error:', e));
+        }
+      } catch (err) { console.error('Calendar patch error:', err.message); }
+    }
+    
     await pool.query('UPDATE appointments SET client_id=$1,stylist_id=$2,service=$3,time=$4,date=$5,status=$6 WHERE id=$7',
       [client_id, stylist_id, service, time, date, status||'pending', appId]);
     res.json({ success: true });
@@ -551,6 +1027,32 @@ app.delete('/api/appointments/:id', authenticateToken, async (req, res) => {
   const appId = parseInt(req.params.id);
   if (isNaN(appId)) return res.status(400).json({ error: 'ID inválido' });
   try {
+    const { rows } = await pool.query('SELECT a.*, c.name as client_name, c.email as client_email FROM appointments a JOIN clients c ON a.client_id=c.id WHERE a.id=$1', [appId]);
+    const appointment = rows[0];
+    
+    const tokens = await getAdminTokens();
+    if (tokens && appointment?.event_id) {
+      try {
+        oauth2Client.setCredentials(tokens);
+        await calendar.events.delete({ calendarId: 'primary', eventId: appointment.event_id });
+      } catch (err) { console.error('Calendar delete error:', err.message); }
+      
+      if (appointment?.client_email) {
+        const dateStr = new Date(`${appointment.date}T${appointment.time}`).toLocaleString('es-ES', { 
+          weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid'
+        });
+        const html = getHtmlTemplate(
+          'Cita Cancelada',
+          '<p>Lamentamos informarte que tu cita ha sido cancelada.</p>',
+          appointment.client_name,
+          dateStr,
+          null,
+          appointment.service
+        );
+        sendEmail(appointment.client_email, 'Cita Cancelada - Salon Hair', html).catch(e => console.error('Cancel email error:', e));
+      }
+    }
+    
     await pool.query('DELETE FROM appointments WHERE id=$1', [appId]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
