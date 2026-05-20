@@ -18,37 +18,39 @@ export default function DashboardStats() {
     })
   }, [])
 
-  if (loading) return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
-    {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl" />)}
-  </div>
+  if (loading) return (
+    <div className="col-span-2 md:col-span-1 lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+      {[1, 2, 3, 4].map(i => <div key={i} className="h-28 md:h-32 bg-white dark:bg-slate-900 rounded-2xl animate-pulse" />)}
+    </div>
+  )
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {Array.isArray(stats) && stats.map((stat) => {
+    <div className="col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+      {Array.isArray(stats) && stats.map((stat, index) => {
         const Icon = stat.title?.includes('Citas') ? Calendar : 
                      stat.title?.includes('Clientes') ? Users : 
                      stat.title?.includes('Ingresos') ? DollarSign : TrendingUp
 
         return (
-          <div key={stat.title} className="stat-card group">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.title}</p>
-                <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-2 group-hover:scale-105 transition-transform origin-left">{stat.value}</h3>
+          <div key={stat.title} className="bg-white dark:bg-slate-900 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 dark:border-slate-800 group">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{stat.title}</p>
+                <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mt-1 md:mt-2 group-hover:scale-105 transition-transform origin-left">{stat.value}</h3>
               </div>
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg transform group-hover:rotate-6 transition-transform`}>
-                <Icon className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-sm flex-shrink-0 ml-2">
+                <Icon className="w-5 h-5 md:w-6 md:h-6 text-amber-400" />
               </div>
             </div>
             
-            <div className="mt-6 flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <div className={`flex items-center px-2 py-1 rounded-lg text-xs font-bold ${
                 stat.trend === 'up' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'
               }`}>
                 {stat.trend === 'up' ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
                 {stat.change}
               </div>
-              <span className="text-xs text-slate-400 font-medium">vs. ayer</span>
+              <span className="text-xs text-slate-400 font-medium hidden md:inline">vs. ayer</span>
             </div>
           </div>
         )
@@ -56,4 +58,3 @@ export default function DashboardStats() {
     </div>
   )
 }
-
