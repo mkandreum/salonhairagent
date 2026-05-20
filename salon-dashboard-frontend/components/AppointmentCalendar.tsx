@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar as CalendarIcon, Clock, User, Scissors, Plus, X, Trash2, Check, Edit2, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, User, Scissors, Plus, X, Trash2, Edit2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { fetchAppointments, createAppointment, updateAppointment, fetchClients, fetchStylists, deleteAppointment as apiDeleteAppointment, updateAppointmentStatus } from '@/lib/api'
-
 
 interface Appointment {
   id: number
@@ -126,61 +125,63 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
   ) : []
 
   if (loading && appointments.length === 0) return (
-    <div className="bg-white/[0.03] border border-white/10 rounded-2xl animate-pulse h-[300px] md:h-[400px]" />
+    <div className="app-card animate-pulse h-[300px] md:h-[400px] bg-white/[0.01] border-white/5" />
   )
 
   return (
-    <div className="app-card p-4 md:p-6">
+    <div className="app-card p-5 md:p-8 animate-fadeUp">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D4A843]/10 flex items-center justify-center">
-            <CalendarIcon className="w-5 h-5 text-[#D4A843]" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8 pb-4 border-b border-white/[0.04]">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-[#E5C17B]/10 border border-[#E5C17B]/20 flex items-center justify-center shadow-md">
+            <CalendarIcon className="w-5 h-5 text-[#E5C17B]" />
           </div>
           <div>
-            <h2 className="text-base md:text-lg font-bold text-white">Agenda de Citas</h2>
-            <p className="text-white/50 font-mono text-[10px] uppercase tracking-widest hidden sm:block">Gestión integral</p>
+            <h2 className="text-lg font-bold text-white tracking-tight">Agenda de Citas</h2>
+            <p className="text-white/40 font-mono text-[9px] uppercase tracking-widest hidden sm:block">Gestión de tocadores e historial</p>
           </div>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-premium">
-          <Plus className="w-4 h-4 mr-2 inline" />
-          <span className="hidden sm:inline">Nueva Cita</span>
-          <span className="sm:hidden">+</span>
+        <button onClick={() => setIsModalOpen(true)} className="btn-premium py-2.5 px-4 text-xs">
+          <Plus className="w-4 h-4 mr-1.5 inline stroke-[2.5]" />
+          <span>Nueva Cita</span>
         </button>
       </div>
 
       {/* Mobile Cards View */}
-      <div className="block md:hidden space-y-3">
+      <div className="block md:hidden space-y-3.5">
         {filteredAppointments.slice(0, fullView ? undefined : 5).map((appointment: any) => (
-          <div key={appointment.id} className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 hover:bg-white/[0.04] transition-all">
-            <div className="flex justify-between items-start mb-3">
+          <div key={appointment.id} className="p-4 bg-white/[0.01] border border-white/[0.04] rounded-2xl hover:border-[#E5C17B]/20 transition-all duration-300">
+            <div className="flex justify-between items-start mb-3.5">
               <div>
-                <p className="font-bold text-white">{appointment.client || 'Cliente'}</p>
-                <p className="text-xs text-white/50 mt-0.5">{appointment.service}</p>
+                <p className="font-bold text-white text-sm">{appointment.client || 'Cliente'}</p>
+                <p className="text-xs text-white/40 mt-1 font-semibold">{appointment.service}</p>
               </div>
-              <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={getStatusColor(appointment.status)}>
+              <button 
+                onClick={() => handleStatusChange(appointment.id, appointment.status)} 
+                className={`text-[9px] font-extrabold font-mono tracking-widest px-2.5 py-1 rounded-md uppercase ${getStatusColor(appointment.status)}`}
+              >
                 {appointment.status}
               </button>
             </div>
-            <div className="flex items-center justify-between text-xs text-white/50">
+            <div className="grid grid-cols-3 gap-2 text-[10px] text-white/45 pt-3 border-t border-white/[0.03]">
               <div className="flex items-center space-x-1.5">
-                <CalendarIcon className="w-3.5 h-3.5 text-[#D4A843]/70" />
+                <CalendarIcon className="w-3.5 h-3.5 text-[#E5C17B]/60" />
                 <span>{appointment.date}</span>
               </div>
               <div className="flex items-center space-x-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#D4A843]/70" />
-                <span>{appointment.time}</span>
+                <Clock className="w-3.5 h-3.5 text-[#E5C17B]/60" />
+                <span className="font-semibold text-white/80">{appointment.time}</span>
               </div>
               <div className="flex items-center space-x-1.5">
-                <Scissors className="w-3.5 h-3.5 text-[#D4A843]/70" />
-                <span>{appointment.stylist}</span>
+                <Scissors className="w-3.5 h-3.5 text-[#E5C17B]/60" />
+                <span className="truncate">{appointment.stylist}</span>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-white/5">
-              <button onClick={() => handleEdit(appointment)} className="p-2 hover:bg-[#D4A843]/10 hover:text-[#D4A843] rounded-lg text-white/40 transition-colors bg-white/[0.04] border border-white/10">
+            <div className="flex justify-end gap-2 mt-4 pt-3.5 border-t border-white/[0.03]">
+              <button onClick={() => handleEdit(appointment)} className="p-2 bg-white/[0.02] border border-white/5 hover:border-[#E5C17B]/30 hover:text-[#E5C17B] rounded-xl text-white/40 transition-all duration-300">
                 <Edit2 className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => handleDelete(appointment.id)} className="p-2 hover:bg-rose-500/15 hover:text-rose-500 rounded-lg text-white/40 transition-colors bg-white/[0.04] border border-white/10">
+              <button onClick={() => handleDelete(appointment.id)} className="p-2 bg-white/[0.02] border border-white/5 hover:bg-rose-500/10 hover:text-rose-400 rounded-xl text-white/40 transition-all duration-300">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -192,57 +193,60 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/5">
-              <th className="text-left py-3 px-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">Fecha/Hora</th>
-              <th className="text-left py-3 px-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">Cliente</th>
-              <th className="text-left py-3 px-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">Servicio</th>
-              <th className="text-left py-3 px-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">Estilista</th>
-              <th className="text-left py-3 px-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">Estado</th>
-              <th className="text-right py-3 px-2"></th>
+            <tr className="border-b border-white/[0.04]">
+              <th className="text-left pb-4 px-3 text-white/35 font-mono text-[9px] uppercase tracking-widest">Fecha/Hora</th>
+              <th className="text-left pb-4 px-3 text-white/35 font-mono text-[9px] uppercase tracking-widest">Cliente</th>
+              <th className="text-left pb-4 px-3 text-white/35 font-mono text-[9px] uppercase tracking-widest">Servicio</th>
+              <th className="text-left pb-4 px-3 text-white/35 font-mono text-[9px] uppercase tracking-widest">Estilista</th>
+              <th className="text-left pb-4 px-3 text-white/35 font-mono text-[9px] uppercase tracking-widest">Estado</th>
+              <th className="text-right pb-4 px-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-white/[0.03]">
             {filteredAppointments.slice(0, fullView ? undefined : 5).map((appointment: any) => (
-              <tr key={appointment.id} className="hover:bg-white/[0.02] border-b border-white/5 transition-colors">
-                <td className="py-3 px-2">
+              <tr key={appointment.id} className="hover:bg-white/[0.015] transition-colors duration-300">
+                <td className="py-4.5 px-3">
                   <div className="flex flex-col">
                     <div className="flex items-center space-x-2">
-                      <CalendarIcon className="w-3 h-3 text-white/40" />
-                      <span className="text-xs font-medium text-white/50">{appointment.date}</span>
+                      <CalendarIcon className="w-3 h-3 text-white/35" />
+                      <span className="text-[11px] font-semibold text-white/45">{appointment.date}</span>
                     </div>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <Clock className="w-4 h-4 text-[#D4A843]" />
-                      <span className="font-bold text-white/80">{appointment.time}</span>
+                    <div className="flex items-center space-x-2 mt-1.5">
+                      <Clock className="w-4 h-4 text-[#E5C17B]" />
+                      <span className="font-bold text-white/90 text-sm">{appointment.time}</span>
                     </div>
                   </div>
                 </td>
-                <td className="py-3 px-2">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#D4A843]/10 border border-[#D4A843]/20 flex items-center justify-center text-xs font-bold text-[#D4A843]">
+                <td className="py-4.5 px-3">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-[#E5C17B]/10 border border-[#E5C17B]/20 flex items-center justify-center text-xs font-bold text-[#E5C17B] shadow-inner">
                       {appointment.client?.split(' ').map((n: string) => n[0]).join('') || '??'}
                     </div>
-                    <span className="font-bold text-white">{appointment.client}</span>
+                    <span className="font-bold text-white/90">{appointment.client}</span>
                   </div>
                 </td>
-                <td className="py-3 px-2 text-white/60 font-bold text-sm">{appointment.service}</td>
-                <td className="py-3 px-2">
-                  <div className="flex items-center space-x-2">
-                    <Scissors className="w-4 h-4 text-white/40" />
-                    <span className="text-white/60 font-semibold">{appointment.stylist}</span>
+                <td className="py-4.5 px-3 text-white/80 font-bold text-sm">{appointment.service}</td>
+                <td className="py-4.5 px-3">
+                  <div className="flex items-center space-x-2.5">
+                    <Scissors className="w-4 h-4 text-white/35" />
+                    <span className="text-white/70 font-semibold text-sm">{appointment.stylist}</span>
                   </div>
                 </td>
-                <td className="py-3 px-2">
-                  <button onClick={() => handleStatusChange(appointment.id, appointment.status)} className={getStatusColor(appointment.status)}>
+                <td className="py-4.5 px-3">
+                  <button 
+                    onClick={() => handleStatusChange(appointment.id, appointment.status)} 
+                    className={`text-[9px] font-extrabold font-mono tracking-widest px-2.5 py-1 rounded-md uppercase transition-all duration-300 ${getStatusColor(appointment.status)}`}
+                  >
                     {appointment.status.toUpperCase()}
                   </button>
                 </td>
-                <td className="py-3 px-2 text-right">
-                  <div className="flex items-center justify-end space-x-1">
-                    <button onClick={() => handleEdit(appointment)} className="p-2 hover:bg-[#D4A843]/10 hover:text-[#D4A843] rounded-lg text-white/40 transition-colors">
-                      <Edit2 className="w-4 h-4" />
+                <td className="py-4.5 px-3 text-right">
+                  <div className="flex items-center justify-end space-x-1.5">
+                    <button onClick={() => handleEdit(appointment)} className="p-2 bg-white/[0.01] border border-white/5 hover:border-[#E5C17B]/30 hover:text-[#E5C17B] rounded-xl text-white/40 transition-all duration-300">
+                      <Edit2 className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => handleDelete(appointment.id)} className="p-2 hover:bg-rose-500/15 hover:text-rose-500 rounded-lg text-white/40 transition-colors">
-                      <Trash2 className="w-4 h-4" />
+                    <button onClick={() => handleDelete(appointment.id)} className="p-2 bg-white/[0.01] border border-white/5 hover:bg-rose-500/10 hover:text-rose-400 rounded-xl text-white/40 transition-all duration-300">
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
@@ -253,64 +257,66 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       </div>
 
       {!fullView && onViewAll && (
-        <div className="mt-4 md:mt-6 pt-4 border-t border-white/5 text-center">
-          <button onClick={onViewAll} className="text-sm font-bold text-white/50 hover:text-white">
-            Ver todas las citas →
+        <div className="mt-4 md:mt-6 pt-5 border-t border-white/[0.04] text-center">
+          <button onClick={onViewAll} className="text-xs font-bold text-white/45 hover:text-[#E5C17B] tracking-wider uppercase transition-colors duration-300">
+            Ver todas las citas de la agenda →
           </button>
         </div>
       )}
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-[#080608]/80 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-[#090709]/85 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="app-card-overlay rounded-t-[32px] sm:rounded-3xl w-full sm:max-w-lg p-6 sm:p-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto border-white/10 shadow-2xl relative">
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#E5C17B]/20 to-transparent" />
+            
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
-              <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-white/[0.06] rounded-full transition-colors">
-                <X className="w-5 h-5 text-white/40" />
+              <h3 className="text-lg font-bold text-white tracking-tight">{editingAppointment ? 'Editar Cita' : 'Nueva Cita en Agenda'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 bg-white/[0.02] hover:bg-white/[0.06] rounded-xl transition-all">
+                <X className="w-4.5 h-4.5 text-white/40" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Cliente</label>
-                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="input-premium py-2.5">
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Cliente</label>
+                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="input-premium py-3 font-semibold text-white/80 bg-[#0c0a0c]">
                   <option value="">Seleccionar cliente</option>
                   {Array.isArray(clients) && clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               
               <div>
-                <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Estilista</label>
-                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="input-premium py-2.5">
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Estilista</label>
+                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="input-premium py-3 font-semibold text-white/80 bg-[#0c0a0c]">
                   <option value="">Seleccionar estilista</option>
                   {Array.isArray(stylists) && stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Servicio</label>
-                <input type="text" required placeholder="Ej: Corte" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="input-premium" />
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Servicio</label>
+                <input type="text" required placeholder="Ej: Corte & Peinado" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="input-premium py-3 font-semibold" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Fecha</label>
-                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="input-premium" />
+                  <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Fecha</label>
+                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="input-premium py-3 font-semibold" style={{colorScheme: 'dark'}} />
                 </div>
                 <div>
-                  <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Hora</label>
-                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="input-premium" />
+                  <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Hora</label>
+                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="input-premium py-3 font-semibold" style={{colorScheme: 'dark'}} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-white/50 font-mono text-[10px] uppercase tracking-widest mb-2">Precio (€)</label>
-                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="input-premium" />
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Tarifa (€)</label>
+                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="input-premium py-3 font-semibold" />
               </div>
 
-              <button type="submit" className="btn-premium w-full py-4 mt-2">
-                <span>{editingAppointment ? 'Actualizar Cita' : 'Crear Cita'}</span>
+              <button type="submit" className="btn-premium w-full py-4 mt-4 shadow-lg shadow-[#E5C17B]/5">
+                <span>{editingAppointment ? 'Actualizar Registro' : 'Confirmar Cita'}</span>
               </button>
             </form>
           </div>

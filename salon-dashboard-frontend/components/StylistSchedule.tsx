@@ -97,7 +97,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
       case 'available': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-      case 'busy': return 'bg-[#D4A843]/10 text-[#D4A843] border border-[#D4A843]/20'
+      case 'busy': return 'bg-[#E5C17B]/10 text-[#E5C17B] border border-[#E5C17B]/20'
       case 'off': return 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
       default: return 'bg-white/[0.04] text-white/40 border border-white/10'
     }
@@ -158,7 +158,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
           {/* Close on clicking backdrop */}
           <div className="absolute inset-0" onClick={() => { setIsModalOpen(false); setEditingStylist(null); }} />
           
-          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in z-10 max-h-[90vh] overflow-y-auto relative">
+          <div className="app-card-overlay rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in z-10 max-h-[90vh] overflow-y-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-white">
                 {editingStylist ? 'Editar Estilista' : 'Añadir Estilista'}
@@ -245,15 +245,15 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredStylists.map((stylist: any) => (
-          <div key={stylist.id} className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 hover:border-[#D4A843]/30 transition-all duration-300 group relative">
+          <div key={stylist.id} className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 hover:border-[#E5C17B]/30 transition-all duration-300 group relative">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-[#D4A843]/10 flex items-center justify-center text-[#D4A843] font-bold text-xl uppercase">
+                  <div className="w-14 h-14 rounded-2xl bg-[#E5C17B]/10 flex items-center justify-center text-[#E5C17B] font-bold text-xl uppercase">
                     <span>{stylist.name ? stylist.name[0] : 'E'}</span>
                   </div>
                   <div className={`absolute -bottom-1 -right-1 w-5.5 h-5.5 rounded-full border-4 border-[#080608] flex items-center justify-center ${
-                    stylist.availability === 'available' ? 'bg-emerald-500' : stylist.availability === 'busy' ? 'bg-[#D4A843]' : 'bg-rose-500'
+                    stylist.availability === 'available' ? 'bg-emerald-500' : stylist.availability === 'busy' ? 'bg-[#E5C17B]' : 'bg-rose-500'
                   }`}>
                     {getAvailabilityIcon(stylist.availability)}
                   </div>
@@ -265,7 +265,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                   </span>
                   <div className="flex items-center space-x-1 mt-2">
                     {[...Array(5)].map((_, i: number) => (
-                      <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(stylist.rating) ? 'fill-[#D4A843] text-[#D4A843] drop-shadow-[0_0_3px_rgba(212,168,67,0.45)]' : 'text-white/10'}`} />
+                      <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(stylist.rating) ? 'fill-[#E5C17B] text-[#E5C17B] drop-shadow-[0_0_3px_rgba(229,193,123,0.45)]' : 'text-white/10'}`} />
                     ))}
                     <span className="text-xs font-bold text-white/50 ml-1">{parseFloat(stylist.rating).toFixed(1)}</span>
                   </div>
@@ -276,7 +276,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
               <div className="flex items-center space-x-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
                 <button 
                   onClick={() => handleEdit(stylist)}
-                  className="p-2 hover:bg-[#D4A843]/10 rounded-xl transition-all text-[#D4A843]"
+                  className="p-2 hover:bg-[#E5C17B]/10 rounded-xl transition-all text-[#E5C17B]"
                   title="Editar estilista"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
               </div>
               <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-2xl">
                 <p className="text-white/40 font-mono text-[10px] uppercase tracking-widest">Próxima Libre</p>
-                <p className="text-lg font-bold text-[#D4A843] mt-1">{stylist.nextAvailable || 'Ahora'}</p>
+                <p className="text-lg font-bold text-[#E5C17B] mt-1">{stylist.nextAvailable || 'Ahora'}</p>
               </div>
             </div>
 
@@ -307,12 +307,12 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
                 onClick={() => onTabChange ? onTabChange('appointments') : alert('Cambiando a citas...')}
                 className="btn-accent py-2.5 px-3 flex-1 text-xs font-bold"
               >
-                <Calendar className="w-4 h-4 text-[#D4A843]" />
+                <Calendar className="w-4 h-4 text-[#E5C17B]" />
                 <span>Agendar</span>
               </button>
               <button 
                 onClick={() => alert(`Abriendo chat con ${stylist.name}...`)}
-                className="bg-white/[0.03] border border-white/10 hover:border-[#D4A843]/30 text-white/70 py-2.5 px-3 flex-1 text-xs font-bold transition-all duration-300 rounded-[16px] flex items-center justify-center space-x-2 ripple-host"
+                className="bg-white/[0.03] border border-white/10 hover:border-[#E5C17B]/30 text-white/70 py-2.5 px-3 flex-1 text-xs font-bold transition-all duration-300 rounded-[16px] flex items-center justify-center space-x-2 ripple-host"
               >
                 <MessageSquare className="w-4 h-4 text-white/40" />
                 <span>Mensaje</span>
@@ -326,7 +326,7 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
         <div className="mt-8 pt-6 border-t border-white/5 text-center">
           <button 
             onClick={onViewAll}
-            className="text-[#D4A843] hover:text-[#F0CC70] font-bold text-sm transition-colors flex items-center justify-center mx-auto space-x-1"
+            className="text-[#E5C17B] hover:text-[#F3DCA3] font-bold text-sm transition-colors flex items-center justify-center mx-auto space-x-1"
           >
             <span>Ver todo el equipo</span>
             <span>→</span>

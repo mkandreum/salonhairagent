@@ -59,7 +59,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: () => void }) {
       onClick={onChange} 
       className={`w-11 h-6 rounded-full relative transition-all duration-300 cursor-pointer ${
         value 
-          ? 'bg-gradient-to-r from-[#D4A843] to-[#F0CC70] shadow-[0_0_8px_rgba(212,168,67,0.4)]' 
+          ? 'bg-gradient-to-r from-[#E5C17B] to-[#F2D8A7] shadow-[0_0_8px_rgba(229,193,123,0.4)]' 
           : 'bg-white/[0.04] border border-white/5'
       }`}
     >
@@ -83,11 +83,11 @@ function SecretInput({ label, value, onChange, placeholder }: { label: string; v
           className="input-premium pr-10 font-mono"
         />
         {!isMasked && (
-          <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#D4A843] transition-colors">
+          <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#E5C17B] transition-colors">
             {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         )}
-        {isMasked && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-bold text-[#D4A843]/70 tracking-wider">guardado</span>}
+        {isMasked && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-bold text-[#E5C17B]/70 tracking-wider">guardado</span>}
       </div>
     </div>
   )
@@ -122,7 +122,7 @@ function CopyableInput({ label, value, placeholder }: { label: string; value: st
       <label className="block text-xs font-mono font-bold text-white/50 uppercase tracking-wider">{label}</label>
       <div className="relative">
         <input type="text" value={value} readOnly placeholder={placeholder} className="input-premium pr-10 font-mono bg-white/[0.04]" />
-        <button type="button" onClick={copy} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#D4A843] transition-colors">
+        <button type="button" onClick={copy} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#E5C17B] transition-colors">
           {copied ? <CheckCircle className="w-4 h-4 text-emerald-500 animate-fadeIn" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
@@ -176,7 +176,7 @@ export default function Home() {
 
   if (checkingAuth) return (
     <div className="min-h-screen flex items-center justify-center bg-[#080608]">
-      <div className="w-8 h-8 border-4 border-white/10 border-t-[#D4A843] rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-white/10 border-t-[#E5C17B] rounded-full animate-spin" />
     </div>
   )
 
@@ -236,7 +236,7 @@ export default function Home() {
             { key: 'notifications', label: 'Notificaciones en tiempo real' },
             { key: 'emailReports', label: 'Informes semanales por Email' },
           ] as { key: keyof Settings; label: string }[]).map(({ key, label }) => (
-            <div key={key} className="p-4 bg-[rgba(255,255,255,0.02)] border border-white/5 rounded-xl flex items-center justify-between hover:border-[rgba(212,168,67,0.3)] transition-colors">
+            <div key={key} className="p-4 bg-[rgba(255,255,255,0.02)] border border-white/5 rounded-xl flex items-center justify-between hover:border-[rgba(229,193,123,0.3)] transition-colors">
               <span className="font-semibold text-white text-sm">{label}</span>
               <Toggle value={!!settings[key]} onChange={() => updateSetting(key, !settings[key])} />
             </div>
@@ -332,7 +332,7 @@ export default function Home() {
                 onClick={() => setAnalyticsSubTab('metrics')} 
                 className={`flex-1 sm:flex-initial px-6 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 ${
                   analyticsSubTab === 'metrics' 
-                    ? 'bg-[rgba(212,168,67,0.1)] text-[#D4A843] border border-[rgba(212,168,67,0.2)]' 
+                    ? 'bg-[rgba(229,193,123,0.1)] text-[#E5C17B] border border-[rgba(229,193,123,0.2)]' 
                     : 'text-white/40 hover:text-white/70'
                 }`}
               >
@@ -342,7 +342,7 @@ export default function Home() {
                 onClick={() => setAnalyticsSubTab('ia')} 
                 className={`flex-1 sm:flex-initial px-6 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 ${
                   analyticsSubTab === 'ia' 
-                    ? 'bg-[rgba(212,168,67,0.1)] text-[#D4A843] border border-[rgba(212,168,67,0.2)]' 
+                    ? 'bg-[rgba(229,193,123,0.1)] text-[#E5C17B] border border-[rgba(229,193,123,0.2)]' 
                     : 'text-white/40 hover:text-white/70'
                 }`}
               >
@@ -391,7 +391,7 @@ export default function Home() {
                 {getPageTitle()}
               </h2>
               <p className="text-sm text-white/50 mt-1">
-                Bienvenido de nuevo, <span className="font-bold text-[#D4A843]">{user?.name || 'Admin'}</span>. Gestiona el salón con elegancia.
+                Bienvenido de nuevo, <span className="font-bold text-[#E5C17B]">{user?.name || 'Admin'}</span>. Gestiona el salón con elegancia.
               </p>
             </div>
 
@@ -403,7 +403,7 @@ export default function Home() {
                   
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase bg-[rgba(212,168,67,0.1)] text-[#D4A843] border border-[rgba(212,168,67,0.2)] mb-3">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase bg-[rgba(229,193,123,0.1)] text-[#E5C17B] border border-[rgba(229,193,123,0.2)] mb-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 inline-block animate-pulse" />
                         Salón Luxe • IA Concierge Activa
                       </span>
@@ -414,7 +414,7 @@ export default function Home() {
                         Gestiona tu salón de belleza con elegancia y control absoluto.
                       </p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A843] via-[#F0CC70] to-[#B8882A] flex items-center justify-center shadow-lg shadow-[rgba(212,168,67,0.2)] text-[#080608] text-base font-bold select-none">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E5C17B] via-[#F2D8A7] to-[#C5A059] flex items-center justify-center shadow-lg shadow-[rgba(229,193,123,0.2)] text-[#080608] text-base font-bold select-none">
                       ✨
                     </div>
                   </div>
@@ -426,7 +426,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-[10px] text-white/50 uppercase tracking-wider font-mono font-bold">Respuesta Automatizada</p>
-                      <p className="text-sm font-extrabold text-[#D4A843] mt-0.5">94% Eficacia IA</p>
+                      <p className="text-sm font-extrabold text-[#E5C17B] mt-0.5">94% Eficacia IA</p>
                     </div>
                   </div>
                 </div>
@@ -434,10 +434,10 @@ export default function Home() {
                 /* Sleek Mobile Standard Header */
                 <div className="flex items-center justify-between pb-3 border-b border-white/5">
                   <h2 className="text-xl font-extrabold text-white capitalize tracking-tight flex items-center gap-2">
-                    <span className="w-1.5 h-4 bg-gradient-to-b from-[#D4A843] to-[#F0CC70] rounded-full inline-block" />
+                    <span className="w-1.5 h-4 bg-gradient-to-b from-[#E5C17B] to-[#F2D8A7] rounded-full inline-block" />
                     {getPageTitle()}
                   </h2>
-                  <span className="text-[10px] font-bold text-[#D4A843] uppercase tracking-widest bg-[rgba(212,168,67,0.1)] px-2 py-0.5 rounded border border-[rgba(212,168,67,0.2)]">
+                  <span className="text-[10px] font-bold text-[#E5C17B] uppercase tracking-widest bg-[rgba(229,193,123,0.1)] px-2 py-0.5 rounded border border-[rgba(229,193,123,0.2)]">
                     Luxe
                   </span>
                 </div>
@@ -457,7 +457,7 @@ export default function Home() {
             className="absolute inset-0 bg-[#080608]/70 backdrop-blur-md transition-opacity duration-300"
           />
           
-          <div className="absolute bottom-0 left-0 right-0 bg-[#0a080a] rounded-t-[32px] border-t border-[rgba(212,168,67,0.1)] p-6 pb-28 shadow-2xl z-90 max-h-[85vh] overflow-y-auto animate-fade-float-in">
+          <div className="absolute bottom-0 left-0 right-0 bg-[#0a080a] rounded-t-[32px] border-t border-[rgba(229,193,123,0.1)] p-6 pb-28 shadow-2xl z-90 max-h-[85vh] overflow-y-auto animate-fade-float-in">
             <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-6" />
             
             <div className="mb-6 flex justify-between items-start">
@@ -489,11 +489,11 @@ export default function Home() {
                     }}
                     className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
                       isActive 
-                        ? 'bg-[rgba(212,168,67,0.1)] border-[rgba(212,168,67,0.3)] text-[#D4A843]' 
-                        : 'bg-white/[0.02] border-white/5 hover:border-[rgba(212,168,67,0.3)] text-white'
+                        ? 'bg-[rgba(229,193,123,0.1)] border-[rgba(229,193,123,0.3)] text-[#E5C17B]' 
+                        : 'bg-white/[0.02] border-white/5 hover:border-[rgba(229,193,123,0.3)] text-white'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isActive ? 'bg-[rgba(212,168,67,0.1)] text-[#D4A843]' : 'bg-white/[0.04] text-white/40'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isActive ? 'bg-[rgba(229,193,123,0.1)] text-[#E5C17B]' : 'bg-white/[0.04] text-white/40'}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <p className="text-sm font-bold truncate">{item.label}</p>
@@ -540,12 +540,12 @@ export default function Home() {
                       setIsMoreOpen(false)
                     }
                   }}
-                  className={`relative flex flex-col items-center justify-center rounded-2xl transition-all duration-200 nav-soft-btn ${isActive ? 'nav-soft-btn-active' : ''} ${isActive ? 'text-[#D4A843]' : 'text-white/20'}`}
+                  className={`relative flex flex-col items-center justify-center rounded-2xl transition-all duration-200 nav-soft-btn ${isActive ? 'nav-soft-btn-active' : ''} ${isActive ? 'text-[#E5C17B]' : 'text-white/20'}`}
                   style={{ flex: 1, height: '56px' }}
                 >
                   <Icon className="w-5 h-5 mb-0.5" />
                   <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
-                  {isActive && <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#D4A843] shadow-[0_0_6px_rgba(212,168,67,0.6)]" />}
+                  {isActive && <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#E5C17B] shadow-[0_0_6px_rgba(229,193,123,0.6)]" />}
                 </button>
               )
             })}

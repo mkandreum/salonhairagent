@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Scissors, Mail, Lock, ArrowRight, Users } from 'lucide-react'
+import { Scissors, Mail, Lock, ArrowRight, Users, Sparkles } from 'lucide-react'
 
 interface LoginProps {
   onLogin: (user: any) => void
@@ -65,87 +65,95 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#080608] relative overflow-hidden flex items-center justify-center p-4 sm:p-6">
-      {/* Ambient orbs */}
-      <div className="absolute top-[-80px] right-[-100px] w-[320px] h-[320px] rounded-full bg-[#D4A843]/10 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[240px] h-[240px] rounded-full bg-purple-500/6 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-60px] left-[-80px] w-[200px] h-[200px] rounded-full bg-teal-400/5 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#0A090A] relative overflow-hidden flex items-center justify-center p-4 sm:p-6">
+      
+      {/* Luxury Ambience Lights (Spotlights) */}
+      <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full bg-[#E5C17B]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-100px] left-[-100px] w-[450px] h-[450px] rounded-full bg-[#C084FC]/4 blur-[110px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full bg-white/[0.015] blur-[90px] pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8 animate-fadeIn">
-          <div className="w-16 h-16 bg-[#D4A843]/10 border border-[#D4A843]/30 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-transform duration-300 hover:scale-105">
-            <Scissors className="w-8 h-8 text-[#D4A843] drop-shadow-[0_0_4px_rgba(212,168,67,0.4)]" />
+        
+        {/* Luxe branding header */}
+        <div className="text-center mb-8 animate-fadeUp">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#E5C17B]/12 to-white/[0.01] border border-[#E5C17B]/20 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-2xl transition-transform duration-500 hover:scale-105 group">
+            <Scissors className="w-7 h-7 text-[#E5C17B] drop-shadow-[0_0_8px_rgba(229,193,123,0.3)] transition-transform duration-500 group-hover:rotate-12" />
           </div>
-          <h1 className="text-white text-2xl font-bold tracking-tight uppercase">
-            {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+          <h1 className="text-white text-xl font-bold tracking-[0.25em] uppercase leading-none">
+            SALÓN <span className="text-[#E5C17B]">LUXE</span>
           </h1>
-          <p className="text-white/40 mt-2 text-xs sm:text-sm tracking-wide font-medium">
-            {isLogin ? 'Luxe Concierge — Gestión de Salón' : 'Únete a nuestra plataforma premium'}
+          <p className="text-white/30 mt-2.5 text-xs tracking-widest font-mono uppercase">
+            {isLogin ? 'Acceso al Portal Concierge' : 'Registro de Cuenta Luxe'}
           </p>
         </div>
 
-        <div className="app-card rounded-[32px] p-6 sm:p-8 relative overflow-hidden border border-[#D4A843]/20">
+        {/* Floating Gloss Card */}
+        <div className="app-card rounded-[32px] p-6 sm:p-8 relative overflow-hidden border-white/[0.06] shadow-2xl shadow-black/90">
+          
+          {/* Subtle top laser border shimmer */}
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#E5C17B]/20 to-transparent" />
+
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl animate-fadeIn">
-              <p className="text-xs sm:text-sm text-rose-400 text-center font-semibold">{error}</p>
+            <div className="mb-6 p-4 bg-rose-500/8 border border-rose-500/15 rounded-2xl animate-fadeUp">
+              <p className="text-xs sm:text-sm text-rose-400 text-center font-bold">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div>
-                <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest mb-2 px-1">Nombre Completo</label>
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Nombre Completo</label>
                 <div className="relative group">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35 group-focus-within:text-[#E5C17B] transition-colors" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Tu nombre completo"
-                    className="input-premium w-full pl-11"
+                    placeholder="Tu nombre y apellido"
+                    className="input-premium w-full pl-11.5"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest mb-2 px-1">Email</label>
+              <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest mb-2 px-1 font-bold">Email de Acceso</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35 group-focus-within:text-[#E5C17B] transition-colors" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@luxe.com"
-                  className="input-premium w-full pl-11"
+                  placeholder="admin@salonaluxe.com"
+                  className="input-premium w-full pl-11.5"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2 px-1">
-                <label className="block text-white/40 font-mono text-[10px] uppercase tracking-widest">Contraseña</label>
+                <label className="block text-white/40 font-mono text-[9px] uppercase tracking-widest font-bold">Contraseña</label>
                 {isLogin && (
                   <button
                     type="button"
-                    onClick={() => alert('Contacta con el administrador para restablecer tu contraseña.')}
-                    className="text-white/40 hover:text-[#D4A843] font-mono text-[9px] uppercase tracking-wider transition-colors"
+                    onClick={() => alert('Contacta con soporte técnico de Salón Luxe para restablecer tu contraseña.')}
+                    className="text-white/30 hover:text-[#E5C17B] font-mono text-[8px] uppercase tracking-wider transition-colors font-bold"
                   >
-                    ¿Olvidaste tu contraseña?
+                    ¿La olvidaste?
                   </button>
                 )}
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/30 group-focus-within:text-[#D4A843] transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35 group-focus-within:text-[#E5C17B] transition-colors" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-premium w-full pl-11"
+                  className="input-premium w-full pl-11.5"
                 />
               </div>
             </div>
@@ -153,25 +161,25 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="btn-premium primary-btn w-full mt-4 py-3.5 flex items-center justify-center space-x-2 ripple-host disabled:opacity-50 disabled:pointer-events-none"
+              className="btn-premium w-full mt-6 py-4 flex items-center justify-center space-x-2 shadow-lg shadow-[#E5C17B]/5 disabled:opacity-50 disabled:pointer-events-none"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-[#E5C17B]/30 border-t-[#E5C17B] rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{isLogin ? 'Ingresar al Portal' : 'Registrar Cuenta'}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span className="font-bold tracking-widest text-xs uppercase">{isLogin ? 'Ingresar al Salón' : 'Crear Cuenta Luxe'}</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center border-t border-white/5 pt-6">
-            <p className="text-xs text-white/50 font-medium">
-              {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
+          <div className="mt-8 text-center border-t border-white/5 pt-6 relative">
+            <p className="text-xs text-white/45 font-medium flex items-center justify-center gap-1.5">
+              <span>{isLogin ? '¿Nuevo en el equipo?' : '¿Ya eres miembro?'}</span>
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 font-bold text-[#D4A843] hover:text-[#D4A843]/80 transition-colors underline underline-offset-4"
+                className="font-bold text-[#E5C17B] hover:text-[#F2D8A7] transition-colors underline underline-offset-4 decoration-[#E5C17B]/30"
               >
                 {isLogin ? 'Regístrate aquí' : 'Inicia sesión'}
               </button>

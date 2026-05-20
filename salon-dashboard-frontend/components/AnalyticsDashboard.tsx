@@ -39,8 +39,8 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
     <div className="app-card p-4 sm:p-6 animate-fade-float-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-[#D4A843]/10 flex items-center justify-center border border-[#D4A843]/20">
-            <BarChart3 className="w-6 h-6 text-[#D4A843]" />
+          <div className="w-12 h-12 rounded-xl bg-[#E5C17B]/10 flex items-center justify-center border border-[#E5C17B]/20">
+            <BarChart3 className="w-6 h-6 text-[#E5C17B]" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Análisis de Negocio</h2>
@@ -67,19 +67,19 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
               <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#D4A843" stopOpacity={0.28}/>
-                    <stop offset="95%" stopColor="#D4A843" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#E5C17B" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#C084FC" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: 'rgba(255,255,255,0.4)', fontSize: 11}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: 'rgba(255,255,255,0.4)', fontSize: 12}} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(8,6,8,0.98)', borderRadius: '16px', border: '1px solid rgba(212,168,67,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
+                  contentStyle={{ backgroundColor: 'rgba(8,6,8,0.98)', borderRadius: '16px', border: '1px solid rgba(229,193,123,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
                   itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#D4A843', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#E5C17B', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#D4A843" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" dot={{ r: 4, fill: '#D4A843', strokeWidth: 2, stroke: '#0c101b' }} activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="revenue" stroke="#E5C17B" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" dot={{ r: 4, fill: '#E5C17B', strokeWidth: 2, stroke: '#0c101b' }} activeDot={{ r: 6 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -112,13 +112,13 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 500}} width={80} />
                 <Tooltip
                   cursor={{fill: 'rgba(255, 255, 255, 0.03)'}}
-                  contentStyle={{ backgroundColor: 'rgba(8,6,8,0.98)', borderRadius: '16px', border: '1px solid rgba(212,168,67,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
+                  contentStyle={{ backgroundColor: 'rgba(8,6,8,0.98)', borderRadius: '16px', border: '1px solid rgba(229,193,123,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)' }}
                   itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#D4A843', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#E5C17B', fontWeight: 'bold' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                   {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#D4A843'} />
+                    <Cell key={`cell-${index}`} fill={entry.color || '#E5C17B'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -128,13 +128,13 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
             {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any) => (
               <div key={service.name} className="flex items-center justify-between p-2.5 bg-white/[0.02] hover:bg-white/[0.04] rounded-xl transition-colors border border-transparent hover:border-white/5">
                 <div className="flex items-center space-x-3">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: service.color || '#D4A843' }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: service.color || '#E5C17B' }} />
                   <span className="text-sm font-semibold text-white/70">{service.name}</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-sm font-bold text-white">{service.value}%</span>
                   <div className="w-24 bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color || '#D4A843' }} />
+                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color || '#E5C17B' }} />
                   </div>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
         <div className="mt-8 pt-6 border-t border-white/10 text-center">
           <button
             onClick={onViewAll}
-            className="text-[#D4A843] hover:text-[#D4A843] font-bold text-sm transition-colors flex items-center justify-center mx-auto space-x-1"
+            className="text-[#E5C17B] hover:text-[#F3DCA3] font-bold text-sm transition-colors flex items-center justify-center mx-auto space-x-1"
           >
             <span>Ver informes detallados</span>
             <span>→</span>
