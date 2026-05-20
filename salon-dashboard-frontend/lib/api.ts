@@ -58,20 +58,6 @@ async function apiFetch(path: string, options: RequestInit = {}) {
     throw err;
   }
 }
-      if (res.status === 504) {
-        throw new Error('El servidor tardó demasiado. Intenta de nuevo.');
-      }
-      throw new Error(errMsg);
-    }
-    return res.json();
-  } catch (err: any) {
-    clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      throw new Error('La petición tardó demasiado. Verifica tu conexión.');
-    }
-    throw err;
-  }
-}
 
 export async function fetchStats() {
   return apiFetch('/stats');
