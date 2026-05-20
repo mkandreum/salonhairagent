@@ -12,7 +12,7 @@ import TriageView from '@/components/TriageView'
 import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
 import { fetchSettings, saveSettings } from '@/lib/api'
-import { Eye, EyeOff, Save, Building2, Phone, MapPin, Mail, Key, MessageSquare, Bot, Megaphone, Copy, CheckCircle, Menu, X, Home, Calendar, Users, BarChart3, Bell, Settings, ChevronLeft } from 'lucide-react'
+import { Eye, EyeOff, Save, Building2, Phone, MapPin, Mail, Key, MessageSquare, Bot, Megaphone, Copy, CheckCircle, Menu, X, Home as HomeIcon, Calendar, Users, BarChart3, Bell, Settings, ChevronLeft } from 'lucide-react'
 
 interface Settings {
   darkMode: boolean
@@ -44,7 +44,7 @@ const DEFAULT_SETTINGS: Settings = {
 }
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
   { id: 'appointments', label: 'Citas', icon: Calendar },
   { id: 'clients', label: 'Clientes', icon: Users },
   { id: 'stylists', label: 'Estilistas', icon: Users },
@@ -404,7 +404,7 @@ export default function Home() {
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 lg:hidden z-40 safe-area-pb">
         <div className="flex items-center justify-around py-2">
           {[
-            { id: 'dashboard', icon: Home, label: 'Home' },
+            { id: 'dashboard', icon: HomeIcon, label: 'Home' },
             { id: 'appointments', icon: Calendar, label: 'Citas' },
             { id: 'clients', icon: Users, label: 'Clientes' },
             { id: 'analytics', icon: BarChart3, label: 'Stats' },
