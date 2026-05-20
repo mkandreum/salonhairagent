@@ -3,8 +3,8 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'Salon Dashboard - Appointment Management',
-  description: 'Dashboard for salon owners to manage appointments, clients, and analytics',
+  title: 'Salón Luxe Concierge — Dashboard',
+  description: 'Panel de gestión elegante para tu salón. Citas, clientes, estilistas y análisis de negocio.',
 }
 
 export default function RootLayout({
@@ -13,19 +13,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            try {
-              let theme = localStorage.getItem('salon_theme');
-              if (!theme) {
-                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark';
-              }
-              document.documentElement.classList.add(theme);
-            } catch(e) {}
-          `
-        }} />
+        {/* Preconnect for Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
         <Providers>
