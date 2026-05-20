@@ -137,7 +137,6 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [searchQuery, setSearchQuery] = useState('')
   const [isMoreOpen, setIsMoreOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'metrics' | 'ia'>('metrics')
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
   const [savingSettings, setSavingSettings] = useState(false)
@@ -353,6 +352,7 @@ export default function Home() {
             </div>
           </div>
         )
+      case 'notifications': return <NotificationsPanel />
       case 'settings': return renderSettings()
       default: return <DashboardStats />
     }
@@ -379,7 +379,7 @@ export default function Home() {
 
       <div className="flex-1 flex flex-col min-w-0 pb-28 sm:pb-24">
         {/* Unified, fully responsive premium header */}
-        <Header user={user} onLogout={handleLogout} onTabChange={setActiveTab} onSearch={setSearchQuery} onNotifToggle={() => setNotifOpen(v => !v)} />
+        <Header user={user} onLogout={handleLogout} onTabChange={setActiveTab} onSearch={setSearchQuery} />
 
         <main className="p-4 sm:p-6 lg:p-8 flex-1">
           <div className="max-w-[1600px] mx-auto">
@@ -515,7 +515,7 @@ export default function Home() {
         </div>
       </div>
 
-      <NotificationsPanel isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
+      <NotificationsPanel />
     </div>
   )
 }
