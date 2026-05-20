@@ -360,7 +360,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-h-screen w-full">
+      <div className="flex-1 flex flex-col min-h-screen w-full lg:ml-[288px]">
         {/* Mobile Header */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between lg:hidden sticky top-0 z-40">
           <div className="flex items-center space-x-3">
