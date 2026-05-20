@@ -263,54 +263,54 @@ export default function AppointmentCalendar({ fullView = false, onViewAll, searc
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto animate-fade-float-in border-t border-slate-200/50 dark:border-amber-500/10">
+          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto animate-fade-float-in">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-slate-850 dark:text-slate-100">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
-              <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">{editingAppointment ? 'Editar Cita' : 'Nueva Cita'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingAppointment(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Cliente</label>
-                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Cliente</label>
+                <select required value={formData.client_id} onChange={e => setFormData({...formData, client_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm">
                   <option value="">Seleccionar cliente</option>
                   {Array.isArray(clients) && clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Estilista</label>
-                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Estilista</label>
+                <select required value={formData.stylist_id} onChange={e => setFormData({...formData, stylist_id: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm">
                   <option value="">Seleccionar estilista</option>
                   {Array.isArray(stylists) && stylists.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Servicio</label>
-                <input type="text" required placeholder="Ej: Corte" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Servicio</label>
+                <input type="text" required placeholder="Ej: Corte" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Fecha</label>
-                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Fecha</label>
+                  <input type="date" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Hora</label>
-                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Hora</label>
+                  <input type="time" required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Precio (€)</label>
-                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Precio (€)</label>
+                <input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
 
-              <button type="submit" className="w-full py-3.5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:shadow-lg hover:shadow-amber-500/10 text-white rounded-xl font-bold text-sm transition-all border border-amber-500/20 active:scale-[0.985] flex items-center justify-center space-x-2">
-                <span>{editingAppointment ? 'Actualizar Cita' : 'Crear Cita'}</span>
+              <button type="submit" className="btn-premium primary-btn w-full py-3 mt-4 ripple-host">
+                {editingAppointment ? 'Actualizar' : 'Crear Cita'}
               </button>
             </form>
           </div>

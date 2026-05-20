@@ -253,29 +253,27 @@ export default function ClientList({ fullView = false, onViewAll, searchQuery = 
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="app-card rounded-t-[32px] sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto animate-fade-float-in border-t border-slate-200/50 dark:border-amber-500/10">
+          <div className="app-card rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-fade-float-in">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-slate-850 dark:text-slate-100">{editingClient ? 'Editar Cliente' : 'Añadir Cliente'}</h3>
-              <button onClick={() => { setIsModalOpen(false); setEditingClient(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">{editingClient ? 'Editar Cliente' : 'Añadir Cliente'}</h3>
+              <button onClick={() => { setIsModalOpen(false); setEditingClient(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Nombre</label>
-                <input type="text" required placeholder="Nombre del cliente" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-805 dark:bg-slate-800/65 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Nombre</label>
+                <input type="text" required placeholder="Nombre del cliente" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Email</label>
-                <input type="email" required placeholder="email@ejemplo.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-805 dark:bg-slate-800/65 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Email</label>
+                <input type="email" required placeholder="email@ejemplo.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider mb-2">Teléfono</label>
-                <input type="text" placeholder="+34 600 000 000" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-805 dark:bg-slate-800/65 border border-slate-200/50 dark:border-slate-700/80 rounded-xl text-slate-800 dark:text-slate-200 text-sm focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 outline-none transition-all" />
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Teléfono</label>
+                <input type="text" placeholder="+34 600 000 000" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm" />
               </div>
-              <button type="submit" className="w-full py-3.5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:shadow-lg hover:shadow-amber-500/10 text-white rounded-xl font-bold text-sm transition-all border border-amber-500/20 active:scale-[0.985] flex items-center justify-center space-x-2">
-                <span>Guardar Cliente</span>
-              </button>
+              <button type="submit" className="btn-premium primary-btn w-full py-3 mt-4 ripple-host">Guardar</button>
             </form>
           </div>
         </div>

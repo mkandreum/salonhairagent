@@ -30,7 +30,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
       .finally(() => setLoading(false))
   }, [timeRange])
 
-  if (!data || loading) return <div className="h-96 animate-pulse app-card rounded-3xl" />
+  if (!data || loading) return <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
 
   const { revenueData = [], serviceData = [], totalRevenue = 0, totalAppointments = 0,
           revenueChangePct = 0, apptsChangePct = 0 } = data
@@ -39,8 +39,8 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
     <div className="app-card p-4 sm:p-6 animate-fade-float-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 dark:bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-            <BarChart3 className="w-6 h-6 text-amber-500" />
+          <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+            <BarChart3 className="w-6 h-6 text-indigo-600" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">Análisis de Negocio</h2>
@@ -50,7 +50,7 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
-          className="input-premium py-2 px-4 text-xs font-bold w-40 bg-slate-50 dark:bg-slate-900/60"
+          className="input-premium py-2 px-4 text-xs font-bold w-40"
         >
           <option>Últimos 7 días</option>
           <option>Últimos 30 días</option>
@@ -67,34 +67,32 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
               <LineChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderRadius: '16px', border: '1px solid rgba(201, 162, 39, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                  itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
-                <Line type="monotone" dataKey="revenue" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, fill: '#d4af37', strokeWidth: 2, stroke: '#151b2d' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={3} dot={{ r: 4, fill: '#6366f1', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex items-center justify-between mt-6 p-4 bg-slate-100/50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/40 dark:border-slate-800/80">
+          <div className="flex items-center justify-between mt-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-450 font-bold uppercase tracking-widest">Total Ingresos</p>
-              <p className="text-2xl font-extrabold text-slate-800 dark:text-white">€{(totalRevenue || 0).toLocaleString()}</p>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Total Ingresos</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white">€{(totalRevenue || 0).toLocaleString()}</p>
               <div className={`flex items-center text-xs font-bold mt-1 ${revenueChangePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                 {revenueChangePct >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
                 <span>{revenueChangePct >= 0 ? '+' : ''}{revenueChangePct}% vs período anterior</span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-slate-500 dark:text-slate-450 font-bold uppercase tracking-widest">Citas Totales</p>
-              <p className="text-2xl font-extrabold text-slate-800 dark:text-white">{(totalAppointments || 0).toLocaleString()}</p>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Citas Totales</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white">{(totalAppointments || 0).toLocaleString()}</p>
               <div className={`flex items-center text-xs font-bold mt-1 justify-end ${apptsChangePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                 {apptsChangePct >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
                 <span>{apptsChangePct >= 0 ? '+' : ''}{apptsChangePct}% vs período anterior</span>
@@ -107,18 +105,16 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={serviceData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} width={80} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 600}} width={80} />
                 <Tooltip
-                  cursor={{fill: 'rgba(255, 255, 255, 0.03)'}}
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderRadius: '16px', border: '1px solid rgba(201, 162, 39, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                  itemStyle={{ color: '#fff' }}
-                  labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                  cursor={{fill: '#f8fafc'}}
+                  contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                   {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#d4af37'} />
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>
@@ -126,15 +122,15 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           </div>
           <div className="mt-6 space-y-3">
             {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any) => (
-              <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 rounded-xl transition-colors">
+              <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors">
                 <div className="flex items-center space-x-3">
-                  <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: service.color || '#d4af37' }} />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-350">{service.name}</span>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: service.color }} />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{service.name}</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-sm font-bold text-slate-800 dark:text-white">{service.value}%</span>
-                  <div className="w-24 bg-slate-200 dark:bg-slate-900 rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color || '#d4af37' }} />
+                  <div className="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color }} />
                   </div>
                 </div>
               </div>
@@ -144,13 +140,12 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
       </div>
 
       {!fullView && (
-        <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-slate-800 text-center">
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
           <button
             onClick={onViewAll}
-            className="text-amber-600 dark:text-amber-400 hover:text-amber-500 font-bold text-sm transition-colors flex items-center justify-center mx-auto space-x-1"
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
           >
-            <span>Ver informes detallados</span>
-            <span>→</span>
+            Ver informes detallados →
           </button>
         </div>
       )}

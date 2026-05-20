@@ -46,7 +46,3 @@ pids
 # SQLite databases (auto-generated at runtime)
 *.db
 data/
-
-# Next.js build outputs
-.next/
-out/

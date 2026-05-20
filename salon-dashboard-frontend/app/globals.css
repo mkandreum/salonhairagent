@@ -6,8 +6,8 @@
 
 :root {
   --foreground-rgb: 30, 41, 59;
-  --background-start-rgb: 252, 252, 253;
-  --background-end-rgb: 247, 248, 250;
+  --background-start-rgb: 250, 250, 250;
+  --background-end-rgb: 245, 245, 247;
 
   --primary: #1e3a5f;
   --primary-hover: #0f2847;
@@ -25,9 +25,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 241, 245, 249;
-    --background-start-rgb: 8, 11, 18;
-    --background-end-rgb: 13, 17, 28;
+    --foreground-rgb: 226, 232, 240;
+    --background-start-rgb: 10, 10, 15;
+    --background-end-rgb: 15, 15, 20;
     --primary: #1e3a5f;
     --accent: #d4af37;
   }
@@ -36,13 +36,12 @@
 body {
   color: rgb(var(--foreground-rgb));
   background:
-    radial-gradient(circle at top right, rgba(201, 162, 39, 0.04), transparent 45%),
-    radial-gradient(circle at bottom left, rgba(30, 58, 95, 0.05), transparent 45%),
-    linear-gradient(180deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
+    linear-gradient(135deg, rgba(201, 162, 39, 0.03) 0%, transparent 50%),
+    linear-gradient(135deg, transparent 50%, rgba(30, 58, 95, 0.05) 100%),
+    rgb(var(--background-start-rgb));
   font-family: 'Plus Jakarta Sans', sans-serif;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -52,8 +51,8 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.012;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
   pointer-events: none;
   z-index: 1;
 }
@@ -390,69 +389,6 @@ body::before {
 
 .interactive-tile:active {
   transform: translateY(0) scale(0.99);
-}
-
-/* ─── Premium Luxury & Bottom Sheet Styles ─────────────────── */
-
-.lux-glow {
-  box-shadow: 0 0 40px rgba(201, 162, 39, 0.15), 0 0 80px rgba(201, 162, 39, 0.05);
-}
-
-.premium-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.1) 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmer-sweep 2.5s infinite;
-}
-
-@keyframes shimmer-sweep {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.bottom-sheet-backdrop {
-  background-color: rgba(9, 13, 22, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 90;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.bottom-sheet-content {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #ffffff 100%);
-  border-top-left-radius: 32px;
-  border-top-right-radius: 32px;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(201, 162, 39, 0.05);
-  transform: translateY(100%);
-  transition: transform 0.38s cubic-bezier(0.32, 0.94, 0.6, 1);
-  z-index: 100;
-}
-
-.dark .bottom-sheet-content {
-  background: linear-gradient(180deg, rgba(20, 27, 45, 0.98) 0%, #0a0d16 100%);
-  border-top: 1px solid rgba(201, 162, 39, 0.15);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.bottom-sheet-open .bottom-sheet-content {
-  transform: translateY(0);
 }
 
 /* ─── iOS Pill Navigation ─────────────────────────────────── */

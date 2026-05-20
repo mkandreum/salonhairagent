@@ -40,7 +40,6 @@ services:
         condition: service_healthy
     networks:
       - salon-network
-      - coolify
     expose:
       - "3000"
     labels:
@@ -53,6 +52,3 @@ volumes:
 networks:
   salon-network:
     driver: bridge
-  coolify:
-    name: coolify
-    external: true
