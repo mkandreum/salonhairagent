@@ -106,7 +106,10 @@ async function initDB() {
       tokens TEXT
     )`);
     try {
-      await client.query(`ALTER TABLE appointments ADD COLUMN event_id TEXT`);
+      const colCheck = await client.query("SELECT column_name FROM information_schema.columns WHERE table_name='appointments' AND column_name='event_id'");
+      if (colCheck.rows.length === 0) {
+        await client.query(`ALTER TABLE appointments ADD COLUMN event_id TEXT`);
+      }
     } catch (e) { /* column may already exist */ }
     console.log('Tablas de base de datos inicializadas.');
   } finally {
@@ -595,14 +598,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.set('query parser', 'simple');
-
-app.use((req, res, next) => {
-  res.timeout(60000, () => {
-    console.warn(`Timeout en ${req.method} ${req.path}`);
-    res.status(504).json({ error: 'El servidor tardó demasiado en responder.' });
-  });
-  next();
-});
 
 // ── AUTHENTICATION ────────────────────────────────────────
 app.post('/api/login', async (req, res) => {
