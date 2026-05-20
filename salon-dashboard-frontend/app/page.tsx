@@ -374,7 +374,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080608] flex transition-colors duration-300 relative overflow-hidden">
+    <div className="min-h-screen bg-[#080608] flex transition-colors duration-300">
 
       <div className="hidden lg:block lg:w-72 lg:flex-shrink-0">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
