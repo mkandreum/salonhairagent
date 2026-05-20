@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Bell, CheckCircle, AlertCircle, Info, X, Trash2, CheckCheck } from 'lucide-react'
 import { fetchNotifications, markNotificationRead, deleteNotification as apiDeleteNotification } from '@/lib/api'
 
@@ -13,10 +13,26 @@ interface Notification {
   read: boolean
 }
 
-export default function NotificationsPanel() {
+interface NotificationsPanelProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [isOpen, setIsOpen] = useState(false)
   const [hasLoaded, setHasLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleClick = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [isOpen, onClose])
 
   useEffect(() => {
     const loadNotifications = () => {
@@ -75,21 +91,9 @@ export default function NotificationsPanel() {
   const unreadCount = notifications.filter((n: any) => !n.read).length
 
   return (
-    <div className="fixed bottom-20 lg:bottom-8 right-4 lg:right-8 z-50" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative w-12 h-12 md:w-14 md:h-14 app-card border border-amber-500/10 flex items-center justify-center hover:scale-105 transition-all active:scale-95 ripple-host shadow-2xl"
-      >
-        <Bell className="w-5 h-5 md:w-6 md:h-6 text-slate-600 dark:text-slate-400" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-amber-500 text-white text-[10px] font-bold rounded-lg flex items-center justify-center border-2 border-white dark:border-slate-900 anim-glow-pulse">
-            {unreadCount}
-          </span>
-        )}
-      </button>
-
+    <>
       {isOpen && (
-        <div className="absolute bottom-16 md:bottom-20 right-0 w-[calc(100vw-32px)] md:w-[400px] app-card border border-amber-500/20 backdrop-blur-xl rounded-2xl overflow-hidden max-h-[70vh] flex flex-col shadow-2xl animate-fade-float-in">
+        <div ref={panelRef} className="fixed top-20 right-4 z-[100] w-[calc(100vw-32px)] md:w-[400px] app-card border border-amber-500/20 rounded-2xl overflow-hidden max-h-[70vh] flex flex-col shadow-2xl animate-fade-float-in">
           <div className="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/10 flex items-center justify-center border border-amber-500/10">
@@ -106,7 +110,7 @@ export default function NotificationsPanel() {
                   <CheckCheck className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               )}
-              <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-slate-100/10 dark:hover:bg-slate-850/50 rounded-lg transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-slate-100/10 dark:hover:bg-slate-850/50 rounded-lg transition-colors">
                 <X className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
               </button>
             </div>
@@ -162,6 +166,6 @@ export default function NotificationsPanel() {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

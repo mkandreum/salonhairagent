@@ -8,9 +8,10 @@ interface HeaderProps {
   onLogout: () => void
   onTabChange: (tab: string) => void
   onSearch: (query: string) => void
+  onNotifToggle: () => void
 }
 
-export default function Header({ user, onLogout, onTabChange, onSearch }: HeaderProps) {
+export default function Header({ user, onLogout, onTabChange, onSearch, onNotifToggle }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
@@ -35,12 +36,11 @@ export default function Header({ user, onLogout, onTabChange, onSearch }: Header
       <div className="flex items-center space-x-2 sm:space-x-5">
         <div className="flex items-center space-x-1 sm:space-x-2">
           <button 
-            onClick={() => onTabChange('notifications')}
+            onClick={onNotifToggle}
             className="p-2 sm:p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative"
             title="Notificaciones"
           >
             <Bell className="w-4.5 h-4.5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-amber-500 rounded-full border-2 border-white dark:border-[#080b11] animate-pulse" />
           </button>
           <button 
             onClick={() => onTabChange('settings')}
