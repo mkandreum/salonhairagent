@@ -19,9 +19,9 @@
   --text-tertiary: rgba(255, 255, 255, 0.35);
   --text-disabled: rgba(255, 255, 255, 0.15);
 
-  --accent: #8B5CF6;
-  --accent-subtle: rgba(139, 92, 246, 0.12);
-  --accent-hover: #A78BFA;
+  --accent: #C9A227;
+  --accent-subtle: rgba(201, 162, 39, 0.12);
+  --accent-hover: #B8941F;
 
   --success: #22C55E;
   --warning: #F59E0B;
@@ -283,8 +283,8 @@ body::before {
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0px rgba(139, 92, 246, 0); }
-  50%       { box-shadow: 0 0 18px rgba(139, 92, 246, 0.55), 0 0 36px rgba(139, 92, 246, 0.22); }
+   0%, 100% { box-shadow: 0 0 0px rgba(201, 162, 39, 0); }
+   50%       { box-shadow: 0 0 18px rgba(201, 162, 39, 0.55), 0 0 36px rgba(201, 162, 39, 0.22); }
 }
 
 @keyframes liquid-shift {
@@ -353,9 +353,9 @@ body::before {
 
 .anim-shimmer {
   background: linear-gradient(90deg,
-    rgba(139, 92, 246, 0.15) 25%,
-    rgba(139, 92, 246, 0.08) 50%,
-    rgba(139, 92, 246, 0.15) 75%);
+    rgba(201, 162, 39, 0.15) 25%,
+    rgba(201, 162, 39, 0.08) 50%,
+    rgba(201, 162, 39, 0.15) 75%);
   background-size: 400% 100%;
   animation: shimmer 1.5s linear infinite;
 }
@@ -370,7 +370,7 @@ body::before {
   position: absolute;
   inset: 50% 50%;
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.28);
+  background: rgba(201, 162, 39, 0.28);
   pointer-events: none;
   transform: scale(0);
   opacity: 0;
@@ -425,7 +425,7 @@ body::before {
   content: '';
   position: absolute;
   inset: -40%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 58%);
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.2) 0%, transparent 58%);
   transform: scale(0.82);
   opacity: 0;
   transition: opacity 320ms ease-out, transform 320ms ease-out;
@@ -448,7 +448,7 @@ body::before {
 
 .interactive-tile:hover {
   transform: translateY(-2px);
-  border-color: rgba(139, 92, 246, 0.48);
+  border-color: rgba(201, 162, 39, 0.48);
 }
 
 .interactive-tile:active {
@@ -569,7 +569,7 @@ body::before {
   height: 5px;
   border-radius: 9999px;
   background: var(--accent);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6), 0 0 16px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.6), 0 0 16px rgba(201, 162, 39, 0.25);
   z-index: 2;
 }
 
