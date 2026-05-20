@@ -112,11 +112,11 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
     }
   }
 
-  if (loading) return <div className="glass-card p-8 animate-pulse h-[400px]" />
+  if (loading) return <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800 animate-pulse h-[300px] sm:h-[400px]" />
 
   return (
-    <div className="glass-card p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
             <Scissors className="w-6 h-6 text-indigo-600" />
@@ -136,8 +136,8 @@ export default function StylistSchedule({ fullView = false, onViewAll, onTabChan
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="glass-card p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingStylist ? 'Editar Estilista' : 'Añadir Estilista'}</h3>
               <button onClick={() => { setIsModalOpen(false); setEditingStylist(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">

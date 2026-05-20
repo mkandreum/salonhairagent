@@ -183,6 +183,10 @@ export async function fetchSettings() {
   return apiFetch('/settings');
 }
 
+export async function fetchMe() {
+  return apiFetch('/me');
+}
+
 export async function saveSettings(settings: any) {
   return apiFetch('/settings', {
     method: 'POST',
