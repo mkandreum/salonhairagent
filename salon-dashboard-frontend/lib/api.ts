@@ -21,7 +21,7 @@ function getAuthHeader(): Record<string, string> {
 
 async function apiFetch(path: string, options: RequestInit = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timeout = setTimeout(() => controller.abort(), 45000);
 
   try {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -41,9 +41,23 @@ async function apiFetch(path: string, options: RequestInit = {}) {
         errMsg = data.error || errMsg;
       } catch {}
       if (res.status === 401 || res.status === 403) {
-        try { localStorage.removeItem('salon_pro_token'); } catch {}
+        try { localStorage.removeItem('salon_pro_token') } catch {}
         if (typeof window !== 'undefined') window.location.reload();
       }
+      if (res.status === 504) {
+        throw new Error('El servidor tardó demasiado. Intenta de nuevo.');
+      }
+      throw new Error(errMsg);
+    }
+    return res.json();
+  } catch (err: any) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      throw new Error('La petición tardó demasiado. Verifica tu conexión.');
+    }
+    throw err;
+  }
+}
       if (res.status === 504) {
         throw new Error('El servidor tardó demasiado. Intenta de nuevo.');
       }

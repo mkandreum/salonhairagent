@@ -23,12 +23,11 @@ export default function NotificationsPanel() {
       fetchNotifications().then((data: any) => {
         setNotifications(Array.isArray(data) ? data : [])
         setHasLoaded(true)
-      }).catch(console.error)
+      }).catch(() => { setHasLoaded(true) })
     }
 
     loadNotifications()
-
-    const interval = setInterval(loadNotifications, 10000)
+    const interval = setInterval(loadNotifications, 15000)
 
     return () => clearInterval(interval)
   }, [])
