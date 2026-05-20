@@ -9,7 +9,6 @@ import ClientList from '@/components/ClientList'
 import StylistSchedule from '@/components/StylistSchedule'
 import AnalyticsDashboard from '@/components/AnalyticsDashboard'
 import TriageView from '@/components/TriageView'
-import NotificationsPanel from '@/components/NotificationsPanel'
 import Login from '@/components/Login'
 import { fetchSettings, saveSettings, fetchMe } from '@/lib/api'
 import { Eye, EyeOff, Save, Building2, Phone, MapPin, Mail, Key, MessageSquare, Bot, Megaphone, Copy, CheckCircle, Home as HomeIcon, Calendar, Users, BarChart3, Bell, Settings, MoreHorizontal, X } from 'lucide-react'
@@ -50,7 +49,7 @@ const menuItems = [
   { id: 'stylists', label: 'Estilistas', icon: Users },
   { id: 'analytics', label: 'Stats', icon: BarChart3 },
   { id: 'triage', label: 'IA', icon: Bot },
-  { id: 'notifications', label: 'Alertas', icon: Bell },
+
   { id: 'settings', label: 'Ajustes', icon: Settings },
 ]
 
@@ -352,7 +351,7 @@ export default function Home() {
             </div>
           </div>
         )
-      case 'notifications': return <NotificationsPanel />
+      case 'notifications': return <DashboardStats />
       case 'settings': return renderSettings()
       default: return <DashboardStats />
     }
@@ -437,7 +436,6 @@ export default function Home() {
               {[
                 { id: 'stylists', label: 'Estilistas', icon: Users, desc: 'Equipo y horarios' },
                 { id: 'analytics', label: 'Análisis & IA', icon: BarChart3, desc: 'Métricas e informes IA' },
-                { id: 'notifications', label: 'Notificaciones', icon: Bell, desc: 'Alertas del sistema' },
                 { id: 'settings', label: 'Ajustes', icon: Settings, desc: 'Configuración general' }
               ].map((item) => {
                 const Icon = item.icon
@@ -449,7 +447,7 @@ export default function Home() {
                       setActiveTab(item.id)
                       setIsMoreOpen(false)
                     }}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
+                    className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
                       isActive 
                         ? 'bg-slate-100 dark:bg-slate-800 border-amber-500/30 text-amber-500 shadow-sm' 
                         : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
@@ -471,7 +469,7 @@ export default function Home() {
                 setIsMoreOpen(false)
                 handleLogout()
               }}
-              className="w-full py-4 bg-rose-500/10 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-500 rounded-2xl font-bold text-sm transition-all flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-rose-500/10 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-500 rounded-2xl font-bold text-sm transition-all duration-200 flex items-center justify-center space-x-2"
             >
               <span>Cerrar Sesión</span>
             </button>
@@ -515,7 +513,6 @@ export default function Home() {
         </div>
       </div>
 
-      <NotificationsPanel />
     </div>
   )
 }

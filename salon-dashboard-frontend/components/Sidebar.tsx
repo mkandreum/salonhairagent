@@ -6,11 +6,9 @@ import {
   Users, 
   Scissors, 
   BarChart3, 
-  Bell, 
   Settings,
   LogOut,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react'
 
 
@@ -27,7 +25,6 @@ const menuItems = [
   { id: 'clients', label: 'Clientes', icon: Users },
   { id: 'stylists', label: 'Estilistas', icon: Scissors },
   { id: 'analytics', label: 'Análisis & IA', icon: BarChart3 },
-  { id: 'notifications', label: 'Notificaciones', icon: Bell },
   { id: 'settings', label: 'Ajustes', icon: Settings },
 ]
 
@@ -39,7 +36,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
         <div className="p-8">
           <div className="flex items-center space-x-4 group cursor-pointer">
             <div className="w-12 h-12 bg-gradient-to-br from-slate-850 to-slate-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <Scissors className="w-5.5 h-5.5 text-amber-400" />
+              <Scissors className="w-6 h-6 text-amber-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-amber-400 to-amber-250 tracking-tight font-sans">
@@ -63,7 +60,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: SidebarPro
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-sm ${
                   isActive 
                     ? 'bg-slate-900/60 text-amber-450 font-semibold shadow-sm border-l-2 border-amber-500' 
-                    : 'text-slate-400 hover:bg-slate-900/30 hover:text-slate-205'
+                    : 'text-slate-400 hover:bg-slate-900/30 hover:text-slate-200'
                 }`}
               >
                 <div className={`p-2 rounded-xl transition-colors ${isActive ? 'bg-slate-850 text-amber-400 border border-amber-500/10' : 'bg-slate-900/30'}`}>
