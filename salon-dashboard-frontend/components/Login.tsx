@@ -65,10 +65,10 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100 dark:bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-black">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-slate-800 dark:bg-slate-700 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-6">
+          <div className="w-16 h-16 bg-slate-950 dark:bg-zinc-950 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-6">
             <Scissors className="w-8 h-8 text-amber-400" />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">

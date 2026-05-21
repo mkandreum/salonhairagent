@@ -175,8 +175,8 @@ export default function Home() {
   }
 
   if (checkingAuth) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950">
-      <div className="w-8 h-8 border-4 border-slate-300 dark:border-slate-700 border-t-slate-800 rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-black">
+      <div className="w-8 h-8 border-4 border-slate-200 dark:border-zinc-800 border-t-amber-500 rounded-full animate-spin" />
     </div>
   )
 
@@ -314,7 +314,7 @@ export default function Home() {
       case 'stylists': return <StylistSchedule searchQuery={searchQuery} fullView onTabChange={setActiveTab} />
       case 'analytics': return <AnalyticsDashboard fullView />
       case 'triage': return <TriageView />
-      case 'notifications': return <NotificationsPanel />
+      case 'notifications': return <NotificationsPanel fullPage />
       case 'settings': return renderSettings()
       default: return <DashboardStats />
     }
@@ -335,11 +335,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex relative overflow-hidden">
-      {/* Background glowing mesh orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-950/10 dark:to-purple-950/10 rounded-full blur-[120px] pointer-events-none animate-blob" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-gradient-to-br from-amber-500/5 to-rose-500/5 dark:from-amber-950/10 dark:to-rose-950/10 rounded-full blur-[120px] pointer-events-none animate-blob animation-delay-2000" />
-
+    <div className="min-h-screen bg-slate-50 dark:bg-black flex relative overflow-hidden">
       <div className="hidden lg:block lg:w-72 lg:flex-shrink-0 z-10">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
       </div>
@@ -394,7 +390,6 @@ export default function Home() {
         </div>
       </div>
 
-      <NotificationsPanel />
     </div>
   )
 }

@@ -39,8 +39,8 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
     <div className="app-card p-4 sm:p-6 animate-fade-float-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-indigo-600" />
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+            <BarChart3 className="w-6 h-6 text-amber-500" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">Análisis de Negocio</h2>
@@ -65,19 +65,13 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ backgroundColor: '#0a0a0c', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)', color: '#fff' }}
                 />
-                <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={3} dot={{ r: 4, fill: '#6366f1', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="revenue" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, fill: '#d4af37', strokeWidth: 2, stroke: '#d4af37' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -105,45 +99,50 @@ export default function AnalyticsDashboard({ fullView = false, onViewAll }: Anal
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={serviceData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                 <XAxis type="number" hide />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 600}} width={80} />
                 <Tooltip
-                  cursor={{fill: '#f8fafc'}}
-                  contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  cursor={{fill: '#0a0a0c'}}
+                  contentStyle={{ backgroundColor: '#0a0a0c', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)', color: '#fff' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                  {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+                  {Array.isArray(serviceData) && serviceData.map((entry: any, index: number) => {
+                    const LUXURY_PALETTE = ['#d4af37', '#b87333', '#cd7f32', '#475569', '#e5e4e2'];
+                    return <Cell key={`cell-${index}`} fill={LUXURY_PALETTE[index % LUXURY_PALETTE.length]} />;
+                  })}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
           <div className="mt-6 space-y-3">
-            {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any) => (
-              <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: service.color }} />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{service.name}</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm font-bold text-slate-800 dark:text-white">{service.value}%</span>
-                  <div className="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: service.color }} />
+            {Array.isArray(serviceData) && serviceData.slice(0, 3).map((service: any, index: number) => {
+              const LUXURY_PALETTE = ['#d4af37', '#b87333', '#cd7f32', '#475569', '#e5e4e2'];
+              const itemColor = LUXURY_PALETTE[index % LUXURY_PALETTE.length];
+              return (
+                <div key={service.name} className="flex items-center justify-between p-2 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: itemColor }} />
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{service.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm font-bold text-slate-800 dark:text-white">{service.value}%</span>
+                    <div className="w-24 bg-slate-100 dark:bg-slate-850 rounded-full h-1.5 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${service.value}%`, backgroundColor: itemColor }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
       {!fullView && (
-        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-900 text-center">
           <button
             onClick={onViewAll}
-            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold text-sm transition-colors"
+            className="text-amber-500 hover:text-amber-600 font-bold text-sm transition-colors"
           >
             Ver informes detallados →
           </button>

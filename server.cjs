@@ -1225,7 +1225,7 @@ app.get('/api/analytics', authenticateToken, async (req, res) => {
       pool.query('SELECT COALESCE(SUM(price),0) as total FROM appointments WHERE date<$1 AND date>=$2',[startStr,new Date(startDate-(now-startDate)).toISOString().split('T')[0]]),
       pool.query('SELECT COUNT(*) as count FROM appointments WHERE date<$1 AND date>=$2',[startStr,new Date(startDate-(now-startDate)).toISOString().split('T')[0]]),
     ]);
-    const colors=['#6366f1','#ec4899','#10b981','#f59e0b','#8b5cf6'];
+    const colors=['#d4af37','#b87333','#cd7f32','#475569','#e5e4e2'];
     const tot=parseInt(tApp.rows[0].count)||1;
     const thisRev=parseFloat(tRev.rows[0].total)||0;
     const prevRev=parseFloat(pRev.rows[0].total)||0;

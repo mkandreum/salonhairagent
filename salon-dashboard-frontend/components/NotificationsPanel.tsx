@@ -13,9 +13,9 @@ interface Notification {
   read: boolean
 }
 
-export default function NotificationsPanel() {
+export default function NotificationsPanel({ fullPage = false }: { fullPage?: boolean }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(fullPage)
   const [hasLoaded, setHasLoaded] = useState(false)
 
   useEffect(() => {
@@ -73,6 +73,93 @@ export default function NotificationsPanel() {
   }
 
   const unreadCount = notifications.filter((n: any) => !n.read).length
+
+  if (fullPage) {
+    return (
+      <div className="app-card overflow-hidden flex flex-col animate-fade-float-in w-full">
+        <div className="p-4 md:p-6 border-b border-slate-100 dark:border-slate-900 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Bell className="w-5 h-5 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800 dark:text-white">Notificaciones</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{unreadCount} nuevas</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            {unreadCount > 0 && (
+              <button 
+                onClick={markAllAsRead} 
+                className="btn-dark py-1.5 px-3 text-xs flex items-center space-x-1.5 rounded-lg border border-slate-200 dark:border-zinc-800"
+                title="Marcar todas como leídas"
+              >
+                <CheckCheck className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                <span className="hidden sm:inline font-bold">Marcar todo leído</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-zinc-900">
+          {!hasLoaded ? (
+            <div className="p-12 text-center">
+              <div className="w-8 h-8 border-2 border-slate-300 dark:border-slate-700 border-t-amber-500 rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold">Cargando notificaciones...</p>
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-900/50 flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-bold">No tienes notificaciones pendientes</p>
+            </div>
+          ) : (
+            notifications.map((notification: any) => (
+              <div
+                key={notification.id}
+                className={`p-5 hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-all relative ${!notification.read ? 'bg-slate-50/30 dark:bg-zinc-900/10' : ''}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start space-x-3.5 flex-1 min-w-0">
+                    <div className="mt-0.5 flex-shrink-0">
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-bold text-slate-800 dark:text-white text-sm truncate">{notification.title}</h4>
+                        {!notification.read && <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 animate-pulse" />}
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{notification.message}</p>
+                      <p className="text-[10px] text-slate-400 mt-2 font-medium">{notification.time}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    {!notification.read && (
+                      <button 
+                        onClick={() => markAsRead(notification.id)} 
+                        className="p-2 bg-slate-100 dark:bg-zinc-900 rounded-lg hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-all border border-transparent dark:hover:border-emerald-500/20" 
+                        title="Marcar como leída"
+                      >
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => deleteNotification(notification.id)} 
+                      className="p-2 bg-slate-100 dark:bg-zinc-900 rounded-lg hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-all border border-transparent dark:hover:border-red-500/20" 
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed bottom-20 lg:bottom-8 right-4 lg:right-8 z-50" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
