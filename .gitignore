@@ -12,6 +12,8 @@ coverage/
 /build
 .out
 .next/
+out/
+/salon-dashboard-frontend/out/
 
 # Environment variables
 .env
