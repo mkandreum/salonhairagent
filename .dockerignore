@@ -1,0 +1,35 @@
+# VCS and editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Runtime-irrelevant docs and notes
+_default
+docs
+job_descriptions
+memory
+tasks
+*.md
+
+# Root node_modules (backend deps se instalan en el Dockerfile)
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# Frontend node_modules (se instalan en la build del Dockerfile)
+salon-dashboard-frontend/node_modules
+salon-dashboard-frontend/.next
+
+# Python local artifacts
+**/__pycache__
+**/*.pyc
+.venv
+venv
+
+# Misc
+.env
+.env.*
+*.log
+.DS_Store
+pgdata

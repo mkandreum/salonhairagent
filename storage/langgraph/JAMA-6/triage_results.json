@@ -1,0 +1,23 @@
+[
+  {
+    "ticket_id": "T1",
+    "category": "auth",
+    "priority": "high",
+    "route": "tier1",
+    "subject": "Urgent: Cannot login to account"
+  },
+  {
+    "ticket_id": "T2",
+    "category": "feature",
+    "priority": "low",
+    "route": "tier2",
+    "subject": "Feature request: Add dark mode"
+  },
+  {
+    "ticket_id": "T3",
+    "category": "bug",
+    "priority": "medium",
+    "route": "tier2",
+    "subject": "Bug: App crashes on file upload"
+  }
+]

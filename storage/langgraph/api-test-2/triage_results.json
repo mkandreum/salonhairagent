@@ -1,0 +1,23 @@
+[
+  {
+    "ticket_id": "BATCH-1",
+    "category": "auth",
+    "priority": "medium",
+    "route": "tier2",
+    "subject": "Login issue"
+  },
+  {
+    "ticket_id": "BATCH-2",
+    "category": "bug",
+    "priority": "medium",
+    "route": "tier2",
+    "subject": "App crashes on startup"
+  },
+  {
+    "ticket_id": "BATCH-3",
+    "category": "feature",
+    "priority": "low",
+    "route": "tier2",
+    "subject": "Request for export feature"
+  }
+]

@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules
+.next
+out
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# VCS and editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Local env files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Docs not needed for image build
+README.md

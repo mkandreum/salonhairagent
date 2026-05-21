@@ -1,0 +1,25 @@
+{
+  "name": "salon-hair-backend",
+  "version": "1.0.0",
+  "description": "Backend API para Salon Hair Agent",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "nodemon server.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^4.21.2",
+    "googleapis": "^140.0.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.13.3",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
